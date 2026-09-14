@@ -17,6 +17,131 @@ type Voz = {
 }
 
 function App() {
+    const [acessoLiberado, setAcessoLiberado] = useState(() => {
+    return sessionStorage.getItem('fabrica_acesso') === 'liberado'
+  })
+
+  const [senhaAcesso, setSenhaAcesso] = useState('')
+  const [erroAcesso, setErroAcesso] = useState('')
+
+  const entrarNaFabrica = () => {
+    if (senhaAcesso === 'fabrica@1985') {
+      sessionStorage.setItem('fabrica_acesso', 'liberado')
+      setAcessoLiberado(true)
+      setErroAcesso('')
+      return
+    }
+
+    setErroAcesso('Senha incorreta.')
+    setSenhaAcesso('')
+  }
+
+  if (!acessoLiberado) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          boxSizing: 'border-box',
+          background: '#090909',
+          color: '#fff'
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '420px',
+            padding: '35px',
+            boxSizing: 'border-box',
+            borderRadius: '20px',
+            background: '#151515',
+            textAlign: 'center',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+          }}
+        >
+          <img
+            src={logoFabrica}
+            alt="Fábrica da Voz"
+            style={{
+              width: '180px',
+              maxWidth: '80%',
+              marginBottom: '25px'
+            }}
+          />
+
+          <h2 style={{ marginBottom: '8px' }}>
+            🔒 Acesso restrito
+          </h2>
+
+          <p
+            style={{
+              opacity: 0.7,
+              marginBottom: '25px'
+            }}
+          >
+            Digite a senha para entrar na Fábrica da Voz.
+          </p>
+
+          <input
+            type="password"
+            value={senhaAcesso}
+            placeholder="Digite sua senha"
+            onChange={(e) => {
+              setSenhaAcesso(e.target.value)
+              setErroAcesso('')
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                entrarNaFabrica()
+              }
+            }}
+            style={{
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '15px',
+              borderRadius: '10px',
+              border: '1px solid rgba(255,255,255,0.15)',
+              background: '#222',
+              color: '#fff',
+              fontSize: '16px',
+              marginBottom: '12px'
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={entrarNaFabrica}
+            style={{
+              width: '100%',
+              padding: '15px',
+              border: '0',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '16px'
+            }}
+          >
+            Entrar
+          </button>
+
+          {erroAcesso && (
+            <p
+              style={{
+                color: '#ff6b6b',
+                marginTop: '15px',
+                fontWeight: 600
+              }}
+            >
+              {erroAcesso}
+            </p>
+          )}
+        </div>
+      </div>
+    )
+  }
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState<string | null>(null)
 
