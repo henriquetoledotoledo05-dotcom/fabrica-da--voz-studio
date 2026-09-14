@@ -306,9 +306,7 @@ function App() {
       // Em produção, chama o próprio domínio que abriu a página.
       // O corpo é enviado como text/plain para evitar o preflight
       // CORS que o proxy do domínio estava redirecionando.
-      const API_URL = import.meta.env.DEV
-        ? 'http://localhost:3010'
-        : window.location.origin
+      const API_URL = window.location.origin;
 
       const payload = JSON.stringify({
         texto: textoFinal,
