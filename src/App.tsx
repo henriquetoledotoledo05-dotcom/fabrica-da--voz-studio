@@ -4,6 +4,10 @@ import './App.css'
 
 import noahLocutor from './assets/noah-locutor.png'
 import ninaLocutora from './assets/nina-locutora-1.png'
+import celsoLocutor from './assets/celso-locutor.png'
+import pedroLocutor from './assets/pedro-locutor.png'
+import luizaLocutora from './assets/luisa-locutor.png'
+import gabyLocutora from './assets/gaby-locutor.png'
 
 type Voz = {
   id: string
@@ -91,28 +95,28 @@ function App() {
     {
       id: 'rpNe0HOx7heUulPiOEaG',
       nome: 'Celso',
-      foto: '/vozes/celso.png',
+      foto: celsoLocutor,
       demonstrativo: '/vozes/celso.mp3'
     },
 
     {
       id: 'zhza6dIY7yb1xz5MKTvQ',
       nome: 'Pedro',
-      foto: '/vozes/pedro.png',
+      foto: pedroLocutor,
       demonstrativo: '/vozes/pedro.mp3'
     },
 
     {
       id: 'x8FWrDHAK5xiFTJLpnHq',
       nome: 'Luiza',
-      foto: '/vozes/luiza.png',
+      foto: luizaLocutora,
       demonstrativo: '/vozes/luiza.mp3'
     },
 
     {
       id: 'iScHbNW8K33gNo3lGgbo',
       nome: 'Gaby',
-      foto: '/vozes/gaby.png',
+      foto: gabyLocutora,
       demonstrativo: '/vozes/gaby.mp3'
     }
   ]
