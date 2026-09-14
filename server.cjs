@@ -1,1295 +1,888 @@
 const express = require("express");
 const cors = require("cors");
+const dotenv = require("dotenv");
+const ffmpegPath = require("ffmpeg-static");
+const { spawn } = require("child_process");
 const path = require("path");
-const multer = require("multer");
 const fs = require("fs");
 const os = require("os");
-const { spawn } = require("child_process");
+
+dotenv.config();
 
 const app = express();
+const PORT = Number(process.env.PORT) || 3010;
 
-/* =========================================================
-   CONFIGURAÇÃO
-========================================================= */
+app.use(cors({
+  origin: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false,
+}));
 
-const PORT = Number(process.env.PORT) || 3000;
+app.options(/.*/, cors());
 
-app.use(cors());
+app.use(express.json({ limit: "100mb" }));
+app.use(express.text({
+  type: ["text/plain", "text/plain;charset=UTF-8"],
+  limit: "100mb"
+}));
+app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 
-/*
-  A trilha enviada pelo celular/computador vira Base64.
-  Por isso precisamos permitir mais de 10 MB.
-*/
-app.use(
-  express.json({
-    limit: "60mb",
-  })
-);
-
-app.use(
-  express.urlencoded({
-    extended: true,
-    limit: "60mb",
-  })
-);
-
-/* =========================================================
-   UPLOAD
-========================================================= */
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 30 * 1024 * 1024,
-  },
-});
-
-/* =========================================================
-   CAMINHO DO FRONTEND
-========================================================= */
-
-const distPath = path.join(__dirname, "dist");
-
-/* =========================================================
-   LOG
-========================================================= */
-
-console.log("");
-console.log("==========================================");
-console.log("       FÁBRICA DA VOZ - SERVIDOR");
-console.log("==========================================");
-console.log("Porta:", PORT);
-console.log("Geração de voz: ATIVADA");
-console.log("Mixagem: ATIVADA");
-console.log("Trilha do cliente: ATIVADA");
-console.log("==========================================");
-console.log("");
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-app.get("/api/status", (req, res) => {
-  res.json({
-    nome: "Fábrica da Voz",
-    status: "online",
-    mensagem: "Servidor funcionando corretamente.",
-    voz: "ativada",
-    mixagem: "ativada",
-    trilha: "ativada",
-  });
-});
-
-/* =========================================================
-   ELEVENLABS
-========================================================= */
-
-async function gerarAudioElevenLabs({
-  texto,
-  voiceId,
-  speed,
-}) {
-  const API_KEY = process.env.ELEVENLABS_API_KEY;
-
-  if (!API_KEY) {
-    throw new Error(
-      "ELEVENLABS_API_KEY não configurada no servidor."
-    );
-  }
-
-  /*
-    O frontend usa:
-    1
-    1.25
-    1.45
-
-    A ElevenLabs aceita no máximo 1.2.
-    Então limitamos corretamente.
-  */
-
-  const velocidade =
-    Number.isFinite(Number(speed))
-      ? Math.min(Math.max(Number(speed), 0.7), 1.2)
-      : 1;
-
-  console.log("");
-  console.log("Chamando ElevenLabs...");
-  console.log("Voice ID:", voiceId);
-  console.log("Velocidade:", velocidade);
-
-  const resposta = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
-      voiceId
-    )}`,
-    {
-      method: "POST",
-
-      headers: {
-        "xi-api-key": API_KEY,
-        "Content-Type": "application/json",
-        Accept: "audio/mpeg",
-      },
-
-      body: JSON.stringify({
-        text: String(texto),
-
-        model_id: "eleven_multilingual_v2",
-
-        voice_settings: {
-          stability: 0.45,
-          similarity_boost: 0.8,
-          style: 0.35,
-          use_speaker_boost: true,
-        },
-
-        speed: velocidade,
-      }),
-    }
-  );
-
-  if (!resposta.ok) {
-    let erroTexto = "";
-
+app.use((req, res, next) => {
+  if (typeof req.body === "string") {
     try {
-      erroTexto = await resposta.text();
-    } catch {
-      erroTexto =
-        "Não foi possível ler a resposta da ElevenLabs.";
-    }
-
-    const erro = new Error(
-      `ElevenLabs HTTP ${resposta.status}: ${
-        erroTexto || "resposta sem detalhes"
-      }`
-    );
-
-    erro.statusCode = resposta.status;
-    erro.details = erroTexto;
-
-    throw erro;
+      req.body = JSON.parse(req.body);
+    } catch {}
   }
-
-  const audioArrayBuffer =
-    await resposta.arrayBuffer();
-
-  const audioBuffer =
-    Buffer.from(audioArrayBuffer);
-
-  if (!audioBuffer.length) {
-    throw new Error(
-      "A ElevenLabs retornou um áudio vazio."
-    );
-  }
-
-  console.log(
-    "Áudio recebido:",
-    Math.round(audioBuffer.length / 1024),
-    "KB"
-  );
-
-  return audioBuffer;
-}
-
-/* =========================================================
-   ENVIAR MP3
-========================================================= */
-
-function enviarMp3(res, buffer, nomeArquivo) {
-  res.setHeader(
-    "Content-Type",
-    "audio/mpeg"
-  );
-
-  res.setHeader(
-    "Content-Length",
-    buffer.length
-  );
-
-  res.setHeader(
-    "Content-Disposition",
-    `inline; filename="${nomeArquivo}"`
-  );
-
-  return res.send(buffer);
-}
-
-/* =========================================================
-   GERAR VOZ
-========================================================= */
-
-app.post("/api/gerar-voz", async (req, res) => {
-  try {
-    console.log("");
-    console.log("==========================================");
-    console.log("NOVA SOLICITAÇÃO DE VOZ");
-    console.log("==========================================");
-
-    const texto = req.body?.texto;
-    const voiceId = req.body?.voiceId;
-    const speed = req.body?.speed;
-
-    if (!texto || !String(texto).trim()) {
-      return res.status(400).json({
-        erro: "Digite um texto para gerar a voz.",
-      });
-    }
-
-    if (!voiceId || !String(voiceId).trim()) {
-      return res.status(400).json({
-        erro: "Selecione uma voz.",
-      });
-    }
-
-    console.log(
-      "Texto:",
-      String(texto).substring(0, 150)
-    );
-
-    const audioBuffer =
-      await gerarAudioElevenLabs({
-        texto,
-        voiceId,
-        speed,
-      });
-
-    return enviarMp3(
-      res,
-      audioBuffer,
-      "fabrica-da-voz.mp3"
-    );
-  } catch (erro) {
-    console.error("");
-    console.error("ERRO NA GERAÇÃO:");
-    console.error(erro);
-    console.error("");
-
-    const status =
-      Number.isInteger(erro.statusCode) &&
-      erro.statusCode >= 400 &&
-      erro.statusCode <= 599
-        ? erro.statusCode
-        : 500;
-
-    return res.status(status).json({
-      erro:
-        status === 500
-          ? "Erro interno no servidor."
-          : "A ElevenLabs recusou a geração da voz.",
-
-      detalhes:
-        erro.details ||
-        erro.message ||
-        "Erro desconhecido.",
-    });
-  }
+  next();
 });
 
-/* =========================================================
-   LOCALIZA TRILHA DA FÁBRICA
-========================================================= */
-
-function localizarTrilhaDaFabrica(
-  trilhaSelecionada
-) {
-  if (
-    !trilhaSelecionada ||
-    typeof trilhaSelecionada !== "string"
-  ) {
-    throw new Error(
-      "Nenhuma trilha da Fábrica foi selecionada."
-    );
-  }
-
-  /*
-    O App.tsx envia algo como:
-
-    /trilhas/TRILHA PARA MERCADO.mp3
-  */
-
-  let caminhoRelativo;
-
-  try {
-    caminhoRelativo =
-      decodeURIComponent(trilhaSelecionada);
-  } catch {
-    caminhoRelativo = trilhaSelecionada;
-  }
-
-  caminhoRelativo =
-    caminhoRelativo.replace(/^\/+/, "");
-
-  const caminhoCompleto =
-    path.resolve(
-      distPath,
-      caminhoRelativo
-    );
-
-  const distReal =
-    path.resolve(distPath);
-
-  /*
-    Segurança:
-    não permite acessar arquivos fora do dist.
-  */
-
-  if (
-    caminhoCompleto !== distReal &&
-    !caminhoCompleto.startsWith(
-      distReal + path.sep
-    )
-  ) {
-    throw new Error(
-      "Caminho da trilha inválido."
-    );
-  }
-
-  if (!fs.existsSync(caminhoCompleto)) {
-    throw new Error(
-      `Trilha não encontrada no servidor: ${trilhaSelecionada}`
-    );
-  }
-
-  return caminhoCompleto;
+if (!ffmpegPath) {
+  console.error("FFmpeg não encontrado.");
+  process.exit(1);
 }
 
-/* =========================================================
-   BASE64 → BUFFER
-========================================================= */
+console.log("FFmpeg:", ffmpegPath);
+
+function limparBase64(valor) {
+  if (!valor || typeof valor !== "string") return null;
+  return valor.replace(/^data:audio\/[^;]+;base64,/i, "");
+}
 
 function base64ParaBuffer(valor) {
-  if (
-    !valor ||
-    typeof valor !== "string"
-  ) {
-    throw new Error(
-      "Áudio em Base64 não informado."
-    );
+  const limpo = limparBase64(valor);
+  if (!limpo) return null;
+
+  try {
+    const buffer = Buffer.from(limpo, "base64");
+    return buffer.length ? buffer : null;
+  } catch {
+    return null;
   }
-
-  let base64 = valor;
-
-  /*
-    Caso venha assim:
-
-    data:audio/mpeg;base64,AAAA...
-  */
-
-  if (base64.includes(",")) {
-    base64 =
-      base64.substring(
-        base64.indexOf(",") + 1
-      );
-  }
-
-  base64 = base64.replace(/\s/g, "");
-
-  const buffer =
-    Buffer.from(base64, "base64");
-
-  if (!buffer.length) {
-    throw new Error(
-      "O áudio Base64 está vazio."
-    );
-  }
-
-  return buffer;
 }
 
-/* =========================================================
-   MIXAGEM COM FFMPEG
-========================================================= */
+function obterDuracao(audioPath) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(ffmpegPath, ["-hide_banner", "-i", audioPath]);
+    let stderr = "";
 
-function mixarAudio(
-  voz,
-  trilha,
-  saida,
-  segundosInicio = 5,
-  segundosFinal = 5
-) {
-  return new Promise(
-    (resolve, reject) => {
-      const ffmpeg =
-        require("ffmpeg-static");
+    proc.stderr.on("data", data => {
+      stderr += data.toString();
+    });
 
-      if (!ffmpeg) {
+    proc.on("error", reject);
+
+    proc.on("close", () => {
+      const m = stderr.match(/Duration:\s*(\d+):(\d+):([\d.]+)/);
+
+      if (!m) {
         reject(
-          new Error(
-            "FFmpeg não encontrado."
-          )
+          new Error("Não foi possível descobrir a duração do áudio.")
         );
-
         return;
       }
 
-      const inicio = Math.min(
-        60,
-        Math.max(
-          0,
-          Number(segundosInicio) || 0
+      resolve(
+        Number(m[1]) * 3600 +
+        Number(m[2]) * 60 +
+        Number(m[3])
+      );
+    });
+  });
+}
+
+function alterarVelocidade(audioBuffer, speed) {
+  return new Promise((resolve, reject) => {
+    let velocidade = Number(speed);
+
+    if (!Number.isFinite(velocidade)) velocidade = 1;
+
+    velocidade = Math.max(
+      0.5,
+      Math.min(2, velocidade)
+    );
+
+    const proc = spawn(ffmpegPath, [
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-i",
+      "pipe:0",
+      "-filter:a",
+      `atempo=${velocidade}`,
+      "-c:a",
+      "libmp3lame",
+      "-b:a",
+      "128k",
+      "-f",
+      "mp3",
+      "pipe:1"
+    ]);
+
+    const partes = [];
+    let erro = "";
+
+    proc.stdout.on("data", parte => {
+      partes.push(parte);
+    });
+
+    proc.stderr.on("data", parte => {
+      erro += parte.toString();
+    });
+
+    proc.on("error", reject);
+
+    proc.on("close", codigo => {
+      if (codigo === 0) {
+        resolve(Buffer.concat(partes));
+        return;
+      }
+
+      reject(
+        new Error(
+          erro || "Erro ao alterar a velocidade da voz."
         )
       );
+    });
 
-      const final = Math.min(
-        60,
-        Math.max(
-          0,
-          Number(segundosFinal) || 0
-        )
-      );
+    proc.stdin.end(audioBuffer);
+  });
+}
 
-      /*
-        A voz começa depois de segundosInicio.
+function executarFfmpeg(argumentos, saidaPath) {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(ffmpegPath, argumentos);
+    let erro = "";
 
-        Depois da voz:
-        apad mantém silêncio pelo tempo
-        definido em segundosFinal.
+    proc.stderr.on("data", data => {
+      erro += data.toString();
+    });
 
-        Como a música está em loop,
-        ela acompanha todo o áudio.
+    proc.on("error", reject);
 
-        Resultado:
-
-        TRILHA
-        ↓
-        segundosInicio
-        ↓
-        VOZ
-        ↓
-        segundosFinal
-        ↓
-        FIM
-      */
-
-      const atrasoMs =
-        Math.round(inicio * 1000);
-
-      console.log("");
-      console.log(
-        "=========================================="
-      );
-      console.log("INICIANDO FFMPEG");
-      console.log(
-        "Trilha antes:",
-        inicio,
-        "segundos"
-      );
-      console.log(
-        "Trilha depois:",
-        final,
-        "segundos"
-      );
-      console.log(
-        "=========================================="
-      );
-
-      const filtro =
-        `[0:a]aresample=44100,adelay=${atrasoMs}:all=1,apad=pad_dur=${final}[voice];` +
-        `[1:a]aresample=44100,volume=0.18,aloop=loop=-1:size=2e+09[music];` +
-        `[voice][music]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[out]`;
-
-      const argumentos = [
-        "-y",
-
-        "-i",
-        voz,
-
-        "-i",
-        trilha,
-
-        "-filter_complex",
-        filtro,
-
-        "-map",
-        "[out]",
-
-        "-ac",
-        "2",
-
-        "-ar",
-        "44100",
-
-        "-codec:a",
-        "libmp3lame",
-
-        "-b:a",
-        "192k",
-
-        saida,
-      ];
-
-      console.log(
-        "Executando FFmpeg..."
-      );
-
-      const processo =
-        spawn(
-          ffmpeg,
-          argumentos
+    proc.on("close", codigo => {
+      if (codigo !== 0) {
+        reject(
+          new Error(
+            erro || "FFmpeg retornou um erro."
+          )
         );
+        return;
+      }
 
-      let erroFFmpeg = "";
+      try {
+        resolve(fs.readFileSync(saidaPath));
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
 
-      processo.stderr.on(
-        "data",
-        dados => {
-          const texto =
-            dados.toString();
+function localizarTrilha(trilhaSelecionada) {
+  const nome = path.basename(
+    String(trilhaSelecionada || "")
+  );
 
-          erroFFmpeg += texto;
+  const candidatos = [
+    path.join(__dirname, "public", "trilhas", nome),
+    path.join(__dirname, "public", nome),
+    path.join(__dirname, "dist", "trilhas", nome),
+    path.join(__dirname, "dist", nome)
+  ];
 
-          /*
-            Mostra no log somente uma parte.
-          */
+  return candidatos.find(
+    caminho => fs.existsSync(caminho)
+  ) || null;
+}
 
-          if (
-            texto.includes("Error") ||
-            texto.includes("error")
-          ) {
-            console.error(
-              "FFmpeg:",
-              texto
-            );
-          }
-        }
+/*
+  MIXAGEM PROFISSIONAL
+
+  - segundosInicio: tempo de trilha antes da voz
+  - voz entra depois desse tempo
+  - trilha fica tocando por baixo da voz
+  - sidechaincompress abaixa a trilha automaticamente durante a fala
+  - segundosFinal: trilha continua depois da voz
+  - fadeFinal: fade-out no final
+  - volumeVoz: volume da locução
+  - volumeTrilha: volume normal da trilha
+  - ducking: intensidade do abaixamento durante a fala
+*/
+async function mixarAudio(
+  vozBuffer,
+  trilhaBuffer,
+  segundosInicio = 5,
+  segundosFinal = 5,
+  volumeVoz = 1,
+  volumeTrilha = 0.2,
+  ducking = 0.2,
+  fadeFinal = 2
+) {
+  let inicio = Number(segundosInicio);
+  let final = Number(segundosFinal);
+  let volVoz = Number(volumeVoz);
+  let volTrilha = Number(volumeTrilha);
+  let intensidadeDucking = Number(ducking);
+  let fade = Number(fadeFinal);
+
+  if (!Number.isFinite(inicio)) inicio = 5;
+  if (!Number.isFinite(final)) final = 5;
+  if (!Number.isFinite(volVoz)) volVoz = 1;
+  if (!Number.isFinite(volTrilha)) volTrilha = 0.2;
+  if (!Number.isFinite(intensidadeDucking)) intensidadeDucking = 0.2;
+  if (!Number.isFinite(fade)) fade = 2;
+
+  inicio = Math.max(0, Math.min(60, inicio));
+  final = Math.max(0, Math.min(60, final));
+  volVoz = Math.max(0, Math.min(1.5, volVoz));
+  volTrilha = Math.max(0, Math.min(1, volTrilha));
+  intensidadeDucking = Math.max(
+    0,
+    Math.min(1, intensidadeDucking)
+  );
+  fade = Math.max(0, Math.min(10, fade));
+
+  const pastaTemp = fs.mkdtempSync(
+    path.join(os.tmpdir(), "fabrica-da-voz-")
+  );
+
+  const vozPath = path.join(
+    pastaTemp,
+    "voz.mp3"
+  );
+
+  const trilhaPath = path.join(
+    pastaTemp,
+    "trilha.mp3"
+  );
+
+  const saidaPath = path.join(
+    pastaTemp,
+    "final.mp3"
+  );
+
+  try {
+    fs.writeFileSync(
+      vozPath,
+      vozBuffer
+    );
+
+    fs.writeFileSync(
+      trilhaPath,
+      trilhaBuffer
+    );
+
+    const duracaoVoz =
+      await obterDuracao(vozPath);
+
+    const duracaoTotal =
+      Math.max(
+        0.1,
+        inicio +
+        duracaoVoz +
+        final
       );
 
-      processo.on(
-        "error",
-        erro => {
-          console.error(
-            "Erro ao iniciar FFmpeg:",
-            erro
-          );
-
-          reject(erro);
-        }
+    const fadeDuracao =
+      Math.min(
+        fade,
+        duracaoTotal
       );
 
-      processo.on(
-        "close",
-        codigo => {
-          if (codigo === 0) {
-            console.log(
-              "FFmpeg terminou corretamente."
-            );
+    const fadeInicio =
+      Math.max(
+        0,
+        duracaoTotal -
+        fadeDuracao
+      );
 
-            if (
-              !fs.existsSync(
-                saida
-              )
-            ) {
-              reject(
-                new Error(
-                  "FFmpeg terminou, mas não criou o arquivo final."
-                )
-              );
+    const delayMs =
+      Math.round(
+        inicio * 1000
+      );
 
-              return;
-            }
+    /*
+      Quanto menor o ducking, mais a trilha é reduzida
+      enquanto o locutor fala.
 
-            const tamanho =
-              fs.statSync(
-                saida
-              ).size;
+      0% = redução forte
+      100% = redução mínima
+    */
+    const ratio =
+      1 +
+      (1 - intensidadeDucking) *
+      19;
 
-            if (!tamanho) {
-              reject(
-                new Error(
-                  "O arquivo final está vazio."
-                )
-              );
+    const filtro =
+      `[0:a]` +
+      `volume=${volVoz},` +
+      `adelay=${delayMs}|${delayMs},` +
+      `apad=pad_dur=${final},` +
+      `atrim=duration=${duracaoTotal},` +
+      `asetpts=N/SR/TB[voz];` +
 
-              return;
-            }
+      `[1:a]` +
+      `volume=${volTrilha},` +
+      `atrim=duration=${duracaoTotal},` +
+      `asetpts=N/SR/TB[trilha];` +
 
-            console.log(
-              "Arquivo final:",
-              Math.round(
-                tamanho / 1024
-              ),
-              "KB"
-            );
+      `[trilha][voz]` +
+      `sidechaincompress=` +
+      `threshold=0.025:` +
+      `ratio=${ratio}:` +
+      `attack=10:` +
+      `release=300:` +
+      `makeup=1:` +
+      `mix=1` +
+      `[trilhaDucked];` +
 
-            resolve();
-            return;
-          }
+      `[trilhaDucked]` +
+      `afade=t=out:` +
+      `st=${fadeInicio}:` +
+      `d=${fadeDuracao}` +
+      `[musica];` +
 
-          console.error(
-            "FFmpeg código:",
-            codigo
-          );
+      `[voz][musica]` +
+      `amix=inputs=2:` +
+      `duration=longest:` +
+      `dropout_transition=0:` +
+      `normalize=0,` +
+      `atrim=duration=${duracaoTotal},` +
+      `asetpts=N/SR/TB` +
+      `[out]`;
 
-          reject(
-            new Error(
-              `FFmpeg falhou. ${erroFFmpeg.slice(
-                -2500
-              )}`
-            )
-          );
+    console.log("");
+    console.log("=================================");
+    console.log("INICIANDO MIXAGEM");
+    console.log("=================================");
+    console.log("Segundos antes:", inicio);
+    console.log("Duração da voz:", duracaoVoz);
+    console.log("Segundos depois:", final);
+    console.log("Duração total:", duracaoTotal);
+    console.log("Volume voz:", volVoz);
+    console.log("Volume trilha:", volTrilha);
+    console.log("Ducking:", intensidadeDucking);
+    console.log("Fade final:", fade);
+    console.log("=================================");
+
+    const argumentos = [
+      "-hide_banner",
+      "-loglevel",
+      "error",
+
+      "-i",
+      vozPath,
+
+      "-stream_loop",
+      "-1",
+
+      "-i",
+      trilhaPath,
+
+      "-filter_complex",
+      filtro,
+
+      "-map",
+      "[out]",
+
+      "-c:a",
+      "libmp3lame",
+
+      "-b:a",
+      "192k",
+
+      "-ar",
+      "44100",
+
+      "-ac",
+      "2",
+
+      "-y",
+      saidaPath
+    ];
+
+    const resultado =
+      await executarFfmpeg(
+        argumentos,
+        saidaPath
+      );
+
+    console.log("MIXAGEM CONCLUÍDA");
+    console.log(
+      "Tamanho:",
+      resultado.length,
+      "bytes"
+    );
+
+    return resultado;
+  } finally {
+    try {
+      fs.rmSync(
+        pastaTemp,
+        {
+          recursive: true,
+          force: true
         }
       );
-    }
+    } catch {}
+  }
+}
+
+async function obterRespostaElevenLabs(
+  voiceId,
+  texto
+) {
+  const apiKey =
+    process.env.ELEVENLABS_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      "ELEVENLABS_API_KEY não configurada no Render."
+    );
+  }
+
+  const resposta =
+    await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
+        voiceId
+      )}`,
+      {
+        method: "POST",
+
+        headers: {
+          "xi-api-key": apiKey,
+          "Content-Type": "application/json",
+          "Accept": "audio/mpeg"
+        },
+
+        body: JSON.stringify({
+          text: texto,
+
+          model_id:
+            process.env.ELEVENLABS_MODEL_ID ||
+            "eleven_v3",
+
+          language_code: "pt",
+
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.82,
+            style: 0.35,
+            use_speaker_boost: true
+          },
+
+          output_format:
+            "mp3_44100_128"
+        })
+      }
+    );
+
+  if (!resposta.ok) {
+    const erro =
+      await resposta.text();
+
+    throw new Error(
+      erro ||
+      "Erro na ElevenLabs."
+    );
+  }
+
+  return Buffer.from(
+    await resposta.arrayBuffer()
   );
 }
 
-/* =========================================================
-   ROTA - MIXAR VOZ + TRILHA DA FÁBRICA
-========================================================= */
+app.post(
+  "/api/gerar-voz",
+  async (req, res) => {
+    try {
+      const {
+        texto,
+        voiceId,
+        speed
+      } = req.body || {};
+
+      if (
+        !texto ||
+        typeof texto !== "string" ||
+        !texto.trim()
+      ) {
+        return res.status(400).json({
+          erro: "Digite um texto."
+        });
+      }
+
+      if (!voiceId) {
+        return res.status(400).json({
+          erro:
+            "Nenhuma voz foi selecionada."
+        });
+      }
+
+      let audio =
+        await obterRespostaElevenLabs(
+          voiceId,
+          texto.trim()
+        );
+
+      if (!audio.length) {
+        return res.status(500).json({
+          erro:
+            "A ElevenLabs retornou um áudio vazio."
+        });
+      }
+
+      if (
+        speed !== undefined &&
+        Number(speed) !== 1
+      ) {
+        audio =
+          await alterarVelocidade(
+            audio,
+            Number(speed)
+          );
+      }
+
+      res.set({
+        "Content-Type":
+          "audio/mpeg",
+
+        "Content-Length":
+          String(audio.length),
+
+        "Cache-Control":
+          "no-store"
+      });
+
+      res.send(audio);
+    } catch (erro) {
+      console.error(
+        "ERRO AO GERAR VOZ:",
+        erro
+      );
+
+      res.status(500).json({
+        erro:
+          erro.message ||
+          "Não foi possível gerar a voz."
+      });
+    }
+  }
+);
+
+async function processarMixagem(
+  req,
+  res,
+  trilhaBuffer
+) {
+  const {
+    audioBase64,
+    segundosInicio,
+    segundosFinal,
+    volumeVoz,
+    volumeTrilha,
+    ducking,
+    fadeFinal
+  } = req.body || {};
+
+  if (!audioBase64) {
+    return res.status(400).json({
+      erro:
+        "Áudio da voz não informado."
+    });
+  }
+
+  if (
+    !trilhaBuffer ||
+    !trilhaBuffer.length
+  ) {
+    return res.status(400).json({
+      erro:
+        "Áudio da trilha vazio ou inválido."
+    });
+  }
+
+  const vozBuffer =
+    base64ParaBuffer(
+      audioBase64
+    );
+
+  if (!vozBuffer) {
+    return res.status(400).json({
+      erro:
+        "Áudio da voz vazio ou inválido."
+    });
+  }
+
+  const resultado =
+    await mixarAudio(
+      vozBuffer,
+      trilhaBuffer,
+      segundosInicio,
+      segundosFinal,
+      volumeVoz,
+      volumeTrilha,
+      ducking,
+      fadeFinal
+    );
+
+  res.set({
+    "Content-Type":
+      "audio/mpeg",
+
+    "Content-Length":
+      String(resultado.length),
+
+    "Content-Disposition":
+      'attachment; filename="fabrica-da-voz.mp3"',
+
+    "Cache-Control":
+      "no-store"
+  });
+
+  res.send(resultado);
+}
 
 app.post(
   "/api/mixar-voz",
   async (req, res) => {
-    let vozPath = null;
-    let saidaPath = null;
-
     try {
-      console.log("");
-      console.log(
-        "=========================================="
-      );
-      console.log(
-        "MIXAGEM COM TRILHA DA FÁBRICA"
-      );
-      console.log(
-        "=========================================="
-      );
-
-      const audioBase64 =
-        req.body?.audioBase64;
-
-      const trilhaSelecionada =
-        req.body?.trilhaSelecionada;
-
-      const segundosInicio =
-        req.body?.segundosInicio ?? 5;
-
-      const segundosFinal =
-        req.body?.segundosFinal ?? 5;
-
-      if (!audioBase64) {
-        return res.status(400).json({
-          erro:
-            "Áudio da voz não informado.",
-        });
-      }
+      const {
+        trilhaSelecionada
+      } = req.body || {};
 
       if (!trilhaSelecionada) {
         return res.status(400).json({
           erro:
-            "Selecione uma trilha.",
+            "Nenhuma trilha foi selecionada."
         });
       }
 
       const trilhaPath =
-        localizarTrilhaDaFabrica(
+        localizarTrilha(
           trilhaSelecionada
         );
 
-      const audioBuffer =
-        base64ParaBuffer(
-          audioBase64
-        );
-
-      const pastaTemp =
-        os.tmpdir();
-
-      const id =
-        `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}`;
-
-      vozPath =
-        path.join(
-          pastaTemp,
-          `voz-${id}.mp3`
-        );
-
-      saidaPath =
-        path.join(
-          pastaTemp,
-          `mix-${id}.mp3`
-        );
-
-      fs.writeFileSync(
-        vozPath,
-        audioBuffer
-      );
-
-      console.log(
-        "Voz temporária:",
-        vozPath
-      );
-
-      console.log(
-        "Trilha:",
-        trilhaPath
-      );
-
-      await mixarAudio(
-        vozPath,
-        trilhaPath,
-        saidaPath,
-        segundosInicio,
-        segundosFinal
-      );
-
-      const resultado =
-        fs.readFileSync(
-          saidaPath
-        );
-
-      const envio =
-        enviarMp3(
-          res,
-          resultado,
-          "fabrica-da-voz-mixagem.mp3"
-        );
-
-      apagarArquivo(
-        vozPath
-      );
-
-      apagarArquivo(
-        saidaPath
-      );
-
-      return envio;
-    } catch (erro) {
-      console.error("");
-      console.error(
-        "ERRO NA MIXAGEM DA FÁBRICA:"
-      );
-      console.error(erro);
-      console.error("");
-
-      apagarArquivo(
-        vozPath
-      );
-
-      apagarArquivo(
-        saidaPath
-      );
-
-      if (res.headersSent) {
-        return;
+      if (!trilhaPath) {
+        return res.status(404).json({
+          erro:
+            `Trilha não encontrada: ${path.basename(
+              trilhaSelecionada
+            )}`
+        });
       }
 
-      return res.status(500).json({
-        erro:
-          "Não foi possível mixar a voz com a trilha.",
+      await processarMixagem(
+        req,
+        res,
+        fs.readFileSync(
+          trilhaPath
+        )
+      );
+    } catch (erro) {
+      console.error(
+        "ERRO NA MIXAGEM:",
+        erro
+      );
 
-        detalhes:
-          erro.message ||
-          "Erro desconhecido.",
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          erro:
+            erro.message ||
+            "Erro ao mixar os áudios."
+        });
+      }
     }
   }
 );
 
-/* =========================================================
-   ROTA - MIXAR VOZ + TRILHA DO CLIENTE
-========================================================= */
-
 app.post(
   "/api/mixar-upload",
   async (req, res) => {
-    let vozPath = null;
-    let trilhaPath = null;
-    let saidaPath = null;
-
     try {
-      console.log("");
-      console.log(
-        "=========================================="
-      );
-      console.log(
-        "MIXAGEM COM TRILHA DO CLIENTE"
-      );
-      console.log(
-        "=========================================="
-      );
-
-      const audioBase64 =
-        req.body?.audioBase64;
-
-      const trilhaBase64 =
-        req.body?.trilhaBase64;
-
-      const segundosInicio =
-        req.body?.segundosInicio ?? 5;
-
-      const segundosFinal =
-        req.body?.segundosFinal ?? 5;
-
-      if (!audioBase64) {
-        return res.status(400).json({
-          erro:
-            "Áudio da voz não informado.",
-        });
-      }
+      const {
+        trilhaBase64
+      } = req.body || {};
 
       if (!trilhaBase64) {
         return res.status(400).json({
           erro:
-            "A trilha do cliente não foi enviada.",
+            "A trilha enviada pelo cliente não foi encontrada."
         });
       }
-
-      const audioBuffer =
-        base64ParaBuffer(
-          audioBase64
-        );
 
       const trilhaBuffer =
         base64ParaBuffer(
           trilhaBase64
         );
 
-      const pastaTemp =
-        os.tmpdir();
+      if (!trilhaBuffer) {
+        return res.status(400).json({
+          erro:
+            "Áudio da trilha vazio ou inválido."
+        });
+      }
 
-      const id =
-        `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}`;
-
-      vozPath =
-        path.join(
-          pastaTemp,
-          `voz-${id}.mp3`
-        );
-
-      trilhaPath =
-        path.join(
-          pastaTemp,
-          `trilha-${id}.mp3`
-        );
-
-      saidaPath =
-        path.join(
-          pastaTemp,
-          `mix-${id}.mp3`
-        );
-
-      fs.writeFileSync(
-        vozPath,
-        audioBuffer
-      );
-
-      fs.writeFileSync(
-        trilhaPath,
+      await processarMixagem(
+        req,
+        res,
         trilhaBuffer
       );
-
-      console.log(
-        "Voz temporária criada."
-      );
-
-      console.log(
-        "Trilha do cliente recebida:",
-        Math.round(
-          trilhaBuffer.length / 1024
-        ),
-        "KB"
-      );
-
-      await mixarAudio(
-        vozPath,
-        trilhaPath,
-        saidaPath,
-        segundosInicio,
-        segundosFinal
-      );
-
-      const resultado =
-        fs.readFileSync(
-          saidaPath
-        );
-
-      const envio =
-        enviarMp3(
-          res,
-          resultado,
-          "fabrica-da-voz-mixagem.mp3"
-        );
-
-      apagarArquivo(
-        vozPath
-      );
-
-      apagarArquivo(
-        trilhaPath
-      );
-
-      apagarArquivo(
-        saidaPath
-      );
-
-      return envio;
-    } catch (erro) {
-      console.error("");
-      console.error(
-        "ERRO NA MIXAGEM DO CLIENTE:"
-      );
-      console.error(erro);
-      console.error("");
-
-      apagarArquivo(
-        vozPath
-      );
-
-      apagarArquivo(
-        trilhaPath
-      );
-
-      apagarArquivo(
-        saidaPath
-      );
-
-      if (res.headersSent) {
-        return;
-      }
-
-      return res.status(500).json({
-        erro:
-          "Não foi possível mixar a trilha do cliente.",
-
-        detalhes:
-          erro.message ||
-          "Erro desconhecido.",
-      });
-    }
-  }
-);
-
-/* =========================================================
-   ROTA ANTIGA - GERAR VOZ COM TRILHA
-   Mantida para compatibilidade
-========================================================= */
-
-app.post(
-  "/api/gerar-voz-com-trilha",
-  upload.single("trilha"),
-  async (req, res) => {
-    let vozPath = null;
-    let trilhaPath = null;
-    let saidaPath = null;
-
-    try {
-      const texto =
-        req.body?.texto;
-
-      const voiceId =
-        req.body?.voiceId;
-
-      const speed =
-        req.body?.speed;
-
-      if (
-        !texto ||
-        !String(texto).trim()
-      ) {
-        return res.status(400).json({
-          erro:
-            "Texto não informado.",
-        });
-      }
-
-      if (
-        !voiceId ||
-        !String(voiceId).trim()
-      ) {
-        return res.status(400).json({
-          erro:
-            "Voz não selecionada.",
-        });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({
-          erro:
-            "Nenhuma trilha foi enviada.",
-        });
-      }
-
-      const audio =
-        await gerarAudioElevenLabs({
-          texto,
-          voiceId,
-          speed,
-        });
-
-      const pastaTemp =
-        os.tmpdir();
-
-      const id =
-        `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}`;
-
-      vozPath =
-        path.join(
-          pastaTemp,
-          `voz-${id}.mp3`
-        );
-
-      trilhaPath =
-        path.join(
-          pastaTemp,
-          `trilha-${id}.mp3`
-        );
-
-      saidaPath =
-        path.join(
-          pastaTemp,
-          `mix-${id}.mp3`
-        );
-
-      fs.writeFileSync(
-        vozPath,
-        audio
-      );
-
-      fs.writeFileSync(
-        trilhaPath,
-        req.file.buffer
-      );
-
-      await mixarAudio(
-        vozPath,
-        trilhaPath,
-        saidaPath,
-        5,
-        5
-      );
-
-      const resultado =
-        fs.readFileSync(
-          saidaPath
-        );
-
-      apagarArquivo(
-        vozPath
-      );
-
-      apagarArquivo(
-        trilhaPath
-      );
-
-      apagarArquivo(
-        saidaPath
-      );
-
-      return enviarMp3(
-        res,
-        resultado,
-        "fabrica-da-voz-mixagem.mp3"
-      );
     } catch (erro) {
       console.error(
-        "Erro em gerar-voz-com-trilha:",
+        "ERRO NA MIXAGEM DO CLIENTE:",
         erro
       );
 
-      apagarArquivo(
-        vozPath
-      );
-
-      apagarArquivo(
-        trilhaPath
-      );
-
-      apagarArquivo(
-        saidaPath
-      );
-
-      if (res.headersSent) {
-        return;
+      if (!res.headersSent) {
+        res.status(500).json({
+          erro:
+            erro.message ||
+            "Não foi possível mixar a trilha enviada."
+        });
       }
-
-      return res.status(500).json({
-        erro:
-          "Não foi possível gerar a mixagem.",
-
-        detalhes:
-          erro.message ||
-          "Erro desconhecido.",
-      });
     }
   }
 );
-
-/* =========================================================
-   ARQUIVO TEMPORÁRIO
-========================================================= */
-
-function apagarArquivo(
-  arquivo
-) {
-  if (!arquivo) {
-    return;
-  }
-
-  try {
-    if (
-      fs.existsSync(
-        arquivo
-      )
-    ) {
-      fs.unlinkSync(
-        arquivo
-      );
-
-      console.log(
-        "Arquivo temporário removido:",
-        arquivo
-      );
-    }
-  } catch (erro) {
-    console.log(
-      "Não foi possível apagar:",
-      arquivo,
-      erro.message
-    );
-  }
-}
-
-/* =========================================================
-   FRONTEND VITE
-========================================================= */
-
-app.use(
-  express.static(
-    distPath
-  )
-);
-
-/* =========================================================
-   FALLBACK DO FRONTEND
-========================================================= */
 
 app.get(
-  "/{*splat}",
+  "/api/health",
   (req, res) => {
-    const indexPath =
-      path.join(
-        distPath,
-        "index.html"
-      );
-
-    if (
-      fs.existsSync(
-        indexPath
-      )
-    ) {
-      return res.sendFile(
-        indexPath
-      );
-    }
-
-    return res
-      .status(404)
-      .send(
-        "Frontend não encontrado. Execute o build do Vite."
-      );
+    res.json({
+      ok: true,
+      servidor:
+        "Fábrica da Voz",
+      porta: PORT,
+      ffmpeg:
+        !!ffmpegPath,
+      geracaoVoz: true,
+      trilhaCliente: true,
+      mixagem: true
+    });
   }
 );
 
-/* =========================================================
-   ERROS
-========================================================= */
+app.get(
+  "/api/status",
+  (req, res) => {
+    res.json({
+      funcionando: true,
+      servidor:
+        "Fábrica da Voz",
+      porta: PORT,
+      ffmpeg:
+        !!ffmpegPath,
+      geracaoVoz: true,
+      segundos: true,
+      fadeFinal: true,
+      volumeVoz: true,
+      volumeTrilha: true,
+      ducking: true,
+      trilhaFabrica: true,
+      trilhaCliente: true
+    });
+  }
+);
+
+app.get(
+  "/",
+  (req, res) => {
+    res.json({
+      nome:
+        "Fábrica da Voz",
+      status:
+        "online",
+      mensagem:
+        "Servidor funcionando corretamente."
+    });
+  }
+);
 
 app.use(
-  (
-    erro,
-    req,
-    res,
-    next
-  ) => {
-    if (
-      erro instanceof
-      multer.MulterError
-    ) {
-      return res
-        .status(400)
-        .json({
-          erro:
-            "Erro no upload da trilha.",
+  (err, req, res, next) => {
+    console.error(
+      "ERRO GERAL:",
+      err
+    );
 
-          detalhes:
-            erro.message,
-        });
+    if (res.headersSent) {
+      return next(err);
     }
 
-    if (erro) {
-      console.error(
-        "Erro não tratado:",
-        erro
-      );
-
-      if (
-        res.headersSent
-      ) {
-        return next(
-          erro
-        );
-      }
-
-      return res
-        .status(500)
-        .json({
-          erro:
-            "Erro interno do servidor.",
-
-          detalhes:
-            erro.message ||
-            "Erro desconhecido.",
-        });
-    }
-
-    return next();
+    res.status(500).json({
+      erro:
+        err.message ||
+        "Erro interno do servidor."
+    });
   }
 );
 
-/* =========================================================
-   INICIA SERVIDOR
-========================================================= */
+const server =
+  app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
+      console.log("");
+      console.log(
+        "================================="
+      );
+      console.log(
+        "FÁBRICA DA VOZ"
+      );
+      console.log(
+        "================================="
+      );
+      console.log(
+        `Servidor na porta ${PORT}`
+      );
+      console.log(
+        "Geração de voz: ATIVADA"
+      );
+      console.log(
+        "Mixagem: ATIVADA"
+      );
+      console.log(
+        "Volume de voz: ATIVADO"
+      );
+      console.log(
+        "Volume de trilha: ATIVADO"
+      );
+      console.log(
+        "Ducking automático: ATIVADO"
+      );
+      console.log(
+        "Fade final: ATIVADO"
+      );
+      console.log(
+        "Trilha do cliente: ATIVADA"
+      );
+      console.log(
+        "================================="
+      );
+    }
+  );
 
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-    console.log("");
-    console.log(
-      "=========================================="
-    );
-    console.log(
-      "      FÁBRICA DA VOZ ESTÁ ONLINE"
-    );
-    console.log(
-      "=========================================="
-    );
-    console.log(
-      `Porta: ${PORT}`
-    );
-    console.log(
-      "API: ATIVA"
-    );
-    console.log(
-      "Geração de voz: ATIVA"
-    );
-    console.log(
-      "Mixagem: ATIVA"
-    );
-    console.log(
-      "Trilha do cliente: ATIVA"
-    );
-    console.log(
-      "Servidor: RODANDO"
-    );
-    console.log(
-      "=========================================="
-    );
-    console.log("");
-  }
+function encerrarServidor(sinal) {
+  console.log(
+    `Recebido ${sinal}. Encerrando servidor...`
+  );
+
+  server.close(() => {
+    process.exit(0);
+  });
+
+  setTimeout(() => {
+    process.exit(1);
+  }, 5000);
+}
+
+process.on(
+  "SIGINT",
+  () => encerrarServidor("SIGINT")
+);
+
+process.on(
+  "SIGTERM",
+  () => encerrarServidor("SIGTERM")
 );
