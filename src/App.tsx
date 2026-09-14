@@ -303,32 +303,29 @@ function App() {
     setGerando(true)
 
     try {
-      const API_URL =
-        import.meta.env.VITE_API_URL || ''
+      // Em produção, chama o próprio domínio que abriu a página.
+      // O corpo é enviado como text/plain para evitar o preflight
+      // CORS que o proxy do domínio estava redirecionando.
+      const API_URL = import.meta.env.DEV
+        ? 'http://localhost:3010'
+        : window.location.origin
 
-      const resposta =
-        await fetch(
-          `${API_URL}/api/gerar-voz`,
-          {
-            method: 'POST',
+      const payload = JSON.stringify({
+        texto: textoFinal,
+        voiceId: vozAtual.id,
+        speed: velocidadeSelecionada
+      })
 
-            headers: {
-              'Content-Type':
-                'application/json'
-            },
-
-            body: JSON.stringify({
-              texto:
-                textoFinal,
-
-              voiceId:
-                vozAtual.id,
-
-              speed:
-                velocidadeSelecionada
-            })
-          }
-        )
+      const resposta = await fetch(
+        `${API_URL}/api/gerar-voz`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=UTF-8'
+          },
+          body: payload
+        }
+      )
 
       if (!resposta.ok) {
         let mensagem =
