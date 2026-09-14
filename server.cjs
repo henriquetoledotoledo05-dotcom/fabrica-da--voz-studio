@@ -54,7 +54,7 @@ console.log("");
    STATUS
 ========================================================= */
 
-app.get("/api/status", (req, res) => {
+app.get("/{*splat}", (req, res) => {
   res.json({
     nome: "Fábrica da Voz",
     status: "online",
