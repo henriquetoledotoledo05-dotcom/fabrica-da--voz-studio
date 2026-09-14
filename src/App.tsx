@@ -36,6 +36,51 @@ function App() {
     setSenhaAcesso('')
   }
 
+  const [categoriaSelecionada, setCategoriaSelecionada] =
+    useState<string | null>(null)
+
+  const [vozSelecionada, setVozSelecionada] =
+    useState('IKne3meq5aSn9XLyUdCD')
+
+  const [estiloSelecionado, setEstiloSelecionado] =
+    useState('normal')
+
+  const [velocidade, setVelocidade] =
+    useState('normal')
+
+  const [audioUrl, setAudioUrl] =
+    useState('')
+
+  const [gerando, setGerando] =
+    useState(false)
+
+  const [mixando, setMixando] =
+    useState(false)
+
+  const [mostrarTrilhas, setMostrarTrilhas] =
+    useState(false)
+
+  const [trilhaSelecionada, setTrilhaSelecionada] =
+    useState('')
+
+  const [trilhaArquivo, setTrilhaArquivo] =
+    useState<File | null>(null)
+
+  const [nomeTrilhaArquivo, setNomeTrilhaArquivo] =
+    useState('')
+
+  const [volumeTrilha, setVolumeTrilha] =
+    useState(28)
+
+  const [volumeVoz, setVolumeVoz] =
+    useState(100)
+
+  const [segundosInicio, setSegundosInicio] =
+    useState(5)
+
+  const [segundosFinal, setSegundosFinal] =
+    useState(5)
+
   if (!acessoLiberado) {
     return (
       <div
@@ -142,51 +187,6 @@ function App() {
       </div>
     )
   }
-  const [categoriaSelecionada, setCategoriaSelecionada] =
-    useState<string | null>(null)
-
-  const [vozSelecionada, setVozSelecionada] =
-    useState('IKne3meq5aSn9XLyUdCD')
-
-  const [estiloSelecionado, setEstiloSelecionado] =
-    useState('normal')
-
-  const [velocidade, setVelocidade] =
-    useState('normal')
-
-  const [audioUrl, setAudioUrl] =
-    useState('')
-
-  const [gerando, setGerando] =
-    useState(false)
-
-  const [mixando, setMixando] =
-    useState(false)
-
-  const [mostrarTrilhas, setMostrarTrilhas] =
-    useState(false)
-
-  const [trilhaSelecionada, setTrilhaSelecionada] =
-    useState('')
-
-  const [trilhaArquivo, setTrilhaArquivo] =
-    useState<File | null>(null)
-
-  const [nomeTrilhaArquivo, setNomeTrilhaArquivo] =
-    useState('')
-
-  const [volumeTrilha, setVolumeTrilha] =
-    useState(28)
-
-  const [volumeVoz, setVolumeVoz] =
-    useState(100)
-
-  const [segundosInicio, setSegundosInicio] =
-    useState(5)
-
-  const [segundosFinal, setSegundosFinal] =
-    useState(5)
-
   // =====================================================
   // VELOCIDADE
   // =====================================================
