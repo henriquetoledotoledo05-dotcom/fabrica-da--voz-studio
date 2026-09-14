@@ -1,25 +1,28 @@
-import { useState, type ChangeEvent } from 'react'
 import logoFabrica from './assets/logo-fabrica.png'
-import celsoLocutor from './assets/celso-locutor.png'
-import pedroLocutor from './assets/pedro-locutor.png'
-import luizaLocutora from './assets/luiza-locutora.png'
-import gabyLocutora from './assets/gaby-locutora.png'
+import { useState } from 'react'
 import './App.css'
-
-type Voz = 'celso' | 'pedro' | 'luiza' | 'gaby'
+import noahLocutor from './assets/noah-locutor.png'
+import ninaLocutora from './assets/nina-locutora-1.png'
 
 function App() {
   const [categoriaSelecionada, setCategoriaSelecionada] =
     useState<string | null>(null)
 
   const [vozSelecionada, setVozSelecionada] =
-    useState<Voz>('celso')
+    useState('masculina')
 
   const [estiloSelecionado, setEstiloSelecionado] =
     useState('normal')
 
   const [velocidade, setVelocidade] =
     useState('normal')
+
+  const velocidadeSelecionada =
+    velocidade === 'normal'
+      ? 1
+      : velocidade === 'rapido'
+      ? 1.25
+      : 1.45
 
   const [audioUrl, setAudioUrl] =
     useState('')
@@ -42,31 +45,11 @@ function App() {
   const [nomeTrilhaArquivo, setNomeTrilhaArquivo] =
     useState('')
 
-  const [volumeTrilha, setVolumeTrilha] =
-    useState(28)
-
-  const [volumeVoz, setVolumeVoz] =
-    useState(100)
-
   const [segundosInicio, setSegundosInicio] =
     useState(5)
 
   const [segundosFinal, setSegundosFinal] =
     useState(5)
-
-  const velocidadeSelecionada =
-    velocidade === 'normal'
-      ? 1
-      : velocidade === 'rapido'
-        ? 1.25
-        : 1.45
-
-  const vozes: Record<Voz, string> = {
-    celso: 'rpNe0HOx7heUulPiOEaG',
-    pedro: 'zhza6dIY7yb1xz5MKTvQ',
-    luiza: 'x8FWrDHAK5xiFTJLpnHq',
-    gaby: 'iScHbNW8K33gNo3lGgbo',
-  }
 
   // =====================================================
   // GERAR VOZ
@@ -74,93 +57,149 @@ function App() {
 
   const gerarVoz = async () => {
     const textarea =
-      document.querySelector('textarea') as HTMLTextAreaElement | null
+      document.querySelector(
+        'textarea'
+      ) as HTMLTextAreaElement
 
-    if (!textarea || !textarea.value.trim()) {
-      alert('Digite um texto para gerar a voz.')
+    if (
+      !textarea ||
+      !textarea.value.trim()
+    ) {
+      alert(
+        'Digite um texto para gerar a voz.'
+      )
       return
     }
 
-    let textoFinal = textarea.value
+    const voiceId =
+      vozSelecionada === 'feminina'
+        ? '21m00Tcm4TlvDq8ikWAM'
+        : 'IKne3meq5aSn9XLyUdCD'
 
-    if (estiloSelecionado === 'animado') {
-      textoFinal = `[excited] ${textarea.value}`
+    let textoFinal =
+      textarea.value
+
+    if (
+      estiloSelecionado ===
+      'animado'
+    ) {
+      textoFinal =
+        `[excited] ${textarea.value}`
     }
 
-    if (estiloSelecionado === 'muitoAnimado') {
-      textoFinal = `[excited] [happily] ${textarea.value}`
+    if (
+      estiloSelecionado ===
+      'muitoAnimado'
+    ) {
+      textoFinal =
+        `[excited] [happily] ${textarea.value}`
     }
 
-    if (estiloSelecionado === 'superImpacto') {
-      textoFinal = `[excited] [shouts] ${textarea.value}`
+    if (
+      estiloSelecionado ===
+      'superImpacto'
+    ) {
+      textoFinal =
+        `[excited] [shouts] ${textarea.value}`
     }
 
     setGerando(true)
 
     try {
-      const API_URL =
-        import.meta.env.VITE_API_URL || ''
+      const resposta =
+        await fetch(
+          'http://localhost:3010/api/gerar-voz',
+          {
+            method: 'POST',
 
-      const resposta = await fetch(
-        `${API_URL}/api/gerar-voz`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            texto: textoFinal,
-            voiceId: vozes[vozSelecionada],
-            speed: velocidadeSelecionada,
-          }),
-        }
-      )
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+
+            body: JSON.stringify({
+              texto: textoFinal,
+              voiceId,
+              speed:
+                velocidadeSelecionada,
+            }),
+          }
+        )
 
       if (!resposta.ok) {
-        let mensagem = 'Erro ao gerar a voz.'
+        let mensagem =
+          'Erro ao gerar a voz.'
 
         try {
-          const erro = await resposta.json()
-          mensagem = erro.erro || mensagem
+          const erro =
+            await resposta.json()
+
+          mensagem =
+            erro.erro ||
+            mensagem
+
         } catch {
-          mensagem = await resposta.text()
+          mensagem =
+            await resposta.text()
         }
 
-        throw new Error(mensagem)
+        throw new Error(
+          mensagem
+        )
       }
 
-      const audioBlob = await resposta.blob()
+      const audioBlob =
+        await resposta.blob()
 
       const novaAudioUrl =
-        URL.createObjectURL(audioBlob)
+        URL.createObjectURL(
+          audioBlob
+        )
 
-      setAudioUrl(novaAudioUrl)
+      setAudioUrl(
+        novaAudioUrl
+      )
 
-      const audio = new Audio(novaAudioUrl)
+      const audio =
+        new Audio(
+          novaAudioUrl
+        )
+
       await audio.play()
+
     } catch (erro) {
-      console.error('Erro ao gerar voz:', erro)
+
+      console.error(
+        'Erro ao gerar voz:',
+        erro
+      )
 
       alert(
         erro instanceof Error
           ? erro.message
           : 'Não foi possível gerar a voz.'
       )
+
     } finally {
+
       setGerando(false)
     }
   }
 
   // =====================================================
-  // SELECIONAR TRILHA
+  // SELECIONAR TRILHA DO COMPUTADOR
   // =====================================================
 
   const selecionarTrilhaArquivo = (
-    e: ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const arquivo = e.target.files?.[0]
 
-    if (!arquivo) return
+    const arquivo =
+      e.target.files?.[0]
+
+    if (!arquivo) {
+      return
+    }
 
     const tiposAceitos = [
       'audio/mpeg',
@@ -170,165 +209,38 @@ function App() {
       'audio/ogg',
       'audio/mp4',
       'audio/aac',
-      'audio/x-m4a',
+      'audio/x-m4a'
     ]
 
     if (
       arquivo.type &&
-      !tiposAceitos.includes(arquivo.type)
+      !tiposAceitos.includes(
+        arquivo.type
+      )
     ) {
+
       alert(
         'Escolha um arquivo de áudio MP3, WAV, OGG, M4A ou AAC.'
       )
 
       e.target.value = ''
+
       return
     }
 
-    setTrilhaArquivo(arquivo)
-    setNomeTrilhaArquivo(arquivo.name)
+    setTrilhaArquivo(
+      arquivo
+    )
+
+    setNomeTrilhaArquivo(
+      arquivo.name
+    )
+
     setTrilhaSelecionada('')
-  }
 
-  // =====================================================
-  // CONVERTER AUDIOBUFFER PARA WAV
-  // =====================================================
-
-  const audioBufferParaWav = (
-    buffer: AudioBuffer
-  ): Blob => {
-    const numeroCanais =
-      buffer.numberOfChannels
-
-    const sampleRate =
-      buffer.sampleRate
-
-    const bitsPorSample = 16
-
-    const dataLength =
-      buffer.length *
-      numeroCanais *
-      2
-
-    const arrayBuffer =
-      new ArrayBuffer(44 + dataLength)
-
-    const view =
-      new DataView(arrayBuffer)
-
-    const escreverTexto = (
-      offset: number,
-      texto: string
-    ) => {
-      for (let i = 0; i < texto.length; i++) {
-        view.setUint8(
-          offset + i,
-          texto.charCodeAt(i)
-        )
-      }
-    }
-
-    escreverTexto(0, 'RIFF')
-
-    view.setUint32(
-      4,
-      36 + dataLength,
-      true
-    )
-
-    escreverTexto(8, 'WAVE')
-    escreverTexto(12, 'fmt ')
-
-    view.setUint32(16, 16, true)
-    view.setUint16(20, 1, true)
-    view.setUint16(22, numeroCanais, true)
-
-    view.setUint32(
-      24,
-      sampleRate,
-      true
-    )
-
-    view.setUint32(
-      28,
-      sampleRate *
-        numeroCanais *
-        2,
-      true
-    )
-
-    view.setUint16(
-      32,
-      numeroCanais * 2,
-      true
-    )
-
-    view.setUint16(
-      34,
-      bitsPorSample,
-      true
-    )
-
-    escreverTexto(36, 'data')
-
-    view.setUint32(
-      40,
-      dataLength,
-      true
-    )
-
-    const canaisData: Float32Array[] = []
-
-    for (
-      let canal = 0;
-      canal < numeroCanais;
-      canal++
-    ) {
-      canaisData.push(
-        buffer.getChannelData(canal)
-      )
-    }
-
-    let offset = 44
-
-    for (
-      let i = 0;
-      i < buffer.length;
-      i++
-    ) {
-      for (
-        let canal = 0;
-        canal < numeroCanais;
-        canal++
-      ) {
-        let amostra =
-          canaisData[canal][i]
-
-        amostra = Math.max(
-          -1,
-          Math.min(1, amostra)
-        )
-
-        const valor =
-          amostra < 0
-            ? amostra * 0x8000
-            : amostra * 0x7fff
-
-        view.setInt16(
-          offset,
-          valor,
-          true
-        )
-
-        offset += 2
-      }
-    }
-
-    return new Blob(
-      [arrayBuffer],
-      {
-        type: 'audio/wav',
-      }
+    console.log(
+      'Trilha própria selecionada:',
+      arquivo.name
     )
   }
 
@@ -342,10 +254,7 @@ function App() {
       return
     }
 
-    if (
-      !trilhaSelecionada &&
-      !trilhaArquivo
-    ) {
+    if (!trilhaSelecionada && !trilhaArquivo) {
       alert(
         'Escolha uma trilha ou envie sua própria trilha.'
       )
@@ -370,11 +279,16 @@ function App() {
       let trilhaBuffer: ArrayBuffer
 
       if (trilhaArquivo) {
+
         trilhaBuffer =
           await trilhaArquivo.arrayBuffer()
+
       } else {
+
         const trilhaResponse =
-          await fetch(trilhaSelecionada)
+          await fetch(
+            trilhaSelecionada
+          )
 
         if (!trilhaResponse.ok) {
           throw new Error(
@@ -388,11 +302,9 @@ function App() {
 
       const AudioContextClass =
         window.AudioContext ||
-        (
-          window as typeof window & {
-            webkitAudioContext?: typeof AudioContext
-          }
-        ).webkitAudioContext
+        (window as typeof window & {
+          webkitAudioContext?: typeof AudioContext
+        }).webkitAudioContext
 
       if (!AudioContextClass) {
         throw new Error(
@@ -413,15 +325,17 @@ function App() {
           trilhaBuffer.slice(0)
         )
 
-      const inicio = Math.max(
-        0,
-        Number(segundosInicio) || 0
-      )
+      const inicio =
+        Math.max(
+          0,
+          Number(segundosInicio) || 0
+        )
 
-      const final = Math.max(
-        0,
-        Number(segundosFinal) || 0
-      )
+      const final =
+        Math.max(
+          0,
+          Number(segundosFinal) || 0
+        )
 
       const duracaoVoz =
         voz.duration
@@ -453,123 +367,116 @@ function App() {
           sampleRate
         )
 
-      // =================================================
+      // ==============================
       // VOZ
-      // =================================================
+      // ==============================
 
       const vozSource =
         offline.createBufferSource()
 
-      vozSource.buffer = voz
+      vozSource.buffer =
+        voz
 
       const vozGain =
         offline.createGain()
 
-      const volumeVozNormalizado =
-        Math.max(
-          0,
-          Math.min(
-            1.5,
-            volumeVoz / 100
-          )
-        )
-
       vozGain.gain.setValueAtTime(
-        volumeVozNormalizado,
+        1,
         0
       )
 
-      vozSource.connect(vozGain)
+      vozSource.connect(
+        vozGain
+      )
+
       vozGain.connect(
         offline.destination
       )
 
-      vozSource.start(inicio)
+      vozSource.start(
+        inicio
+      )
 
-      // =================================================
+      // ==============================
       // TRILHA
-      // =================================================
+      // ==============================
 
       const trilhaGain =
         offline.createGain()
 
-      const volumeNormal =
-        Math.max(
-          0,
-          Math.min(
-            1,
-            volumeTrilha / 100
-          )
-        )
-
-      const volumeDuranteVoz =
-        volumeNormal * 0.30
+      const volumeTrilha =
+        0.28
 
       trilhaGain.gain.setValueAtTime(
-        volumeNormal,
+        0,
         0
       )
 
-      trilhaGain.gain.setValueAtTime(
-        volumeNormal,
-        inicio
-      )
+      // FADE-IN
 
-      trilhaGain.gain.setValueAtTime(
-        volumeDuranteVoz,
-        inicio + 0.01
-      )
+      if (inicio > 0) {
 
-      const fimDaVoz =
-        inicio + duracaoVoz
+        trilhaGain.gain.linearRampToValueAtTime(
+          volumeTrilha,
+          inicio
+        )
 
-      trilhaGain.gain.setValueAtTime(
-        volumeDuranteVoz,
-        fimDaVoz
-      )
-
-      trilhaGain.gain.setValueAtTime(
-        volumeNormal,
-        fimDaVoz + 0.01
-      )
-
-      // =================================================
-      // FADE FINAL
-      // =================================================
-
-      if (final > 0) {
-        const fadeOutInicio =
-          duracaoTotal - final
+      } else {
 
         trilhaGain.gain.setValueAtTime(
-          volumeNormal,
-          fadeOutInicio
+          volumeTrilha,
+          0
+        )
+
+      }
+
+      // FADE-OUT FINAL
+
+      const fadeInicio =
+        inicio +
+        duracaoVoz
+
+      const fadeDuracao =
+        Math.min(
+          final,
+          duracaoTotal -
+            fadeInicio
+        )
+
+      if (fadeDuracao > 0) {
+
+        trilhaGain.gain.setValueAtTime(
+          volumeTrilha,
+          fadeInicio
         )
 
         trilhaGain.gain.linearRampToValueAtTime(
           0,
-          duracaoTotal
+          fadeInicio +
+            fadeDuracao
         )
+
       }
 
       trilhaGain.connect(
         offline.destination
       )
 
-      // =================================================
-      // REPETIR TRILHA
-      // =================================================
+      // Repetimos a trilha se ela for menor que o projeto.
 
-      let trilhaAtual = 0
+      let trilhaAtual =
+        0
 
       while (
         trilhaAtual <
         duracaoTotal
       ) {
+
         const trilhaSource =
           offline.createBufferSource()
 
-        trilhaSource.buffer = trilha
+        trilhaSource.buffer =
+          trilha
 
         trilhaSource.connect(
           trilhaGain
@@ -595,12 +502,12 @@ function App() {
           trilha.duration
       }
 
-      // =================================================
-      // RENDERIZAR
-      // =================================================
-
       const renderizado =
         await offline.startRendering()
+
+      // ==============================
+      // EXPORTAR WAV
+      // ==============================
 
       const wavBlob =
         audioBufferParaWav(
@@ -612,15 +519,19 @@ function App() {
           wavBlob
         )
 
-      setAudioUrl(mixUrl)
+      setAudioUrl(
+        mixUrl
+      )
 
       const audio =
-        new Audio(mixUrl)
+        new Audio(
+          mixUrl
+        )
 
       await audio.play()
 
-      await contexto.close()
     } catch (erro) {
+
       console.error(
         'Erro na mixagem:',
         erro
@@ -631,9 +542,215 @@ function App() {
           ? erro.message
           : 'Não foi possível mixar a voz com a trilha.'
       )
+
     } finally {
+
       setMixando(false)
     }
+  }
+
+  // =====================================================
+  // CONVERTER AUDIOBUFFER PARA WAV
+  // =====================================================
+
+  const audioBufferParaWav = (
+    buffer: AudioBuffer
+  ): Blob => {
+
+    const numeroCanais =
+      buffer.numberOfChannels
+
+    const sampleRate =
+      buffer.sampleRate
+
+    const bitsPorSample =
+      16
+
+    const dataLength =
+      buffer.length *
+      numeroCanais *
+      (bitsPorSample / 8)
+
+    const bufferArray =
+      new ArrayBuffer(
+        44 +
+        dataLength
+      )
+
+    const view =
+      new DataView(
+        bufferArray
+      )
+
+    const escreverTexto = (
+      offset: number,
+      texto: string
+    ) => {
+
+      for (
+        let i = 0;
+        i < texto.length;
+        i++
+      ) {
+
+        view.setUint8(
+          offset + i,
+          texto.charCodeAt(i)
+        )
+
+      }
+    }
+
+    escreverTexto(
+      0,
+      'RIFF'
+    )
+
+    view.setUint32(
+      4,
+      36 +
+        dataLength,
+      true
+    )
+
+    escreverTexto(
+      8,
+      'WAVE'
+    )
+
+    escreverTexto(
+      12,
+      'fmt '
+    )
+
+    view.setUint32(
+      16,
+      16,
+      true
+    )
+
+    view.setUint16(
+      20,
+      1,
+      true
+    )
+
+    view.setUint16(
+      22,
+      numeroCanais,
+      true
+    )
+
+    view.setUint32(
+      24,
+      sampleRate,
+      true
+    )
+
+    view.setUint32(
+      28,
+      sampleRate *
+        numeroCanais *
+        (bitsPorSample / 8),
+      true
+    )
+
+    view.setUint16(
+      32,
+      numeroCanais *
+        (bitsPorSample / 8),
+      true
+    )
+
+    view.setUint16(
+      34,
+      bitsPorSample,
+      true
+    )
+
+    escreverTexto(
+      36,
+      'data'
+    )
+
+    view.setUint32(
+      40,
+      dataLength,
+      true
+    )
+
+    const canaisData:
+      Float32Array[] = []
+
+    for (
+      let canal = 0;
+      canal < numeroCanais;
+      canal++
+    ) {
+
+      canaisData.push(
+        buffer.getChannelData(
+          canal %
+            buffer.numberOfChannels
+        )
+      )
+
+    }
+
+    let offset =
+      44
+
+    for (
+      let i = 0;
+      i < buffer.length;
+      i++
+    ) {
+
+      for (
+        let canal = 0;
+        canal < numeroCanais;
+        canal++
+      ) {
+
+        let amostra =
+          canaisData[
+            canal
+          ][i]
+
+        amostra =
+          Math.max(
+            -1,
+            Math.min(
+              1,
+              amostra
+            )
+          )
+
+        const inteiro =
+          amostra < 0
+            ? amostra *
+              0x8000
+            : amostra *
+              0x7fff
+
+        view.setInt16(
+          offset,
+          inteiro,
+          true
+        )
+
+        offset +=
+          2
+      }
+    }
+
+    return new Blob(
+      [bufferArray],
+      {
+        type:
+          'audio/wav'
+      }
+    )
   }
 
   // =====================================================
@@ -645,44 +762,58 @@ function App() {
       emoji: '📻',
       titulo: 'Spot de Rádio',
       descricao:
-        'Crie spots profissionais para sua programação',
+        'Crie spots profissionais para sua programação'
     },
+
     {
       emoji: '🎉',
       titulo: 'Chamadas de Festa',
       descricao:
-        'Divulgue festas, eventos e shows',
+        'Divulgue festas, eventos e shows'
     },
+
     {
       emoji: '🙏',
       titulo: 'Chamadas Religiosas',
       descricao:
-        'Produza chamadas para igrejas e eventos religiosos',
+        'Produza chamadas para igrejas e eventos religiosos'
     },
+
     {
       emoji: '📢',
       titulo: 'Propaganda Comercial',
       descricao:
-        'Crie comerciais para empresas e lojas',
-    },
+        'Crie comerciais para empresas e lojas'
+    }
   ]
 
   // =====================================================
   // EDITOR
   // =====================================================
 
-  if (categoriaSelecionada) {
+  if (
+    categoriaSelecionada
+  ) {
+
     return (
+
       <div className="app">
 
         <header>
+
           <h1>
             FÁBRICA DA VOZ
           </h1>
 
-          <p style={{ marginTop: '25px' }}>
+          <p
+            style={{
+              marginTop:
+                '25px'
+            }}
+          >
             Seu estúdio de locução profissional
           </p>
+
         </header>
 
         <main className="main">
@@ -711,9 +842,7 @@ function App() {
                 Crie sua locução
               </h3>
 
-              {/* =================================================
-                  VOZES
-              ================================================= */}
+              {/* VOZES */}
 
               <div className="vozes">
 
@@ -723,138 +852,76 @@ function App() {
 
                 <div className="opcoes-voz">
 
-                  {/* CELSO */}
-
                   <div className="voz-card">
 
                     <button
                       type="button"
                       className={
-                        vozSelecionada === 'celso'
+                        vozSelecionada ===
+                        'masculina'
                           ? 'voz ativo'
                           : 'voz'
                       }
                       onClick={() =>
-                        setVozSelecionada('celso')
+                        setVozSelecionada(
+                          'masculina'
+                        )
                       }
                     >
 
                       <img
-                        src={celsoLocutor}
-                        alt="Celso"
+                        src={
+                          noahLocutor
+                        }
+                        alt="Noah"
                       />
 
                       <span>
-                        Celso
+                        Noah
                       </span>
 
                     </button>
 
                     <audio
                       controls
-                      src="/demonstrativos/celso.mp3"
+                      src="/noah-amostra.mp3"
                     />
 
                   </div>
 
-                  {/* PEDRO */}
-
                   <div className="voz-card">
 
                     <button
                       type="button"
                       className={
-                        vozSelecionada === 'pedro'
+                        vozSelecionada ===
+                        'feminina'
                           ? 'voz ativo'
                           : 'voz'
                       }
                       onClick={() =>
-                        setVozSelecionada('pedro')
+                        setVozSelecionada(
+                          'feminina'
+                        )
                       }
                     >
 
                       <img
-                        src={pedroLocutor}
-                        alt="Pedro"
+                        src={
+                          ninaLocutora
+                        }
+                        alt="Nina"
                       />
 
                       <span>
-                        Pedro
+                        Nina
                       </span>
 
                     </button>
 
                     <audio
                       controls
-                      src="/demonstrativos/pedro.mp3"
-                    />
-
-                  </div>
-
-                  {/* LUÍZA */}
-
-                  <div className="voz-card">
-
-                    <button
-                      type="button"
-                      className={
-                        vozSelecionada === 'luiza'
-                          ? 'voz ativo'
-                          : 'voz'
-                      }
-                      onClick={() =>
-                        setVozSelecionada('luiza')
-                      }
-                    >
-
-                      <img
-                        src={luizaLocutora}
-                        alt="Luíza"
-                      />
-
-                      <span>
-                        Luíza
-                      </span>
-
-                    </button>
-
-                    <audio
-                      controls
-                      src="/demonstrativos/luiza.mp3"
-                    />
-
-                  </div>
-
-                  {/* GABY */}
-
-                  <div className="voz-card">
-
-                    <button
-                      type="button"
-                      className={
-                        vozSelecionada === 'gaby'
-                          ? 'voz ativo'
-                          : 'voz'
-                      }
-                      onClick={() =>
-                        setVozSelecionada('gaby')
-                      }
-                    >
-
-                      <img
-                        src={gabyLocutora}
-                        alt="Gaby"
-                      />
-
-                      <span>
-                        Gaby
-                      </span>
-
-                    </button>
-
-                    <audio
-                      controls
-                      src="/demonstrativos/gaby.mp3"
+                      src="/nina-amostra.mp3"
                     />
 
                   </div>
@@ -863,9 +930,7 @@ function App() {
 
               </div>
 
-              {/* =================================================
-                  ESTILOS
-              ================================================= */}
+              {/* ESTILOS */}
 
               <div className="estilos">
 
@@ -878,15 +943,21 @@ function App() {
                   <button
                     type="button"
                     className={
-                      estiloSelecionado === 'normal'
+                      estiloSelecionado ===
+                      'normal'
                         ? 'estilo ativo'
                         : 'estilo'
                     }
                     onClick={() =>
-                      setEstiloSelecionado('normal')
+                      setEstiloSelecionado(
+                        'normal'
+                      )
                     }
                   >
-                    <span>🎙️</span>
+
+                    <span>
+                      🎙️
+                    </span>
 
                     <strong>
                       Normal
@@ -895,20 +966,27 @@ function App() {
                     <small>
                       Voz natural e profissional
                     </small>
+
                   </button>
 
                   <button
                     type="button"
                     className={
-                      estiloSelecionado === 'animado'
+                      estiloSelecionado ===
+                      'animado'
                         ? 'estilo ativo'
                         : 'estilo'
                     }
                     onClick={() =>
-                      setEstiloSelecionado('animado')
+                      setEstiloSelecionado(
+                        'animado'
+                      )
                     }
                   >
-                    <span>🔥</span>
+
+                    <span>
+                      🔥
+                    </span>
 
                     <strong>
                       Animado
@@ -917,12 +995,14 @@ function App() {
                     <small>
                       Mais energia e entusiasmo
                     </small>
+
                   </button>
 
                   <button
                     type="button"
                     className={
-                      estiloSelecionado === 'muitoAnimado'
+                      estiloSelecionado ===
+                      'muitoAnimado'
                         ? 'estilo ativo'
                         : 'estilo'
                     }
@@ -932,7 +1012,10 @@ function App() {
                       )
                     }
                   >
-                    <span>🚀</span>
+
+                    <span>
+                      🚀
+                    </span>
 
                     <strong>
                       Muito Animado
@@ -941,12 +1024,14 @@ function App() {
                     <small>
                       Mais ritmo e empolgação
                     </small>
+
                   </button>
 
                   <button
                     type="button"
                     className={
-                      estiloSelecionado === 'superImpacto'
+                      estiloSelecionado ===
+                      'superImpacto'
                         ? 'estilo ativo'
                         : 'estilo'
                     }
@@ -956,7 +1041,10 @@ function App() {
                       )
                     }
                   >
-                    <span>💥</span>
+
+                    <span>
+                      💥
+                    </span>
 
                     <strong>
                       Super Impacto
@@ -965,15 +1053,14 @@ function App() {
                     <small>
                       Forte, intenso e marcante
                     </small>
+
                   </button>
 
                 </div>
 
               </div>
 
-              {/* =================================================
-                  VELOCIDADE
-              ================================================= */}
+              {/* VELOCIDADE */}
 
               <div className="opcoes-velocidade">
 
@@ -984,12 +1071,15 @@ function App() {
                 <button
                   type="button"
                   className={
-                    velocidade === 'normal'
+                    velocidade ===
+                    'normal'
                       ? 'velocidade ativo'
                       : 'velocidade'
                   }
                   onClick={() =>
-                    setVelocidade('normal')
+                    setVelocidade(
+                      'normal'
+                    )
                   }
                 >
                   Normal
@@ -998,12 +1088,15 @@ function App() {
                 <button
                   type="button"
                   className={
-                    velocidade === 'rapido'
+                    velocidade ===
+                    'rapido'
                       ? 'velocidade ativo'
                       : 'velocidade'
                   }
                   onClick={() =>
-                    setVelocidade('rapido')
+                    setVelocidade(
+                      'rapido'
+                    )
                   }
                 >
                   Rápido
@@ -1012,12 +1105,15 @@ function App() {
                 <button
                   type="button"
                   className={
-                    velocidade === 'superRapido'
+                    velocidade ===
+                    'superRapido'
                       ? 'velocidade ativo'
                       : 'velocidade'
                   }
                   onClick={() =>
-                    setVelocidade('superRapido')
+                    setVelocidade(
+                      'superRapido'
+                    )
                   }
                 >
                   Super rápido
@@ -1025,11 +1121,14 @@ function App() {
 
               </div>
 
-              <div style={{ height: '20px' }} />
+              <div
+                style={{
+                  height:
+                    '20px'
+                }}
+              />
 
-              {/* =================================================
-                  TEXTO
-              ================================================= */}
+              {/* TEXTO */}
 
               <label>
                 Texto da locução
@@ -1040,475 +1139,480 @@ function App() {
                 placeholder="Digite aqui o texto que você quer transformar em voz..."
               />
 
-              {/* =================================================
-                  GERAR
-              ================================================= */}
+              {/* EDITOR DE TEMPO */}
+
+              <div className="editor-tempo">
+
+                <h3>
+                  ⏱️ Editor de tempo
+                </h3>
+
+                <p>
+                  Defina quantos segundos de trilha você quer antes e depois da locução.
+                </p>
+
+                <div className="tempo-opcoes">
+
+                  <div className="tempo-campo">
+
+                    <label>
+                      ⏮️ Início
+                    </label>
+
+                    <div className="tempo-presets">
+
+                      {[0, 5, 10, 15, 20].map(
+                        (valor) => (
+
+                          <button
+                            key={
+                              valor
+                            }
+                            type="button"
+                            className={
+                              segundosInicio ===
+                              valor
+                                ? 'velocidade ativo'
+                                : 'velocidade'
+                            }
+                            onClick={() =>
+                              setSegundosInicio(
+                                valor
+                              )
+                            }
+                          >
+                            {valor}s
+                          </button>
+
+                        )
+                      )}
+
+                    </div>
+
+                    <label>
+                      Personalizado
+                    </label>
+
+                    <input
+                      type="number"
+                      min="0"
+                      max="60"
+                      value={
+                        segundosInicio
+                      }
+                      onChange={(e) =>
+                        setSegundosInicio(
+                          Math.min(
+                            60,
+                            Math.max(
+                              0,
+                              Number(
+                                e.target.value
+                              )
+                            )
+                          )
+                        )
+                      }
+                    />
+
+                  </div>
+
+                  <div className="tempo-campo">
+
+                    <label>
+                      ⏭️ Final
+                    </label>
+
+                    <div className="tempo-presets">
+
+                      {[0, 5, 10, 15, 20].map(
+                        (valor) => (
+
+                          <button
+                            key={
+                              valor
+                            }
+                            type="button"
+                            className={
+                              segundosFinal ===
+                              valor
+                                ? 'velocidade ativo'
+                                : 'velocidade'
+                            }
+                            onClick={() =>
+                              setSegundosFinal(
+                                valor
+                              )
+                            }
+                          >
+                            {valor}s
+                          </button>
+
+                        )
+                      )}
+
+                    </div>
+
+                    <label>
+                      Personalizado
+                    </label>
+
+                    <input
+                      type="number"
+                      min="0"
+                      max="60"
+                      value={
+                        segundosFinal
+                      }
+                      onChange={(e) =>
+                        setSegundosFinal(
+                          Math.min(
+                            60,
+                            Math.max(
+                              0,
+                              Number(
+                                e.target.value
+                              )
+                            )
+                          )
+                        )
+                      }
+                    />
+
+                  </div>
+
+                </div>
+
+                <div className="resumo-tempo">
+
+                  🎵 Trilha:{' '}
+
+                  <strong>
+                    {segundosInicio}s
+                  </strong>
+
+                  {' → '}
+
+                  🎙️ Voz
+
+                  {' → '}
+
+                  <strong>
+                    {segundosFinal}s
+                  </strong>
+
+                  {' '}🎵
+
+                </div>
+
+              </div>
+
+              {/* AÇÕES */}
 
               <div className="acoes-geracao">
 
                 <button
                   className="botao-gerar"
-                  onClick={gerarVoz}
-                  disabled={gerando}
+                  onClick={
+                    gerarVoz
+                  }
+                  disabled={
+                    gerando
+                  }
                 >
+
                   {gerando
                     ? '⏳ Gerando...'
                     : '🔊 Gerar voz'}
+
                 </button>
 
-              </div>
+                {audioUrl && (
 
-              {/* =================================================
-                  RESULTADO
-                  SÓ APARECE DEPOIS DA GERAÇÃO
-              ================================================= */}
+                  <a
+                    className="botao-download"
+                    href={
+                      audioUrl
+                    }
+                    download="fabrica-da-voz-mixada.wav"
+                  >
+                    ⬇️ Baixar MP3
+                  </a>
 
-              {audioUrl && (
+                )}
 
-                <div className="resultado-pos-geracao">
+                {audioUrl && (
 
-                  <div className="titulo-previa">
-                    🎧 Prévia da sua locução
-                  </div>
+                  <button
+                    type="button"
+                    className="botao-trilha"
+                    onClick={() =>
+                      setMostrarTrilhas(
+                        !mostrarTrilhas
+                      )
+                    }
+                  >
+                    🎵 Adicionar trilha
+                  </button>
 
-                  <audio
-                    className="player-audio"
-                    controls
-                    src={audioUrl}
-                  />
+                )}
 
-                  <div className="acoes-geracao">
+                {/* PAINEL DE TRILHAS */}
 
-                    <a
-                      className="botao-download"
-                      href={audioUrl}
-                      download="fabrica-da-voz.wav"
+                {mostrarTrilhas && (
+
+                  <div className="painel-trilhas">
+
+                    <h3>
+                      🎵 Escolha uma trilha
+                    </h3>
+
+                    {/* UPLOAD */}
+
+                    <div
+                      className="trilha-item"
                     >
-                      ⬇️ Baixar áudio
-                    </a>
 
-                    <button
-                      type="button"
-                      className="botao-trilha"
-                      onClick={() =>
-                        setMostrarTrilhas(
-                          !mostrarTrilhas
-                        )
-                      }
-                    >
-                      🎵{' '}
-                      {mostrarTrilhas
-                        ? 'Fechar trilhas'
-                        : 'Adicionar trilha'}
-                    </button>
+                      <strong>
+                        📤 Enviar minha própria trilha
+                      </strong>
 
-                  </div>
+                      <p>
+                        Escolha uma música ou trilha de áudio do seu computador.
+                      </p>
 
-                  {/* =================================================
-                      TRILHAS
-                  ================================================= */}
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={
+                          selecionarTrilhaArquivo
+                        }
+                      />
 
-                  {mostrarTrilhas && (
-
-                    <div className="painel-trilhas">
-
-                      <h3>
-                        🎵 Escolha uma trilha
-                      </h3>
-
-                      {/* =================================================
-                          EDITOR DE TEMPO
-                          AGORA SÓ APARECE DEPOIS DA GERAÇÃO
-                      ================================================= */}
-
-                      <div className="editor-tempo">
-
-                        <h3>
-                          ⏱️ Ajuste da trilha
-                        </h3>
-
-                        <p>
-                          Escolha quanto tempo de trilha ficará antes e depois da sua locução.
-                        </p>
-
-                        <div className="tempo-opcoes">
-
-                          <div className="tempo-campo">
-
-                            <label>
-                              ⏮️ Trilha antes da voz
-                            </label>
-
-                            <input
-                              type="number"
-                              min="0"
-                              max="60"
-                              value={segundosInicio}
-                              onChange={(e) =>
-                                setSegundosInicio(
-                                  Math.min(
-                                    60,
-                                    Math.max(
-                                      0,
-                                      Number(
-                                        e.target.value
-                                      )
-                                    )
-                                  )
-                                )
-                              }
-                            />
-
-                            <small>
-                              segundos
-                            </small>
-
-                          </div>
-
-                          <div className="tempo-campo">
-
-                            <label>
-                              ⏭️ Trilha depois da voz
-                            </label>
-
-                            <input
-                              type="number"
-                              min="0"
-                              max="60"
-                              value={segundosFinal}
-                              onChange={(e) =>
-                                setSegundosFinal(
-                                  Math.min(
-                                    60,
-                                    Math.max(
-                                      0,
-                                      Number(
-                                        e.target.value
-                                      )
-                                    )
-                                  )
-                                )
-                              }
-                            />
-
-                            <small>
-                              segundos
-                            </small>
-
-                          </div>
-
-                        </div>
-
-                        <div className="resumo-tempo">
-
-                          🎵 {segundosInicio}s de trilha
-                          {' → '}
-                          🎙️ Locução
-                          {' → '}
-                          {segundosFinal}s de trilha 🎵
-
-                        </div>
-
-                      </div>
-
-                      {/* =================================================
-                          TRILHA PRÓPRIA
-                      ================================================= */}
-
-                      <div className="trilha-item">
-
-                        <strong>
-                          📤 Enviar minha própria trilha
-                        </strong>
-
-                        <p>
-                          Escolha uma música ou trilha de áudio do seu computador.
-                        </p>
-
-                        <input
-                          type="file"
-                          accept="audio/*"
-                          onChange={
-                            selecionarTrilhaArquivo
-                          }
-                        />
-
-                        {nomeTrilhaArquivo && (
-                          <div
-                            style={{
-                              marginTop: '10px',
-                            }}
-                          >
-                            🎵{' '}
-                            <strong>
-                              {nomeTrilhaArquivo}
-                            </strong>
-                          </div>
-                        )}
-
-                        {trilhaArquivo && (
-                          <audio
-                            controls
-                            style={{
-                              width: '100%',
-                              marginTop: '10px',
-                            }}
-                            src={URL.createObjectURL(
-                              trilhaArquivo
-                            )}
-                          />
-                        )}
-
-                      </div>
-
-                      {/* =================================================
-                          TRILHA 1
-                      ================================================= */}
-
-                      <div className="trilha-item">
-
-                        <strong>
-                          Trilha para Mercado
-                        </strong>
-
-                        <audio
-                          controls
-                          src="/trilhas/TRILHA PARA MERCADO.mp3"
-                        />
-
-                        <button
-                          type="button"
-                          className={
-                            trilhaSelecionada ===
-                            '/trilhas/TRILHA PARA MERCADO.mp3'
-                              ? 'botao-trilha ativo'
-                              : 'botao-trilha'
-                          }
-                          onClick={() => {
-                            setTrilhaSelecionada(
-                              '/trilhas/TRILHA PARA MERCADO.mp3'
-                            )
-                            setTrilhaArquivo(null)
-                            setNomeTrilhaArquivo('')
-                          }}
-                        >
-                          ✓ Usar esta trilha
-                        </button>
-
-                      </div>
-
-                      {/* =================================================
-                          TRILHA 2
-                      ================================================= */}
-
-                      <div className="trilha-item">
-
-                        <strong>
-                          Trilha para Mercado 2
-                        </strong>
-
-                        <audio
-                          controls
-                          src="/trilhas/TRILHA PARA MERCADO (2).mp3"
-                        />
-
-                        <button
-                          type="button"
-                          className={
-                            trilhaSelecionada ===
-                            '/trilhas/TRILHA PARA MERCADO (2).mp3'
-                              ? 'botao-trilha ativo'
-                              : 'botao-trilha'
-                          }
-                          onClick={() => {
-                            setTrilhaSelecionada(
-                              '/trilhas/TRILHA PARA MERCADO (2).mp3'
-                            )
-                            setTrilhaArquivo(null)
-                            setNomeTrilhaArquivo('')
-                          }}
-                        >
-                          ✓ Usar esta trilha
-                        </button>
-
-                      </div>
-
-                      {/* =================================================
-                          TRILHA 3
-                      ================================================= */}
-
-                      <div className="trilha-item">
-
-                        <strong>
-                          Trilha para Mercado 3
-                        </strong>
-
-                        <audio
-                          controls
-                          src="/trilhas/TRILHA PARA MERCADO (3).mp3"
-                        />
-
-                        <button
-                          type="button"
-                          className={
-                            trilhaSelecionada ===
-                            '/trilhas/TRILHA PARA MERCADO (3).mp3'
-                              ? 'botao-trilha ativo'
-                              : 'botao-trilha'
-                          }
-                          onClick={() => {
-                            setTrilhaSelecionada(
-                              '/trilhas/TRILHA PARA MERCADO (3).mp3'
-                            )
-                            setTrilhaArquivo(null)
-                            setNomeTrilhaArquivo('')
-                          }}
-                        >
-                          ✓ Usar esta trilha
-                        </button>
-
-                      </div>
-
-                      {/* =================================================
-                          VOLUMES
-                      ================================================= */}
-
-                      {(trilhaSelecionada ||
-                        trilhaArquivo) && (
+                      {nomeTrilhaArquivo && (
 
                         <div
-                          className="controle-volume-trilha"
                           style={{
-                            marginTop: '20px',
-                            padding: '18px',
-                            borderRadius: '12px',
-                            background:
-                              'rgba(255,255,255,0.04)',
-                            border:
-                              '1px solid rgba(255,255,255,0.08)',
+                            marginTop:
+                              '10px'
                           }}
                         >
 
-                          <label
-                            style={{
-                              display: 'block',
-                              marginBottom: '10px',
-                              fontWeight: 700,
-                            }}
-                          >
-                            🎙️ Volume da voz: {volumeVoz}%
-                          </label>
+                          🎵{' '}
 
-                          <input
-                            type="range"
-                            min="0"
-                            max="150"
-                            step="1"
-                            value={volumeVoz}
-                            onChange={(e) =>
-                              setVolumeVoz(
-                                Number(
-                                  e.target.value
-                                )
-                              )
-                            }
-                            style={{
-                              width: '100%',
-                              cursor: 'pointer',
-                            }}
-                          />
-
-                          <label
-                            style={{
-                              display: 'block',
-                              marginTop: '22px',
-                              marginBottom: '10px',
-                              fontWeight: 700,
-                            }}
-                          >
-                            🎵 Volume da trilha: {volumeTrilha}%
-                          </label>
-
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            step="1"
-                            value={volumeTrilha}
-                            onChange={(e) =>
-                              setVolumeTrilha(
-                                Number(
-                                  e.target.value
-                                )
-                              )
-                            }
-                            style={{
-                              width: '100%',
-                              cursor: 'pointer',
-                            }}
-                          />
-
-                          <small
-                            style={{
-                              display: 'block',
-                              marginTop: '12px',
-                              opacity: 0.75,
-                            }}
-                          >
-                            Durante a voz, a trilha é reduzida automaticamente para deixar o locutor em destaque.
-                          </small>
+                          <strong>
+                            {nomeTrilhaArquivo}
+                          </strong>
 
                         </div>
 
                       )}
 
-                      {/* =================================================
-                          MIXAR
-                      ================================================= */}
+                      {trilhaArquivo && (
 
-                      {(trilhaSelecionada ||
-                        trilhaArquivo) && (
-
-                        <div
-                          className="acoes-geracao"
+                        <audio
+                          controls
                           style={{
-                            marginTop: '22px',
+                            width:
+                              '100%',
+                            marginTop:
+                              '10px'
                           }}
-                        >
-
-                          <button
-                            type="button"
-                            className="botao-trilha"
-                            onClick={
-                              mixarVozComTrilha
-                            }
-                            disabled={mixando}
-                          >
-                            {mixando
-                              ? '⏳ Mixando...'
-                              : '🎚️ Mixar voz + trilha'}
-                          </button>
-
-                        </div>
+                          src={
+                            URL.createObjectURL(
+                              trilhaArquivo
+                            )
+                          }
+                        />
 
                       )}
 
                     </div>
 
-                  )}
+                    {/* TRILHA 1 */}
 
-                </div>
+                    <div className="trilha-item">
 
-              )}
+                      <strong>
+                        Trilha para Mercado
+                      </strong>
+
+                      <audio
+                        controls
+                        src="/trilhas/TRILHA PARA MERCADO.mp3"
+                      />
+
+                      <button
+                        type="button"
+                        className={
+                          trilhaSelecionada ===
+                          '/trilhas/TRILHA PARA MERCADO.mp3'
+                            ? 'botao-trilha ativo'
+                            : 'botao-trilha'
+                        }
+                        onClick={() => {
+
+                          setTrilhaSelecionada(
+                            '/trilhas/TRILHA PARA MERCADO.mp3'
+                          )
+
+                          setTrilhaArquivo(
+                            null
+                          )
+
+                          setNomeTrilhaArquivo(
+                            ''
+                          )
+
+                        }}
+                      >
+                        ✓ Usar esta trilha
+                      </button>
+
+                    </div>
+
+                    {/* TRILHA 2 */}
+
+                    <div className="trilha-item">
+
+                      <strong>
+                        Trilha para Mercado 2
+                      </strong>
+
+                      <audio
+                        controls
+                        src="/trilhas/TRILHA PARA MERCADO (2).mp3"
+                      />
+
+                      <button
+                        type="button"
+                        className={
+                          trilhaSelecionada ===
+                          '/trilhas/TRILHA PARA MERCADO (2).mp3'
+                            ? 'botao-trilha ativo'
+                            : 'botao-trilha'
+                        }
+                        onClick={() => {
+
+                          setTrilhaSelecionada(
+                            '/trilhas/TRILHA PARA MERCADO (2).mp3'
+                          )
+
+                          setTrilhaArquivo(
+                            null
+                          )
+
+                          setNomeTrilhaArquivo(
+                            ''
+                          )
+
+                        }}
+                      >
+                        ✓ Usar esta trilha
+                      </button>
+
+                    </div>
+
+                    {/* TRILHA 3 */}
+
+                    <div className="trilha-item">
+
+                      <strong>
+                        Trilha para Mercado 3
+                      </strong>
+
+                      <audio
+                        controls
+                        src="/trilhas/TRILHA PARA MERCADO (3).mp3"
+                      />
+
+                      <button
+                        type="button"
+                        className={
+                          trilhaSelecionada ===
+                          '/trilhas/TRILHA PARA MERCADO (3).mp3'
+                            ? 'botao-trilha ativo'
+                            : 'botao-trilha'
+                        }
+                        onClick={() => {
+
+                          setTrilhaSelecionada(
+                            '/trilhas/TRILHA PARA MERCADO (3).mp3'
+                          )
+
+                          setTrilhaArquivo(
+                            null
+                          )
+
+                          setNomeTrilhaArquivo(
+                            ''
+                          )
+
+                        }}
+                      >
+                        ✓ Usar esta trilha
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+                {/* BOTÃO MIXAR */}
+
+                {(trilhaSelecionada ||
+                  trilhaArquivo) && (
+
+                  <button
+                    type="button"
+                    className="botao-trilha"
+                    onClick={
+                      mixarVozComTrilha
+                    }
+                    disabled={
+                      mixando
+                    }
+                  >
+
+                    {mixando
+                      ? '⏳ Mixando...'
+                      : '🎚️ Mixar voz + trilha'}
+
+                  </button>
+
+                )}
+
+                {audioUrl && (
+
+                  <div className="titulo-previa">
+                    🎧 Prévia da sua locução
+                  </div>
+
+                )}
+
+                {audioUrl && (
+
+                  <audio
+                    className="player-audio"
+                    controls
+                    src={
+                      audioUrl
+                    }
+                  />
+
+                )}
+
+              </div>
 
             </div>
-
-            {/* VOLTAR */}
 
             <button
               className="voltar"
               onClick={() =>
-                setCategoriaSelecionada(null)
+                setCategoriaSelecionada(
+                  null
+                )
               }
             >
               ← Voltar
@@ -1527,6 +1631,7 @@ function App() {
   // =====================================================
 
   return (
+
     <div className="app">
 
       <header className="topo">
@@ -1576,7 +1681,9 @@ function App() {
 
                 <button
                   className="card"
-                  key={categoria.titulo}
+                  key={
+                    categoria.titulo
+                  }
                   onClick={() =>
                     setCategoriaSelecionada(
                       categoria.titulo
