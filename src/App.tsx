@@ -273,7 +273,7 @@ function App() {
 
   try {
     const resposta = await fetch(
-      '/api/gerar voz',
+      '/api/gerar-voz',
       {
         method: 'POST',
         headers: {
