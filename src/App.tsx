@@ -207,7 +207,7 @@ function App() {
 
   const vozes: Voz[] = [
     {
-      id: 'IKne3meq5aSn9XLyUdCD',
+      id: 'CQUa1KO9t8WZRPTc1a5k',
       nome: 'Noah',
       foto: noahLocutor,
       demonstrativo: '/noah-amostra.mp3'
