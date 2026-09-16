@@ -1,0 +1,1494 @@
+/* =========================================================
+   FÁBRICA DA VOZ - APP.CSS
+   CSS LIMPO E ORGANIZADO
+   ========================================================= */
+
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f7f7fa;
+  --text: #57515f;
+  --text-dark: #17131d;
+  --purple: #8b5cf6;
+  --purple-dark: #6d28d9;
+  --purple-light: #a855f7;
+  --border: #dedbe5;
+  --shadow: 0 10px 30px rgba(30, 20, 50, 0.08);
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Arial, sans-serif;
+
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  background: #ffffff;
+  overflow-x: hidden;
+}
+
+button,
+textarea,
+input {
+  font-family: inherit;
+}
+
+/* =========================================================
+   APLICAÇÃO
+   ========================================================= */
+
+.app {
+  width: 100%;
+  max-width: 1126px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   TOPO / BANNER
+   ========================================================= */
+
+.topo {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #151022;
+}
+
+.topo .logo {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: block;
+  line-height: 0;
+}
+
+.topo .logo img {
+  width: 100%;
+  height: auto;
+  max-height: 360px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* =========================================================
+   CABEÇALHO DO EDITOR
+   ========================================================= */
+
+.app > header:not(.topo) {
+  width: 100%;
+  padding: 35px 20px 10px;
+  text-align: center;
+}
+
+.app > header:not(.topo) h1 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.app > header:not(.topo) p {
+  margin: 12px 0 0;
+  color: #77717f;
+  font-size: 16px;
+}
+
+/* =========================================================
+   CONTEÚDO PRINCIPAL
+   ========================================================= */
+
+.main {
+  width: 100%;
+  flex: 1;
+  padding: 32px 35px 45px;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.hero {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto 25px;
+  text-align: center;
+}
+
+.tag {
+  display: block;
+  margin-bottom: 7px;
+  color: #77717f;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+.hero h2 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 28px;
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  margin: 12px auto 0;
+  max-width: 760px;
+  color: #77717f;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   CATEGORIAS
+   ========================================================= */
+
+.categorias {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.categorias > h3 {
+  margin: 0 0 16px;
+  text-align: center;
+  color: var(--text-dark);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   GRID DOS 4 CARDS
+   ========================================================= */
+
+.grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  align-items: stretch;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card {
+  width: 100%;
+  min-width: 0;
+  min-height: 155px;
+
+  margin: 0;
+  padding: 20px 15px 16px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  background: #ffffff;
+  color: var(--text);
+
+  border: 1px solid #d8d5df;
+  border-radius: 0;
+
+  cursor: pointer;
+  text-align: center;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.card:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.card:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.card:hover {
+  background: #faf8ff;
+  border-color: rgba(139, 92, 246, 0.55);
+  box-shadow: 0 8px 22px rgba(90, 50, 140, 0.10);
+  transform: translateY(-2px);
+}
+
+.cardEmoji {
+  display: block;
+  height: 22px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.cardTexto {
+  width: 100%;
+}
+
+.cardTexto h4 {
+  margin: 0;
+  color: #27212f;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.cardTexto p {
+  margin: 12px 0 0;
+  color: #77717f;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.seta {
+  display: block;
+  margin-top: auto;
+  padding-top: 10px;
+  color: #77717f;
+  font-size: 16px;
+}
+
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+
+footer {
+  width: 100%;
+  padding: 12px 20px 22px;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+  color: #8a8491;
+  font-size: 12px;
+}
+
+/* =========================================================
+   EDITOR
+   ========================================================= */
+
+.editor {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.editor > h3 {
+  margin: 0 0 25px;
+  color: var(--text-dark);
+  text-align: center;
+  font-size: 22px;
+}
+
+/* =========================================================
+   VOZES
+   ========================================================= */
+
+.vozes {
+  width: 100%;
+}
+
+.vozes > label,
+.estilos > label,
+.opcoes-velocidade > label,
+.editor > label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.opcoes-voz {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.voz-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voz {
+  width: 100%;
+  min-height: 145px;
+  padding: 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(145deg, #171225, #0d0b14);
+  color: #ffffff;
+
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.voz:hover {
+  transform: translateY(-2px);
+  border-color: var(--purple-light);
+  box-shadow: 0 8px 25px rgba(100, 40, 160, 0.22);
+}
+
+.voz.ativo {
+  border-color: var(--purple-light);
+  background: linear-gradient(145deg, #291640, #120d1d);
+  box-shadow: 0 0 22px rgba(168, 85, 247, 0.25);
+}
+
+.voz img {
+  width: 78px;
+  height: 78px;
+  margin: 0 auto 9px;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.voz span {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.voz-card audio {
+  width: 100%;
+  height: 36px;
+}
+
+/* =========================================================
+   ESTILOS
+   ========================================================= */
+
+.estilos {
+  width: 100%;
+  margin-top: 28px;
+}
+
+.opcoes-estilo {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.estilo {
+  min-height: 90px;
+  padding: 13px 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  background: #ffffff;
+  color: #4d4657;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.estilo:hover {
+  border-color: var(--purple-light);
+  background: #faf7ff;
+}
+
+.estilo.ativo {
+  border-color: var(--purple-light);
+  background: rgba(168, 85, 247, 0.10);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.08);
+}
+
+.estilo strong {
+  color: #292330;
+  font-size: 14px;
+}
+
+.estilo small {
+  color: #77717f;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   VELOCIDADE
+   ========================================================= */
+
+.opcoes-velocidade {
+  width: 100%;
+  margin-top: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.opcoes-velocidade > label {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.velocidade {
+  min-width: 110px;
+  height: 42px;
+  padding: 0 15px;
+
+  background: #ffffff;
+  color: #514a5b;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.velocidade:hover {
+  border-color: var(--purple-light);
+}
+
+.velocidade.ativo {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* =========================================================
+   CAMPO DE TEXTO
+   ========================================================= */
+
+.campo-texto {
+  display: block;
+  width: 100%;
+  height: 180px;
+  min-height: 180px;
+
+  margin: 0 0 20px;
+  padding: 16px;
+
+  box-sizing: border-box;
+  resize: vertical;
+
+  background: #0b0912;
+  color: #ffffff;
+
+  border: 1px solid rgba(168, 85, 247, 0.6);
+  border-radius: 14px;
+
+  font-size: 16px;
+  line-height: 1.5;
+
+  outline: none;
+}
+
+.campo-texto::placeholder {
+  color: #8f8a9d;
+  opacity: 1;
+}
+
+.campo-texto:focus {
+  border-color: var(--purple-light);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.12);
+}
+
+/* =========================================================
+   BOTÕES DE GERAÇÃO
+   ========================================================= */
+
+.acoes-geracao {
+  width: 100%;
+  margin: 22px auto 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.botao-gerar {
+  width: 190px;
+  height: 52px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  border-radius: 12px;
+
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.18);
+  transition: 0.2s ease;
+}
+
+.botao-gerar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.28);
+}
+
+.botao-gerar:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+
+/* =========================================================
+   DOWNLOAD
+   ========================================================= */
+
+.botao-download {
+  width: 190px;
+  height: 52px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+  border: 1px solid #a855f7;
+
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.18);
+  transition: 0.2s ease;
+}
+
+.botao-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(168, 85, 247, 0.28);
+}
+
+/* =========================================================
+   BOTÃO TRILHA
+   ========================================================= */
+
+.botao-trilha {
+  min-width: 180px;
+  min-height: 46px;
+
+  padding: 0 18px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(168, 85, 247, 0.55);
+  border-radius: 11px;
+
+  background: #ffffff;
+  color: #55357a;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.botao-trilha:hover {
+  background: #faf7ff;
+  border-color: var(--purple-light);
+}
+
+.botao-trilha.ativo {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* =========================================================
+   RESULTADO
+   ========================================================= */
+
+.resultado-pos-geracao {
+  width: 100%;
+  margin-top: 28px;
+  text-align: center;
+}
+
+.titulo-previa {
+  margin: 0 0 10px;
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.player-audio {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: 52px;
+  margin: 10px auto 0;
+}
+
+.resultado-pos-geracao .acoes-geracao {
+  margin-top: 16px;
+}
+
+/* =========================================================
+   PAINEL DE TRILHAS
+   ========================================================= */
+
+.painel-trilhas {
+  width: 100%;
+  margin-top: 25px;
+  padding: 22px;
+
+  background: #faf9fc;
+
+  border: 1px solid var(--border);
+  border-radius: 16px;
+
+  text-align: left;
+}
+
+.painel-trilhas > h3 {
+  margin: 0 0 20px;
+  text-align: center;
+  color: var(--text-dark);
+  font-size: 19px;
+}
+
+/* =========================================================
+   TEMPO
+   ========================================================= */
+
+.editor-tempo {
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.editor-tempo h3 {
+  margin: 0;
+  color: var(--text-dark);
+  font-size: 16px;
+}
+
+.editor-tempo > p {
+  margin: 8px 0 18px;
+  color: #77717f;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tempo-opcoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.tempo-campo {
+  padding: 14px;
+  background: #faf9fc;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.tempo-campo label {
+  display: block;
+  margin-bottom: 9px;
+  color: #403949;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tempo-campo input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+
+  background: #ffffff;
+  color: #292330;
+
+  border: 1px solid var(--border);
+  border-radius: 9px;
+
+  font-size: 15px;
+}
+
+.tempo-campo small {
+  display: block;
+  margin-top: 5px;
+  color: #8a8491;
+}
+
+.resumo-tempo {
+  margin-top: 15px;
+  padding: 12px;
+  text-align: center;
+
+  background: rgba(168, 85, 247, 0.08);
+  color: #56327a;
+
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   TRILHAS
+   ========================================================= */
+
+.trilha-item {
+  width: 100%;
+  margin-top: 15px;
+  padding: 17px;
+
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+
+.trilha-item strong {
+  color: #332c3b;
+  font-size: 14px;
+}
+
+.trilha-item p {
+  margin: 7px 0 12px;
+  color: #77717f;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.trilha-item input[type="file"] {
+  width: 100%;
+  font-size: 13px;
+}
+
+.trilha-item audio {
+  width: 100%;
+  margin-top: 10px;
+  height: 40px;
+}
+
+.trilha-item .botao-trilha {
+  margin-top: 12px;
+}
+
+/* =========================================================
+   VOLTAR
+   ========================================================= */
+
+button.voltar {
+  width: 180px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 22px auto 0;
+  padding: 0;
+
+  background: #ffffff !important;
+  color: #6d28d9 !important;
+
+  border: 1px solid #8b5cf6 !important;
+  border-radius: 10px;
+
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  font-family: inherit;
+
+  opacity: 1 !important;
+  visibility: visible !important;
+
+  -webkit-text-fill-color: #6d28d9 !important;
+
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+button.voltar:hover {
+  background: #f5f3ff !important;
+  color: #5b21b6 !important;
+  -webkit-text-fill-color: #5b21b6 !important;
+}
+
+button.voltar:active {
+  transform: scale(0.98);
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .main {
+    padding: 28px 22px 40px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card:first-child {
+    border-radius: 10px 0 0 0;
+  }
+
+  .card:nth-child(2) {
+    border-radius: 0 10px 0 0;
+  }
+
+  .card:nth-child(3) {
+    border-radius: 0 0 0 10px;
+  }
+
+  .card:last-child {
+    border-radius: 0 0 10px 0;
+  }
+
+  .opcoes-voz {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .opcoes-estilo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .app {
+    width: 100%;
+  }
+
+  .topo .logo img {
+    max-height: 240px;
+    object-fit: cover;
+  }
+
+  .main {
+    padding: 24px 14px 35px;
+  }
+
+  .hero {
+    margin-bottom: 22px;
+  }
+
+  .hero h2 {
+    font-size: 24px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .card,
+  .card:first-child,
+  .card:nth-child(2),
+  .card:nth-child(3),
+  .card:last-child {
+    min-height: 125px;
+    border-radius: 12px;
+  }
+
+  .cardTexto p {
+    margin-top: 8px;
+  }
+
+  .opcoes-voz {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .voz {
+    min-height: 135px;
+    padding: 12px;
+  }
+
+  .voz img {
+    width: 65px;
+    height: 65px;
+  }
+
+  .opcoes-estilo {
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .estilo {
+    min-height: 85px;
+  }
+
+  .tempo-opcoes {
+    grid-template-columns: 1fr;
+  }
+
+  .painel-trilhas {
+    padding: 14px;
+  }
+
+  .acoes-geracao {
+    flex-direction: column;
+  }
+
+  .botao-gerar,
+  .botao-download {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+/* CORREÇÃO DO BANNER PRINCIPAL */
+img {
+  max-width: 100%;
+}
+
+header img,
+.hero img,
+.banner img,
+.logo img {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  object-fit: contain !important;
+}
+/* ===== CORREÇÃO FINAL DE CENTRALIZAÇÃO ===== */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Mantém todo o conteúdo principal centralizado */
+main,
+main > section,
+section {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Cabeçalhos e textos */
+main h1,
+main h2,
+main h3,
+main p,
+main .subtitle,
+main .description {
+  text-align: center;
+}
+
+/* Área dos cards */
+main .cards,
+main .card-grid,
+main .categories,
+main .options,
+main .voices,
+main .voice-grid {
+  width: 100%;
+  max-width: 1100px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  justify-content: center !important;
+}
+
+/* Quando houver grid */
+main .cards,
+main .card-grid,
+main .categories,
+main .voice-grid {
+  display: grid;
+  justify-content: center !important;
+  justify-items: stretch;
+}
+
+/* Cards individuais */
+main .card,
+main .category-card,
+main .voice-card {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Evita elementos com deslocamento lateral */
+main,
+main > *,
+section > * {
+  box-sizing: border-box;
+}
+
+/* Imagem/logo do topo */
+header,
+.hero,
+.hero-section,
+.banner,
+.banner-container {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Celular */
+@media (max-width: 768px) {
+  main,
+  main > section,
+  section {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  main .cards,
+  main .card-grid,
+  main .categories,
+  main .voice-grid {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+}
+/* ===== CENTRALIZAR OS 4 CARDS DA HOME ===== */
+
+.cards-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 20px !important;
+
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+.cards-container > * {
+  width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* telas menores */
+@media (max-width: 900px) {
+  .cards-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .cards-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+/* =========================================================
+   CENTRALIZAÇÃO DEFINITIVA - FÁBRICA DA VOZ
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================
+   TOPO / LOGOTIPO
+   ========================= */
+
+.topo {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+
+.logo {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo img {
+  display: block;
+  width: 100%;
+  max-width: 1100px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* =========================
+   CONTEÚDO PRINCIPAL
+   ========================= */
+
+.main {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto !important;
+  padding: 40px 24px 60px;
+  text-align: center;
+}
+
+/* =========================
+   HERO
+   ========================= */
+
+.hero {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto 45px !important;
+  padding: 0;
+  text-align: center !important;
+}
+
+.hero h2,
+.hero h3,
+.hero p,
+.hero .tag {
+  text-align: center !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================
+   CATEGORIAS
+   ========================= */
+
+.categorias {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto !important;
+  padding: 0;
+  text-align: center !important;
+}
+
+.categorias h3 {
+  text-align: center !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================
+   CARDS DA PÁGINA INICIAL
+   ========================= */
+
+.grid {
+  width: 100%;
+  max-width: 1100px;
+  margin: 25px auto 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.card {
+  width: 100%;
+  margin: 0 !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardTexto {
+  width: 100%;
+  text-align: center !important;
+}
+
+.cardTexto h4,
+.cardTexto p {
+  text-align: center !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cardEmoji,
+.seta {
+  text-align: center;
+}
+
+/* =========================
+   EDITOR DE LOCUÇÃO
+   ========================= */
+
+.editor {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto !important;
+  padding: 0;
+  text-align: center;
+}
+
+.editor h3 {
+  text-align: center !important;
+}
+
+/* =========================
+   VOZES
+   ========================= */
+
+.vozes {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto !important;
+  text-align: center !important;
+}
+
+.vozes > label {
+  display: block;
+  width: 100%;
+  text-align: center !important;
+  margin: 0 auto 18px;
+}
+
+.opcoes-voz {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  justify-content: center;
+  align-items: start;
+}
+
+.voz-card {
+  width: 100%;
+  margin: 0 !important;
+  text-align: center !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.voz {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.voz img {
+  display: block;
+  margin: 0 auto 10px !important;
+}
+
+.voz span {
+  display: block;
+  width: 100%;
+  text-align: center !important;
+}
+
+.voz-card audio {
+  width: 100%;
+  margin: 8px auto 0 !important;
+}
+
+/* =========================
+   RODAPÉ
+   ========================= */
+
+footer {
+  width: 100%;
+  text-align: center !important;
+  margin: 0 auto;
+}
+
+footer p {
+  text-align: center !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* =========================
+   CELULAR
+   ========================= */
+
+@media (max-width: 800px) {
+
+  .main {
+    padding: 30px 15px 50px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .opcoes-voz {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+
+  .main {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .opcoes-voz {
+    grid-template-columns: 1fr;
+  }
+}
+/* CENTRALIZAÇÃO FINAL */
+#root {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app {
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+.main {
+  width: 100% !important;
+  max-width: 1100px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.hero,
+.categorias,
+.editor,
+.vozes {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.opcoes-voz {
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
