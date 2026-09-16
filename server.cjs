@@ -10,7 +10,7 @@ const os = require("os");
 dotenv.config();
 
 const app = express();
-const PORT = Number(process.env.PORT) || 10000;
+const PORT = Number(process.env.PORT) || 3010;
 
 // =====================================================
 // CONFIGURAÇÃO
@@ -1000,24 +1000,42 @@ app.get(
 );
 
 // =====================================================
-// ROTA DE TESTE
+// FRONTEND VITE / REACT
+//
+// O Render precisa executar `npm run build` para criar a
+// pasta dist. Depois o próprio Express entrega essa pasta.
+// As rotas /api/* continuam sendo atendidas acima.
 // =====================================================
 
-app.get(
-  "/",
-  (req, res) => {
-    res.json({
-      nome:
-        "Fábrica da Voz",
+const distPath = path.join(__dirname, "dist");
 
-      status:
-        "online",
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
 
-      mensagem:
-        "Servidor funcionando corretamente.",
-    });
-  }
-);
+  // SPA: qualquer rota que não seja /api/* recebe o index.html.
+  app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
+    const indexPath = path.join(distPath, "index.html");
+
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+      return;
+    }
+
+    res.status(500).send(
+      "Frontend não encontrado. Execute npm run build no deploy."
+    );
+  });
+} else {
+  console.warn(
+    "AVISO: pasta dist não encontrada. O frontend não será exibido até o build do Vite ser executado."
+  );
+
+  app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
+    res.status(503).send(
+      "Fábrica da Voz: frontend ainda não foi compilado. Execute npm run build."
+    );
+  });
+}
 
 // =====================================================
 // TRATAMENTO DE ERROS
