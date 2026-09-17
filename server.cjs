@@ -606,9 +606,9 @@ app.post(
                 "pt",
 
               voice_settings: {
-                stability: 0.45,
+                stability: 0.30,
                 similarity_boost: 0.80,
-                style: 0.55,
+                style: 0.75,
                 use_speaker_boost: true,
               },
 
