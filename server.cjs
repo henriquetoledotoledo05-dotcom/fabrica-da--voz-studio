@@ -596,8 +596,14 @@ app.post(
             },
 
             body: JSON.stringify({
-              text: texto,
-
+  text:
+  voiceId === "ELBrtmIkk40wCZ5YnlwM" ||
+  voiceId === "zhza6dIY7yb1xz5MKTvQ" ||
+  voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+  voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+  voiceId === "iScHbNW8K33gNo3lGgbo"
+    ? `[excited] ${texto}`
+    : texto,
               // Mantido conforme o projeto atual.
               model_id:
                 "eleven_v3",
@@ -606,11 +612,24 @@ app.post(
                 "pt",
 
               voice_settings: {
-                stability: 0.30,
-                similarity_boost: 0.80,
-                style: 0.75,
-                use_speaker_boost: true,
-              },
+  stability:
+    voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+    voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+    voiceId === "iScHbNW8K33gNo3lGgbo"
+      ? 0.20
+      : 0.30,
+
+  similarity_boost: 0.80,
+
+  style:
+    voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+    voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+    voiceId === "iScHbNW8K33gNo3lGgbo"
+      ? 0.90
+      : 0.75,
+
+  use_speaker_boost: true,
+},
 
               output_format:
                 "mp3_44100_128",
