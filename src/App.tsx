@@ -213,14 +213,14 @@ function App() {
 
   const vozes: Voz[] = [
     {
-      id: 'ELBrtmIkk40wCZ5YnlwM',
+      id: 'rz25pon9uanPpUGOW98Y',
       nome: 'Noah',
       foto: noahLocutor,
       demonstrativo: '/noah-amostra.mp3'
     },
 
     {
-      id: '21m00Tcm4TlvDq8ikWAM',
+      id: 'cxaKsaoZvZoce6kBBu0n',
       nome: 'Nina',
       foto: ninaLocutora,
       demonstrativo: '/nina-amostra.mp3'
@@ -234,7 +234,7 @@ function App() {
     },
 
     {
-      id: 'zhza6dIY7yb1xz5MKTvQ',
+      id: '0utPdY4y5ppoXQxzubar',
       nome: 'Pedro',
       foto: pedroLocutor,
       demonstrativo: '/vozes/pedro.mp3'
