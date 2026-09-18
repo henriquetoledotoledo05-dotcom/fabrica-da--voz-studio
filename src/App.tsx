@@ -54,6 +54,12 @@ function App() {
   const [audioUrl, setAudioUrl] =
     useState('')
 
+    const [mixAudioUrl, setMixAudioUrl] =
+  useState('')
+
+    const [audioOriginalUrl, setAudioOriginalUrl] =
+  useState('')
+
   const [gerando, setGerando] =
     useState(false)
 
@@ -319,10 +325,10 @@ function App() {
     const urlAudio = URL.createObjectURL(audioBlob)
 
     setAudioUrl(urlAudio)
+    setAudioOriginalUrl(urlAudio)
+    setMixAudioUrl('')
 
-    const audio = new Audio(urlAudio)
-
-    await audio.play().catch(() => {})
+    
 
   } catch (erro) {
     console.error('Erro ao gerar voz:', erro)
@@ -380,6 +386,7 @@ function App() {
     setTrilhaArquivo(
       arquivo
     )
+    setMixAudioUrl('')
 
     setNomeTrilhaArquivo(
       arquivo.name
@@ -607,7 +614,7 @@ function App() {
       try {
         const vozResponse =
           await fetch(
-            audioUrl
+            audioOriginalUrl
           )
 
         if (!vozResponse.ok) {
@@ -886,16 +893,8 @@ function App() {
             wavBlob
           )
 
-        setAudioUrl(
-          mixUrl
-        )
-
-        const audio =
-          new Audio(
-            mixUrl
-          )
-
-        await audio.play()
+        setMixAudioUrl(mixUrl)
+        
 
         await contexto.close()
 
@@ -1292,29 +1291,22 @@ function App() {
               ================================================= */}
 
               <div className="acoes-geracao">
-
                 <button
                   className="botao-gerar"
-                  onClick={
-                    gerarVoz
-                  }
-                  disabled={
-                    gerando
-                  }
+                  onClick={gerarVoz}
+                  disabled={gerando}
                 >
                   {gerando
                     ? '⏳ Gerando...'
                     : '🔊 Gerar voz'}
                 </button>
-
               </div>
 
               {/* =================================================
-                  RESULTADO
+                  RESULTADO DA VOZ
               ================================================= */}
 
               {audioUrl && (
-
                 <div className="resultado-pos-geracao">
 
                   <div className="titulo-previa">
@@ -1324,18 +1316,14 @@ function App() {
                   <audio
                     className="player-audio"
                     controls
-                    src={
-                      audioUrl
-                    }
+                    src={audioUrl}
                   />
 
                   <div className="acoes-geracao">
 
                     <a
                       className="botao-download"
-                      href={
-                        audioUrl
-                      }
+                      href={audioUrl}
                       download="fabrica-da-voz.mp3"
                     >
                       ⬇️ Baixar áudio
@@ -1345,9 +1333,7 @@ function App() {
                       type="button"
                       className="botao-trilha"
                       onClick={() =>
-                        setMostrarTrilhas(
-                          !mostrarTrilhas
-                        )
+                        setMostrarTrilhas(!mostrarTrilhas)
                       }
                     >
                       🎵{' '}
@@ -1363,7 +1349,6 @@ function App() {
                   ================================================= */}
 
                   {mostrarTrilhas && (
-
                     <div className="painel-trilhas">
 
                       <h3>
@@ -1396,18 +1381,14 @@ function App() {
                               type="number"
                               min="0"
                               max="60"
-                              value={
-                                segundosInicio
-                              }
+                              value={segundosInicio}
                               onChange={(e) =>
                                 setSegundosInicio(
                                   Math.min(
                                     60,
                                     Math.max(
                                       0,
-                                      Number(
-                                        e.target.value
-                                      )
+                                      Number(e.target.value)
                                     )
                                   )
                                 )
@@ -1430,18 +1411,14 @@ function App() {
                               type="number"
                               min="0"
                               max="60"
-                              value={
-                                segundosFinal
-                              }
+                              value={segundosFinal}
                               onChange={(e) =>
                                 setSegundosFinal(
                                   Math.min(
                                     60,
                                     Math.max(
                                       0,
-                                      Number(
-                                        e.target.value
-                                      )
+                                      Number(e.target.value)
                                     )
                                   )
                                 )
@@ -1457,13 +1434,11 @@ function App() {
                         </div>
 
                         <div className="resumo-tempo">
-
                           🎵 {segundosInicio}s de trilha
                           {' → '}
                           🎙️ Locução
                           {' → '}
                           {segundosFinal}s de trilha 🎵
-
                         </div>
 
                       </div>
@@ -1485,17 +1460,13 @@ function App() {
                         <input
                           type="file"
                           accept="audio/*"
-                          onChange={
-                            selecionarTrilhaArquivo
-                          }
+                          onChange={selecionarTrilhaArquivo}
                         />
 
                         {nomeTrilhaArquivo && (
-
                           <div
                             style={{
-                              marginTop:
-                                '10px'
+                              marginTop: '10px'
                             }}
                           >
                             🎵{' '}
@@ -1503,26 +1474,19 @@ function App() {
                               {nomeTrilhaArquivo}
                             </strong>
                           </div>
-
                         )}
 
                         {trilhaArquivo && (
-
                           <audio
                             controls
                             style={{
-                              width:
-                                '100%',
-                              marginTop:
-                                '10px'
+                              width: '100%',
+                              marginTop: '10px'
                             }}
-                            src={
-                              URL.createObjectURL(
-                                trilhaArquivo
-                              )
-                            }
+                            src={URL.createObjectURL(
+                              trilhaArquivo
+                            )}
                           />
-
                         )}
 
                       </div>
@@ -1554,14 +1518,9 @@ function App() {
                             setTrilhaSelecionada(
                               '/trilhas/TRILHA PARA MERCADO.mp3'
                             )
-
-                            setTrilhaArquivo(
-                              null
-                            )
-
-                            setNomeTrilhaArquivo(
-                              ''
-                            )
+                            setMixAudioUrl('')
+                            setTrilhaArquivo(null)
+                            setNomeTrilhaArquivo('')
                           }}
                         >
                           ✓ Usar esta trilha
@@ -1596,14 +1555,9 @@ function App() {
                             setTrilhaSelecionada(
                               '/trilhas/TRILHA PARA MERCADO (2).mp3'
                             )
-
-                            setTrilhaArquivo(
-                              null
-                            )
-
-                            setNomeTrilhaArquivo(
-                              ''
-                            )
+                            setMixAudioUrl('')
+                            setTrilhaArquivo(null)
+                            setNomeTrilhaArquivo('')
                           }}
                         >
                           ✓ Usar esta trilha
@@ -1638,14 +1592,9 @@ function App() {
                             setTrilhaSelecionada(
                               '/trilhas/TRILHA PARA MERCADO (3).mp3'
                             )
-
-                            setTrilhaArquivo(
-                              null
-                            )
-
-                            setNomeTrilhaArquivo(
-                              ''
-                            )
+                            setMixAudioUrl('')
+                            setTrilhaArquivo(null)
+                            setNomeTrilhaArquivo('')
                           }}
                         >
                           ✓ Usar esta trilha
@@ -1659,31 +1608,22 @@ function App() {
 
                       {(trilhaSelecionada ||
                         trilhaArquivo) && (
-
                         <div
                           className="controle-volume-trilha"
                           style={{
-                            marginTop:
-                              '20px',
-                            padding:
-                              '18px',
-                            borderRadius:
-                              '12px',
-                            background:
-                              'rgba(255,255,255,0.04)',
-                            border:
-                              '1px solid rgba(255,255,255,0.08)'
+                            marginTop: '20px',
+                            padding: '18px',
+                            borderRadius: '12px',
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.08)'
                           }}
                         >
 
                           <label
                             style={{
-                              display:
-                                'block',
-                              marginBottom:
-                                '10px',
-                              fontWeight:
-                                700
+                              display: 'block',
+                              marginBottom: '10px',
+                              fontWeight: 700
                             }}
                           >
                             🎙️ Volume da voz: {volumeVoz}%
@@ -1694,34 +1634,24 @@ function App() {
                             min="0"
                             max="150"
                             step="1"
-                            value={
-                              volumeVoz
-                            }
+                            value={volumeVoz}
                             onChange={(e) =>
                               setVolumeVoz(
-                                Number(
-                                  e.target.value
-                                )
+                                Number(e.target.value)
                               )
                             }
                             style={{
-                              width:
-                                '100%',
-                              cursor:
-                                'pointer'
+                              width: '100%',
+                              cursor: 'pointer'
                             }}
                           />
 
                           <label
                             style={{
-                              display:
-                                'block',
-                              marginTop:
-                                '22px',
-                              marginBottom:
-                                '10px',
-                              fontWeight:
-                                700
+                              display: 'block',
+                              marginTop: '22px',
+                              marginBottom: '10px',
+                              fontWeight: 700
                             }}
                           >
                             🎵 Volume da trilha: {volumeTrilha}%
@@ -1732,39 +1662,29 @@ function App() {
                             min="0"
                             max="100"
                             step="1"
-                            value={
-                              volumeTrilha
-                            }
+                            value={volumeTrilha}
                             onChange={(e) =>
                               setVolumeTrilha(
-                                Number(
-                                  e.target.value
-                                )
+                                Number(e.target.value)
                               )
                             }
                             style={{
-                              width:
-                                '100%',
-                              cursor:
-                                'pointer'
+                              width: '100%',
+                              cursor: 'pointer'
                             }}
                           />
 
                           <small
                             style={{
-                              display:
-                                'block',
-                              marginTop:
-                                '12px',
-                              opacity:
-                                0.75
+                              display: 'block',
+                              marginTop: '12px',
+                              opacity: 0.75
                             }}
                           >
                             Durante a voz, a trilha é reduzida automaticamente para deixar o locutor em destaque.
                           </small>
 
                         </div>
-
                       )}
 
                       {/* =================================================
@@ -1773,32 +1693,26 @@ function App() {
 
                       {(trilhaSelecionada ||
                         trilhaArquivo) && (
-
                         <div
                           className="acoes-geracao"
                           style={{
-                            marginTop:
-                              '22px'
+                            marginTop: '22px'
                           }}
                         >
 
                           <button
                             type="button"
                             className="botao-trilha"
-style={{
-  color: "#ffffff",
-  background: "linear-gradient(135deg, #6d28d9, #4c1d95)",
-  border: "1px solid #8b5cf6",
-  fontWeight: 700,
-  opacity: 1,
-  visibility: "visible",
-}}
-                            onClick={
-                              mixarVozComTrilha
-                            }
-                            disabled={
-                              mixando
-                            }
+                            style={{
+                              color: "#ffffff",
+                              background: "linear-gradient(135deg, #6d28d9, #4c1d95)",
+                              border: "1px solid #8b5cf6",
+                              fontWeight: 700,
+                              opacity: 1,
+                              visibility: "visible"
+                            }}
+                            onClick={mixarVozComTrilha}
+                            disabled={mixando}
                           >
                             {mixando
                               ? '⏳ Mixando...'
@@ -1806,18 +1720,41 @@ style={{
                           </button>
 
                         </div>
+                      )}
 
+                      {/* =================================================
+                          RESULTADO DA MIXAGEM
+                      ================================================= */}
+
+                      {mixAudioUrl && (
+                        <div className="resultado-mixagem">
+
+                          <div className="titulo-previa">
+                            🎵 Mixagem pronta
+                          </div>
+
+                          <audio
+                            className="player-audio"
+                            controls
+                            src={mixAudioUrl}
+                          />
+
+                          <a
+                            href={mixAudioUrl}
+                            download="fabrica-da-voz-mixagem.mp3"
+                            className="botao-download-mixagem"
+                          >
+                            ⬇️ Baixar mixagem
+                          </a>
+
+                        </div>
                       )}
 
                     </div>
-
                   )}
 
                 </div>
-
               )}
-
-            </div>
 
             {/* =================================================
                 VOLTAR
@@ -1833,6 +1770,8 @@ style={{
             >
               ← Voltar
             </button>
+
+          </div>
 
           </section>
 
