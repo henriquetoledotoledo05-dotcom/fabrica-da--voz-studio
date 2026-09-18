@@ -1,5 +1,5 @@
-/* =========================================================
-   FÁBRICA DA VOZ - APP.CSS
+﻿/* =========================================================
+   FÃBRICA DA VOZ - APP.CSS
    CSS LIMPO E ORGANIZADO
    ========================================================= */
 
@@ -58,7 +58,7 @@ input {
 }
 
 /* =========================================================
-   APLICAÇÃO
+   APLICAÃ‡ÃƒO
    ========================================================= */
 
 .app {
@@ -101,7 +101,7 @@ input {
 }
 
 /* =========================================================
-   CABEÇALHO DO EDITOR
+   CABEÃ‡ALHO DO EDITOR
    ========================================================= */
 
 .app > header:not(.topo) {
@@ -125,7 +125,7 @@ input {
 }
 
 /* =========================================================
-   CONTEÚDO PRINCIPAL
+   CONTEÃšDO PRINCIPAL
    ========================================================= */
 
 .main {
@@ -285,7 +285,7 @@ input {
 }
 
 /* =========================================================
-   RODAPÉ
+   RODAPÃ‰
    ========================================================= */
 
 footer {
@@ -550,7 +550,7 @@ footer p {
 }
 
 /* =========================================================
-   BOTÕES DE GERAÇÃO
+   BOTÃ•ES DE GERAÃ‡ÃƒO
    ========================================================= */
 
 .acoes-geracao {
@@ -639,7 +639,7 @@ footer p {
 }
 
 /* =========================================================
-   BOTÃO TRILHA
+   BOTÃƒO TRILHA
    ========================================================= */
 
 .botao-trilha {
@@ -1022,7 +1022,7 @@ button.voltar:active {
     max-width: 320px;
   }
 }
-/* CORREÇÃO DO BANNER PRINCIPAL */
+/* CORREÃ‡ÃƒO DO BANNER PRINCIPAL */
 img {
   max-width: 100%;
 }
@@ -1039,7 +1039,7 @@ header img,
   margin-right: auto !important;
   object-fit: contain !important;
 }
-/* ===== CORREÇÃO FINAL DE CENTRALIZAÇÃO ===== */
+/* ===== CORREÃ‡ÃƒO FINAL DE CENTRALIZAÃ‡ÃƒO ===== */
 
 html,
 body,
@@ -1060,7 +1060,7 @@ body {
   align-items: center;
 }
 
-/* Mantém todo o conteúdo principal centralizado */
+/* MantÃ©m todo o conteÃºdo principal centralizado */
 main,
 main > section,
 section {
@@ -1070,7 +1070,7 @@ section {
   margin-right: auto !important;
 }
 
-/* Cabeçalhos e textos */
+/* CabeÃ§alhos e textos */
 main h1,
 main h2,
 main h3,
@@ -1080,7 +1080,7 @@ main .description {
   text-align: center;
 }
 
-/* Área dos cards */
+/* Ãrea dos cards */
 main .cards,
 main .card-grid,
 main .categories,
@@ -1181,7 +1181,7 @@ header,
   }
 }
 /* =========================================================
-   CENTRALIZAÇÃO DEFINITIVA - FÁBRICA DA VOZ
+   CENTRALIZAÃ‡ÃƒO DEFINITIVA - FÃBRICA DA VOZ
    ========================================================= */
 
 * {
@@ -1237,7 +1237,7 @@ body {
 }
 
 /* =========================
-   CONTEÚDO PRINCIPAL
+   CONTEÃšDO PRINCIPAL
    ========================= */
 
 .main {
@@ -1288,7 +1288,7 @@ body {
 }
 
 /* =========================
-   CARDS DA PÁGINA INICIAL
+   CARDS DA PÃGINA INICIAL
    ========================= */
 
 .grid {
@@ -1330,7 +1330,7 @@ body {
 }
 
 /* =========================
-   EDITOR DE LOCUÇÃO
+   EDITOR DE LOCUÃ‡ÃƒO
    ========================= */
 
 .editor {
@@ -1410,7 +1410,7 @@ body {
 }
 
 /* =========================
-   RODAPÉ
+   RODAPÃ‰
    ========================= */
 
 footer {
@@ -1459,7 +1459,7 @@ footer p {
     grid-template-columns: 1fr;
   }
 }
-/* CENTRALIZAÇÃO FINAL */
+/* CENTRALIZAÃ‡ÃƒO FINAL */
 #root {
   width: 100% !important;
   margin: 0 !important;
@@ -1492,3 +1492,739 @@ footer p {
   margin-left: auto !important;
   margin-right: auto !important;
 }
+/* =========================================================
+   FÃBRICA DA VOZ â€” NOVA PALETA DE CORES
+   ALTERAÃ‡ÃƒO SOMENTE VISUAL â€” ESTRUTURA E FUNÃ‡Ã•ES PRESERVADAS
+   ========================================================= */
+
+:root {
+  --bg: #0b0912;
+  --bg-soft: #15121d;
+  --text: #ddd8e8;
+  --text-dark: #ffffff;
+  --purple: #8b5cf6;
+  --purple-dark: #6d28d9;
+  --purple-light: #a855f7;
+  --border: #332b42;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.30);
+}
+
+html, body, #root, .app {
+  background: #0b0912;
+  color: #ddd8e8;
+}
+
+.app > header:not(.topo) h1,
+.hero h2,
+.categorias > h3,
+.editor > h3,
+.vozes > label,
+.estilos > label,
+.opcoes-velocidade > label,
+.editor > label,
+.titulo-previa,
+.painel-trilhas > h3,
+.editor-tempo h3 {
+  color: #ffffff;
+}
+
+.app > header:not(.topo) p,
+.hero p,
+.tag,
+.cardTexto p,
+.seta,
+footer p,
+.editor-tempo > p,
+.trilha-item p,
+.tempo-campo small {
+  color: #aaa3b8;
+}
+
+.card {
+  background: #17131f;
+  color: #ddd8e8;
+  border-color: #342b43;
+}
+
+.card:hover {
+  background: #21182e;
+  border-color: rgba(168, 85, 247, 0.70);
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.18);
+}
+
+.cardTexto h4 {
+  color: #ffffff;
+}
+
+.estilo,
+.velocidade,
+.botao-trilha {
+  background: #17131f;
+  color: #ddd8e8;
+  border-color: #3a304a;
+}
+
+.estilo:hover,
+.velocidade:hover,
+.botao-trilha:hover {
+  background: #21182e;
+  border-color: var(--purple-light);
+}
+
+.estilo strong {
+  color: #ffffff;
+}
+
+.estilo small {
+  color: #aaa3b8;
+}
+
+.estilo.ativo {
+  background: rgba(168, 85, 247, 0.18);
+  border-color: var(--purple-light);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.12);
+}
+
+.botao-trilha {
+  color: #d9c7ff;
+}
+
+.campo-texto {
+  background: #09070f;
+  color: #ffffff;
+  border-color: rgba(168, 85, 247, 0.65);
+}
+
+.painel-trilhas {
+  background: #12101a;
+  border-color: #332b42;
+}
+
+.editor-tempo {
+  background: #17131f;
+  border-color: #332b42;
+}
+
+.tempo-campo {
+  background: #12101a;
+  border-color: #332b42;
+}
+
+.tempo-campo label {
+  color: #ddd8e8;
+}
+
+.tempo-campo input {
+  background: #0d0a13;
+  color: #ffffff;
+  border-color: #3a304a;
+}
+
+.resumo-tempo {
+  background: rgba(168, 85, 247, 0.14);
+  color: #d8bfff;
+}
+
+.trilha-item {
+  background: #17131f;
+  border-color: #332b42;
+}
+
+.trilha-item strong {
+  color: #ffffff;
+}
+
+button.voltar {
+  background: #17131f !important;
+  color: #c9a8ff !important;
+  border-color: #8b5cf6 !important;
+  -webkit-text-fill-color: #c9a8ff !important;
+}
+
+button.voltar:hover {
+  background: #21182e !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.topo {
+  background: #100c18;
+}
+/* =========================================================
+   BOTÕES DA ÁREA DE MIXAGEM
+   ========================================================= */
+
+.resultado-pos-geracao .acoes-geracao {
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botão MIXAR */
+.painel-trilhas .botao-trilha {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+  border: 1px solid #a78bfa !important;
+  border-radius: 12px;
+  padding: 13px 26px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.28);
+  transition: 0.2s ease;
+}
+
+.painel-trilhas .botao-trilha:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.40);
+}
+
+.painel-trilhas .botao-trilha:disabled {
+  opacity: 0.65 !important;
+  cursor: wait;
+  transform: none;
+}
+
+/* Botão/link BAIXAR MIXAGEM */
+.botao-download-mixagem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  padding: 11px 22px;
+  border-radius: 10px;
+  color: #ffffff !important;
+  background: #21182f;
+  border: 1px solid #7c3aed;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.botao-download-mixagem:hover {
+  background: #302044;
+  border-color: #a78bfa;
+  transform: translateY(-1px);
+}
+
+/* Botão VOLTAR */
+.voltar {
+  color: #ffffff !important;
+  background: transparent !important;
+  border: 1px solid #7c3aed !important;
+  border-radius: 10px;
+  padding: 11px 25px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.voltar:hover {
+  background: rgba(124, 58, 237, 0.15) !important;
+  border-color: #a78bfa !important;
+}
+/* =========================================================
+   FÁBRICA DA VOZ — ÁREA DE MIXAGEM PREMIUM
+   ========================================================= */
+
+.painel-trilhas {
+  width: 100%;
+}
+
+/* BOTÃO PRINCIPAL — MIXAR */
+.painel-trilhas > .acoes-geracao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 34px 0 42px !important;
+  padding: 0 !important;
+}
+
+.painel-trilhas > .acoes-geracao .botao-trilha {
+  min-width: 245px;
+  min-height: 50px;
+  padding: 14px 30px !important;
+
+  color: #ffffff !important;
+  background: linear-gradient(
+    135deg,
+    #9333ea 0%,
+    #7c3aed 50%,
+    #6d28d9 100%
+  ) !important;
+
+  border: 1px solid rgba(196, 181, 253, 0.65) !important;
+  border-radius: 13px !important;
+
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+
+  box-shadow:
+    0 8px 25px rgba(124, 58, 237, 0.28),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.painel-trilhas > .acoes-geracao .botao-trilha:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+
+  box-shadow:
+    0 12px 30px rgba(124, 58, 237, 0.40),
+    inset 0 1px 0 rgba(255,255,255,0.20);
+}
+
+.painel-trilhas > .acoes-geracao .botao-trilha:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   CARD — MIXAGEM PRONTA
+   ========================================================= */
+
+.resultado-mixagem {
+  width: 100%;
+  box-sizing: border-box;
+
+  margin: 0 auto !important;
+  padding: 30px 28px 28px !important;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31, 24, 46, 0.96),
+      rgba(18, 14, 28, 0.96)
+    ) !important;
+
+  border: 1px solid rgba(139, 92, 246, 0.32) !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 20px;
+}
+
+
+/* =========================================================
+   TÍTULO
+   ========================================================= */
+
+.resultado-mixagem .titulo-previa {
+  width: 100%;
+
+  margin: 0 !important;
+
+  text-align: center;
+
+  color: #f5f3ff !important;
+
+  font-size: 19px !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.1px;
+}
+
+
+/* =========================================================
+   PLAYER
+   ========================================================= */
+
+.resultado-mixagem audio,
+.resultado-mixagem .player-audio {
+  width: min(100%, 760px);
+
+  display: block;
+
+  border-radius: 12px;
+}
+
+
+/* =========================================================
+   BAIXAR MIXAGEM
+   ========================================================= */
+
+.resultado-mixagem .botao-download-mixagem {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 190px;
+
+  margin: 2px 0 0 !important;
+  padding: 12px 24px !important;
+
+  color: #ffffff !important;
+
+  background: rgba(124, 58, 237, 0.14) !important;
+
+  border: 1px solid rgba(167, 139, 250, 0.65) !important;
+  border-radius: 11px !important;
+
+  font-weight: 700;
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.resultado-mixagem .botao-download-mixagem:hover {
+  background: rgba(124, 58, 237, 0.25) !important;
+
+  border-color: #a78bfa !important;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BOTÃO VOLTAR
+   ========================================================= */
+
+.voltar {
+  display: block;
+
+  margin: 30px auto 0 !important;
+
+  padding: 11px 27px !important;
+
+  color: #dcd4ee !important;
+
+  background: rgba(255,255,255,0.025) !important;
+
+  border: 1px solid rgba(139, 92, 246, 0.50) !important;
+  border-radius: 10px !important;
+
+  font-size: 14px !important;
+  font-weight: 650 !important;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.voltar:hover {
+  color: #ffffff !important;
+
+  background: rgba(124, 58, 237, 0.12) !important;
+
+  border-color: #8b5cf6 !important;
+}
+
+
+/* =========================================================
+   CELULAR
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .painel-trilhas > .acoes-geracao {
+    margin: 25px 0 30px !important;
+  }
+
+  .painel-trilhas > .acoes-geracao .botao-trilha {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .resultado-mixagem {
+    padding: 24px 16px !important;
+    border-radius: 15px !important;
+  }
+
+  .resultado-mixagem .titulo-previa {
+    font-size: 17px !important;
+  }
+
+  .resultado-mixagem .botao-download-mixagem {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .voltar {
+    margin-top: 24px !important;
+  }
+}
+/* =====================================================
+   FÁBRICA DA VOZ — BOTÕES PREMIUM
+   ===================================================== */
+
+/* BOTÃO MIXAR VOZ + TRILHA */
+.botao-trilha {
+  min-width: 245px !important;
+  min-height: 52px !important;
+  padding: 14px 30px !important;
+
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #9333ea, #6d28d9) !important;
+
+  border: 1px solid #a78bfa !important;
+  border-radius: 13px !important;
+
+  font-size: 15px !important;
+  font-weight: 700 !important;
+
+  box-shadow:
+    0 8px 25px rgba(124, 58, 237, 0.30),
+    inset 0 1px 0 rgba(255,255,255,0.18) !important;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.botao-trilha:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+
+  box-shadow:
+    0 12px 30px rgba(124, 58, 237, 0.42),
+    inset 0 1px 0 rgba(255,255,255,0.22) !important;
+}
+
+.botao-trilha:disabled {
+  opacity: 0.75 !important;
+  transform: none !important;
+}
+
+
+/* BOTÃO BAIXAR MIXAGEM */
+.botao-download-mixagem {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 190px;
+  min-height: 46px;
+
+  padding: 11px 24px !important;
+
+  color: #ffffff !important;
+  background: rgba(124, 58, 237, 0.16) !important;
+
+  border: 1px solid rgba(167, 139, 250, 0.65) !important;
+  border-radius: 11px !important;
+
+  font-size: 14px !important;
+  font-weight: 700 !important;
+
+  text-decoration: none !important;
+
+  transition: all 0.2s ease;
+}
+
+.botao-download-mixagem:hover {
+  background: rgba(124, 58, 237, 0.28) !important;
+  border-color: #a78bfa !important;
+  transform: translateY(-1px);
+}
+
+
+/* BOTÃO VOLTAR */
+.voltar {
+  display: block;
+
+  margin: 28px auto 0 !important;
+
+  min-height: 44px;
+
+  padding: 10px 27px !important;
+
+  color: #ddd6fe !important;
+  background: rgba(255,255,255,0.025) !important;
+
+  border: 1px solid rgba(139, 92, 246, 0.55) !important;
+  border-radius: 10px !important;
+
+  font-size: 14px !important;
+  font-weight: 700 !important;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.voltar:hover {
+  color: #ffffff !important;
+  background: rgba(124, 58, 237, 0.14) !important;
+  border-color: #a78bfa !important;
+}
+
+
+/* CELULAR */
+@media (max-width: 700px) {
+
+  .botao-trilha {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .botao-download-mixagem {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .voltar {
+    width: auto;
+  }
+}
+/* =========================================================
+   SELEÇÃO — DEIXAR CLARO O QUE FOI ESCOLHIDO
+   ========================================================= */
+
+/* VOZ SELECIONADA */
+.voz.ativo {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+  border: 2px solid #c4b5fd !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.22),
+    0 10px 25px rgba(124, 58, 237, 0.35) !important;
+
+  transform: translateY(-2px);
+}
+
+.voz.ativo span {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+
+/* ESTILO SELECIONADO */
+.estilo.ativo {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+  border: 2px solid #c4b5fd !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.20),
+    0 10px 25px rgba(124, 58, 237, 0.32) !important;
+
+  transform: translateY(-2px);
+}
+
+.estilo.ativo strong,
+.estilo.ativo small,
+.estilo.ativo span {
+  color: #ffffff !important;
+}
+
+
+/* VELOCIDADE SELECIONADA */
+.velocidade.ativo {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+  border: 2px solid #c4b5fd !important;
+  color: #ffffff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.20),
+    0 7px 18px rgba(124, 58, 237, 0.30) !important;
+
+  font-weight: 800 !important;
+  transform: translateY(-1px);
+}
+
+
+/* EFEITO AO PASSAR O MOUSE */
+.voz:hover,
+.estilo:hover,
+.velocidade:hover {
+  border-color: #a78bfa !important;
+}
+
+
+/* TRANSIÇÃO SUAVE */
+.voz,
+.estilo,
+.velocidade {
+  transition:
+    background 0.2s ease,
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease !important;
+}
+/* =========================================================
+   TRILHAS — DEIXAR A TRILHA SELECIONADA BEM VISÍVEL
+   ========================================================= */
+
+/* Botão normal */
+.botao-usar-trilha {
+  color: #ddd6fe !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease;
+}
+
+/* Quando a trilha estiver selecionada */
+.botao-usar-trilha.ativo,
+.botao-usar-trilha.selecionado,
+.trilha.ativo .botao-usar-trilha,
+.trilha.selecionada .botao-usar-trilha {
+  color: #ffffff !important;
+
+  background: linear-gradient(
+    135deg,
+    #9333ea,
+    #6d28d9
+  ) !important;
+
+  border: 2px solid #c4b5fd !important;
+
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.20),
+    0 8px 22px rgba(124, 58, 237, 0.35) !important;
+
+  font-weight: 800 !important;
+
+  transform: translateY(-1px);
+}
+
+/* Hover */
+.botao-usar-trilha:hover {
+  color: #ffffff !important;
+  border-color: #a78bfa !important;
+}
+
+/* Texto do botão selecionado */
+.botao-usar-trilha.ativo *,
+.botao-usar-trilha.selecionado *,
+.trilha.ativo .botao-usar-trilha * {
+  color: #ffffff !important;
+}
+/* TRILHA SELECIONADA */
+.botao-trilha.ativo {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+  color: #ffffff !important;
+  border: 2px solid #a855f7 !important;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.20),
+              0 8px 20px rgba(139, 92, 246, 0.30) !important;
+  font-weight: 700 !important;
+  transform: translateY(-1px);
+}
+
+.botao-trilha:not(.ativo) {
+  background: #211c2b !important;
+  color: #ddd8e8 !important;
+  border: 1px solid #3b3349 !important;
+  box-shadow: none !important;
+}
+
