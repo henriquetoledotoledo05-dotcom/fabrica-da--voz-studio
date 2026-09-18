@@ -216,14 +216,14 @@ function App() {
       id: 'rz25pon9uanPpUGOW98Y',
       nome: 'Noah',
       foto: noahLocutor,
-      demonstrativo: '/noah-amostra.mp3'
+      demonstrativo: '/noah-amostra-novo.mp3'
     },
 
     {
       id: 'cxaKsaoZvZoce6kBBu0n',
       nome: 'Nina',
       foto: ninaLocutora,
-      demonstrativo: '/nina-amostra.mp3'
+      demonstrativo: '/nina-amostra-novo.mp3'
     },
 
     {
@@ -237,7 +237,7 @@ function App() {
       id: '0utPdY4y5ppoXQxzubar',
       nome: 'Pedro',
       foto: pedroLocutor,
-      demonstrativo: '/vozes/pedro.mp3'
+      demonstrativo: '/vozes/pedro-amostra-novo.mp3'
     },
 
     {
@@ -1891,3 +1891,4 @@ function App() {
 }
 
 export default App
+
