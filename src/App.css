@@ -1,4 +1,5 @@
-﻿/* =========================================================
+﻿
+/* =========================================================
    FÃBRICA DA VOZ - APP.CSS
    CSS LIMPO E ORGANIZADO
    ========================================================= */
@@ -2228,3 +2229,525 @@ button.voltar:hover {
   box-shadow: none !important;
 }
 
+/* =========================================================
+   FÁBRICA DA VOZ — AJUSTE FINAL DOS BOTÕES
+   BASEADO NA REFERÊNCIA ENVIADA
+   SOMENTE VISUAL — NÃO ALTERA FUNÇÕES
+   ========================================================= */
+
+/* Fonte */
+
+
+button,
+input,
+textarea,
+select,
+.app {
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif;
+}
+
+/* =========================================================
+   PALETA DOS CONTROLES
+   ========================================================= */
+
+:root {
+  --ref-bg: #111827;
+  --ref-card: #202a3b;
+  --ref-card-hover: #263246;
+  --ref-border: #3b465a;
+  --ref-purple: #9333ea;
+  --ref-purple-2: #6d28d9;
+  --ref-purple-light: #c084fc;
+  --ref-blue: #3b82f6;
+}
+
+/* =========================================================
+   CARDS DAS VOZES
+   ========================================================= */
+
+.voz {
+  background: #202a3b !important;
+  color: #ffffff !important;
+  border: 2px solid #39455a !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.18) !important;
+  transition: all .2s ease !important;
+}
+
+.voz:hover {
+  background: #263246 !important;
+  border-color: #6f7fa0 !important;
+  transform: translateY(-1px);
+}
+
+.voz img {
+  border: 3px solid rgba(255,255,255,.20);
+}
+
+.voz span {
+  color: #ffffff !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+/* Voz selecionada — igual ao destaque azul da referência */
+.voz.ativo {
+  background: linear-gradient(135deg, #243f73 0%, #245c76 100%) !important;
+  border: 3px solid #438cff !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 0 0 3px rgba(67,140,255,.18),
+    0 8px 25px rgba(59,130,246,.30) !important;
+  transform: translateY(-2px);
+}
+
+.voz.ativo img {
+  border-color: #63a4ff;
+}
+
+.voz.ativo span {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+/* =========================================================
+   ESTILOS DA LOCUÇÃO
+   ========================================================= */
+
+.estilo {
+  background: #202a3b !important;
+  color: #e7eaf0 !important;
+  border: 2px solid #39455a !important;
+  border-radius: 14px !important;
+  min-height: 86px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 3px 10px rgba(0,0,0,.14) !important;
+}
+
+.estilo strong {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.estilo small {
+  color: #b8c0ce !important;
+}
+
+/* Estilo selecionado */
+.estilo.ativo {
+  background: linear-gradient(135deg, #a63ff0 0%, #7c32d7 100%) !important;
+  color: #ffffff !important;
+  border: 2px solid #c58cff !important;
+  box-shadow:
+    0 0 0 3px rgba(168,85,247,.18),
+    0 8px 22px rgba(124,58,237,.30) !important;
+  transform: translateY(-1px);
+}
+
+.estilo.ativo strong,
+.estilo.ativo small,
+.estilo.ativo span {
+  color: #ffffff !important;
+}
+
+/* =========================================================
+   VELOCIDADE
+   ========================================================= */
+
+.velocidade {
+  min-width: 110px !important;
+  min-height: 44px !important;
+  padding: 0 18px !important;
+  background: #202a3b !important;
+  color: #e7eaf0 !important;
+  border: 2px solid #39455a !important;
+  border-radius: 13px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.velocidade:hover {
+  background: #263246 !important;
+  border-color: #7c5ce7 !important;
+}
+
+.velocidade.ativo {
+  background: linear-gradient(135deg, #a63ff0, #7132d4) !important;
+  color: #ffffff !important;
+  border: 2px solid #c58cff !important;
+  box-shadow:
+    0 0 0 3px rgba(168,85,247,.16),
+    0 7px 18px rgba(124,58,237,.28) !important;
+  font-weight: 800 !important;
+}
+
+/* =========================================================
+   BOTÃO GERAR ÁUDIO
+   ========================================================= */
+
+.botao-gerar {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 58px !important;
+  min-height: 58px !important;
+
+  border-radius: 16px !important;
+  border: 1px solid rgba(211,178,255,.55) !important;
+
+  background: linear-gradient(
+    100deg,
+    #8b2ff5 0%,
+    #a83cf0 48%,
+    #5f45ed 100%
+  ) !important;
+
+  color: #ffffff !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+
+  box-shadow:
+    0 8px 24px rgba(124,58,237,.35),
+    inset 0 1px 0 rgba(255,255,255,.20) !important;
+
+  transition: all .2s ease !important;
+}
+
+.botao-gerar:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 12px 28px rgba(124,58,237,.43),
+    inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+
+.botao-gerar:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   BOTÕES DE TRILHA / ÁUDIO
+   ========================================================= */
+
+.botao-trilha {
+  min-height: 52px !important;
+  min-width: 0 !important;
+  padding: 0 22px !important;
+
+  background: #202a3b !important;
+  color: #f1eaff !important;
+
+  border: 2px solid #813fd0 !important;
+  border-radius: 15px !important;
+
+  font-size: 15px !important;
+  font-weight: 700 !important;
+
+  box-shadow: none !important;
+}
+
+.botao-trilha:hover {
+  background: #273246 !important;
+  border-color: #b56cff !important;
+  transform: translateY(-1px);
+}
+
+.botao-trilha.ativo {
+  background: linear-gradient(135deg, #963ff0, #6d2bd0) !important;
+  color: #ffffff !important;
+  border: 2px solid #c58cff !important;
+  box-shadow:
+    0 0 0 3px rgba(168,85,247,.16),
+    0 8px 22px rgba(124,58,237,.30) !important;
+}
+
+/* =========================================================
+   BOTÃO VOLTAR
+   ========================================================= */
+
+button.voltar,
+.voltar {
+  min-height: 46px !important;
+  padding: 0 24px !important;
+  border-radius: 13px !important;
+
+  background: #202a3b !important;
+  color: #e6d8ff !important;
+
+  border: 2px solid #7040b4 !important;
+
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+button.voltar:hover,
+.voltar:hover {
+  background: #283348 !important;
+  color: #ffffff !important;
+  border-color: #a855f7 !important;
+}
+
+/* =========================================================
+   DOWNLOAD
+   ========================================================= */
+
+.botao-download,
+.botao-download-mixagem {
+  min-height: 48px !important;
+  border-radius: 13px !important;
+  font-family: "Poppins", "Segoe UI", Arial, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+/* =========================================================
+   MOBILE — PROPORÇÕES DA REFERÊNCIA
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .voz {
+    border-radius: 16px !important;
+  }
+
+  .estilo {
+    min-height: 78px !important;
+    border-radius: 13px !important;
+  }
+
+  .velocidade {
+    min-width: 92px !important;
+    min-height: 42px !important;
+  }
+
+  .botao-gerar {
+    height: 56px !important;
+    min-height: 56px !important;
+    border-radius: 15px !important;
+    font-size: 16px !important;
+  }
+
+  .botao-trilha {
+    min-height: 50px !important;
+    border-radius: 14px !important;
+  }
+}
+/* =========================================================
+   AJUSTE VISUAL FINAL — ESTILO DA REFERÊNCIA
+   SOMENTE CORES E APARÊNCIA DOS BOTÕES
+   ========================================================= */
+
+/* CARDS DAS VOZES */
+.voz {
+  background: #202938 !important;
+  border: 2px solid #394457 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Voz ao passar o mouse */
+.voz:hover {
+  background: #263244 !important;
+  border-color: #59677f !important;
+}
+
+/* VOZ SELECIONADA */
+.voz.ativo {
+  background: linear-gradient(
+    135deg,
+    #243f73 0%,
+    #245b76 100%
+  ) !important;
+
+  border: 3px solid #438cff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(67, 140, 255, 0.18),
+    0 8px 25px rgba(59, 130, 246, 0.30) !important;
+
+  transform: translateY(-2px) !important;
+}
+
+/* NOME DA VOZ */
+.voz span {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.voz.ativo span {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+
+/* =========================================================
+   BOTÕES DE ESTILO
+   ========================================================= */
+
+.estilo {
+  background: #202938 !important;
+  color: #e8ebf1 !important;
+  border: 2px solid #394457 !important;
+  border-radius: 14px !important;
+
+  box-shadow: none !important;
+}
+
+.estilo:hover {
+  background: #273347 !important;
+  border-color: #7651a8 !important;
+}
+
+/* ESTILO SELECIONADO */
+.estilo.ativo {
+  background: linear-gradient(
+    135deg,
+    #a53ff0 0%,
+    #7132d4 100%
+  ) !important;
+
+  color: #ffffff !important;
+
+  border: 2px solid #c58cff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(168, 85, 247, 0.16),
+    0 8px 22px rgba(124, 58, 237, 0.30) !important;
+
+  transform: translateY(-1px) !important;
+}
+
+.estilo.ativo strong,
+.estilo.ativo small,
+.estilo.ativo span {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   VELOCIDADE
+   ========================================================= */
+
+.velocidade {
+  background: #202938 !important;
+  color: #e8ebf1 !important;
+  border: 2px solid #394457 !important;
+  border-radius: 13px !important;
+}
+
+.velocidade:hover {
+  background: #273347 !important;
+  border-color: #7651a8 !important;
+}
+
+.velocidade.ativo {
+  background: linear-gradient(
+    135deg,
+    #a53ff0 0%,
+    #7132d4 100%
+  ) !important;
+
+  color: #ffffff !important;
+
+  border: 2px solid #c58cff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(168, 85, 247, 0.16),
+    0 7px 18px rgba(124, 58, 237, 0.28) !important;
+
+  font-weight: 800 !important;
+}
+
+
+/* =========================================================
+   BOTÃO GERAR ÁUDIO
+   ========================================================= */
+
+.botao-gerar {
+  background: linear-gradient(
+    100deg,
+    #8b2ff5 0%,
+    #a83cf0 48%,
+    #5f45ed 100%
+  ) !important;
+
+  color: #ffffff !important;
+
+  border: 1px solid rgba(211, 178, 255, 0.55) !important;
+  border-radius: 16px !important;
+
+  box-shadow:
+    0 8px 24px rgba(124, 58, 237, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20) !important;
+}
+
+.botao-gerar:hover {
+  filter: brightness(1.06);
+}
+
+
+/* =========================================================
+   BOTÕES DE TRILHA
+   ========================================================= */
+
+.botao-trilha {
+  background: #202938 !important;
+  color: #eee7fa !important;
+
+  border: 2px solid #7040a8 !important;
+  border-radius: 15px !important;
+
+  box-shadow: none !important;
+}
+
+.botao-trilha:hover {
+  background: #273347 !important;
+  border-color: #a855f7 !important;
+}
+
+.botao-trilha.ativo {
+  background: linear-gradient(
+    135deg,
+    #963ff0,
+    #6d2bd0
+  ) !important;
+
+  color: #ffffff !important;
+
+  border: 2px solid #c58cff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(168, 85, 247, 0.16),
+    0 8px 22px rgba(124, 58, 237, 0.30) !important;
+}
+/* =========================================================
+   VOZ SELECIONADA — PADRÃO ROXO
+   ========================================================= */
+
+.voz.ativo {
+  background: linear-gradient(
+    135deg,
+    #8b3fe8 0%,
+    #6d28d9 100%
+  ) !important;
+
+  border: 3px solid #c084fc !important;
+
+  box-shadow:
+    0 0 0 3px rgba(168, 85, 247, 0.18),
+    0 8px 25px rgba(124, 58, 237, 0.35) !important;
+
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+}
+
+.voz.ativo span {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+/* Foto da voz selecionada */
+.voz.ativo img {
+  border-color: #c084fc !important;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.35) !important;
+}
