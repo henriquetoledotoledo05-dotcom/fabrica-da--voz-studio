@@ -50,6 +50,7 @@ function App() {
 
   const [texto, setTexto] =
     useState('')
+  const [corrigindoTexto, setCorrigindoTexto] = useState(false)  
 
   const [audioUrl, setAudioUrl] =
     useState('')
@@ -265,6 +266,46 @@ function App() {
   // GERAR VOZ
   // =====================================================
 
+  const corrigirTextoComIA = async () => {
+  const textoDigitado = texto.trim()
+
+  if (!textoDigitado) {
+    alert('Digite um texto para corrigir.')
+    return
+  }
+
+  setCorrigindoTexto(true)
+
+  try {
+    const resposta = await fetch('/api/corrigir-texto', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        texto: textoDigitado
+      })
+    })
+
+    const dados = await resposta.json()
+
+    if (!resposta.ok) {
+      throw new Error(dados?.erro || 'Não foi possível corrigir o texto.')
+    }
+
+    setTexto(dados.texto || '')
+  } catch (erro) {
+    console.error('Erro ao corrigir texto:', erro)
+
+    alert(
+      erro instanceof Error
+        ? erro.message
+        : 'Não foi possível corrigir o texto.'
+    )
+  } finally {
+    setCorrigindoTexto(false)
+  }
+}
   const gerarVoz = async () => {
   const textoDigitado = texto.trim()
 
@@ -1279,12 +1320,24 @@ function App() {
               </label>
 
               <textarea
-                id="campoTextoLocucao"
-                className="campo-texto"
-                value={texto}
-                onChange={(e) => setTexto(e.target.value)}
-                placeholder="Digite aqui o texto que você quer transformar..."
-              />
+  id="campoTextoLocucao"
+  className="campo-texto"
+  value={texto}
+  onChange={(e) => setTexto(e.target.value)}
+  placeholder="Digite aqui o texto que você quer transformar..."
+/>
+
+<div className="contador-caracteres">
+  {texto.length} caracteres
+</div>
+<button
+  type="button"
+  className="botao-corrigir"
+  onClick={corrigirTextoComIA}
+  disabled={corrigindoTexto}
+>
+  {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
+</button>
 
               {/* =================================================
                   GERAR

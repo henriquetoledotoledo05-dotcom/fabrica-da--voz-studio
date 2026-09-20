@@ -2751,3 +2751,78 @@ button.voltar:hover,
   border-color: #c084fc !important;
   box-shadow: 0 0 10px rgba(168, 85, 247, 0.35) !important;
 }
+/* =========================================================
+   CONTADOR DE CARACTERES
+   ========================================================= */
+
+.contador-caracteres {
+  text-align: right;
+  margin-top: 6px;
+  padding-right: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #a78bfa;
+  opacity: 0.9;
+}
+.contador-caracteres {
+  display: block !important;
+  width: 100% !important;
+  text-align: right !important;
+  margin-top: 8px !important;
+  padding: 4px 8px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #c084fc !important;
+  background: transparent !important;
+}
+.botao-corrigir {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 18px;
+  border: 1px solid #8b5cf6;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.botao-corrigir:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+}
+
+.botao-corrigir:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+.botao-corrigir {
+  display: block !important;
+  width: auto !important;
+  min-width: 220px !important;
+  max-width: 280px !important;
+  margin: 10px auto !important;
+  padding: 11px 20px !important;
+  border: 1px solid #c084fc !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #8b3fe8 0%, #6d28d9 100%) !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
+}
+
+.botao-corrigir:hover {
+  transform: translateY(-1px) !important;
+}
+
+.botao-corrigir:disabled {
+  opacity: 0.65 !important;
+  cursor: wait !important;
+}

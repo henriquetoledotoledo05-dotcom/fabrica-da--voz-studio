@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const OpenAI = require("openai");
 const ffmpegPath = require("ffmpeg-static");
 const { spawn } = require("child_process");
 const path = require("path");
@@ -8,6 +9,9 @@ const fs = require("fs");
 const os = require("os");
 
 dotenv.config();
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3010;
@@ -514,7 +518,68 @@ function executarFfmpeg(
     }
   );
 }
+// =========================================================
+// CORRIGIR TEXTO COM IA
+// =========================================================
 
+app.post("/api/corrigir-texto", async (req, res) => {
+  try {
+    const { texto } = req.body;
+
+    if (!texto || !texto.trim()) {
+      return res.status(400).json({
+        erro: "Digite um texto para corrigir.",
+      });
+    }
+
+    const resposta = await openai.responses.create({
+      model: "gpt-5.6-luna",
+      instructions: `
+Você é um revisor especializado em textos para locução de rádio em português do Brasil.
+
+Corrija:
+- erros de ortografia;
+- acentuação;
+- pontuação;
+- concordância;
+- palavras digitadas incorretamente;
+- frases que estejam pouco naturais para serem faladas.
+
+Deixe o texto natural, claro e agradável para uma locução.
+
+MUITO IMPORTANTE:
+- Não invente informações.
+- Não altere nomes de pessoas, empresas ou lugares.
+- Não altere números de telefone.
+- Não altere preços.
+- Não altere datas ou horários.
+- Não altere endereços.
+- Preserve as informações e o sentido original.
+- Retorne SOMENTE o texto corrigido, sem explicações, sem aspas e sem comentários.
+      `,
+      input: texto.trim(),
+    });
+
+    const textoCorrigido = resposta.output_text?.trim();
+
+    if (!textoCorrigido) {
+      return res.status(500).json({
+        erro: "A IA não retornou um texto corrigido.",
+      });
+    }
+
+    res.json({
+      texto: textoCorrigido,
+    });
+  } catch (erro) {
+    console.error("ERRO AO CORRIGIR TEXTO:", erro);
+
+    res.status(500).json({
+      erro: "Não foi possível corrigir o texto.",
+      detalhes: erro?.message || "Erro desconhecido",
+    });
+  }
+});
 // =====================================================
 // GERAR VOZ - ELEVENLABS
 // =====================================================
