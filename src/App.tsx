@@ -242,14 +242,14 @@ function App() {
     },
 
     {
-      id: 'x8FWrDHAK5xiFTJLpnHq',
+      id: 'myEJoaX0UkuoJmX7w2Rf',
       nome: 'Luiza',
       foto: luizaLocutora,
       demonstrativo: '/vozes/luiza.mp3'
     },
 
     {
-      id: 'iScHbNW8K33gNo3lGgbo',
+      id: 'qn85SVnJvSWg5wutkjZa',
       nome: 'Gaby',
       foto: gabyLocutora,
       demonstrativo: '/vozes/gaby.mp3'
