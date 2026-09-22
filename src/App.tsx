@@ -329,7 +329,8 @@ function App() {
         body: JSON.stringify({
           texto: textoFinal,
           voiceId: vozAtual.id,
-          speed: velocidadeSelecionada
+          speed: velocidadeSelecionada,
+          categoria: categoriaSelecionada
         })
       }
     )
@@ -1027,7 +1028,7 @@ function App() {
           <section className="hero">
 
             <span className="tag">
-              ESTÚDIO DE LOCUÇÃO
+              ESTÚDIO DE LOCAÇÃO
             </span>
 
             <h2>
@@ -1944,4 +1945,5 @@ function App() {
 }
 
 export default App
+
 
