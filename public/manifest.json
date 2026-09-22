@@ -1,0 +1,17 @@
+{
+  "name": "Fábrica da Voz",
+  "short_name": "Fábrica da Voz",
+  "description": "Sua voz, sem limites",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b0614",
+  "icons": [
+    {
+      "src": "/icon-app.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
