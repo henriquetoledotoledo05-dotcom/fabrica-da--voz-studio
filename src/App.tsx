@@ -256,6 +256,15 @@ function App() {
     }
   ]
 
+  const vozesMasculinas = vozes.filter(
+  (voz) =>
+    ['Noah', 'Celso', 'Pedro'].includes(voz.nome)
+)
+
+const vozesFemininas = vozes.filter(
+  (voz) =>
+    ['Nina', 'Luiza', 'Gaby'].includes(voz.nome)
+)
   const vozAtual =
     vozes.find(
       (voz) =>
@@ -1061,58 +1070,85 @@ function App() {
 
                 <div className="opcoes-voz">
 
-                  {vozes.map(
-                    (voz) => (
+                  <h3 className="titulo-sexo-voz">
+  MASCULINO
+</h3>
 
-                      <div
-                        className="voz-card"
-                        key={
-                          voz.id
-                        }
-                      >
+{vozesMasculinas.map(
+  (voz) => (
+    <div
+      className="voz-card"
+      key={voz.id}
+    >
+      <button
+        type="button"
+        className={
+          vozSelecionada === voz.id
+            ? 'voz ativo'
+            : 'voz'
+        }
+        onClick={() =>
+          setVozSelecionada(voz.id)
+        }
+      >
+        <img
+          src={voz.foto}
+          alt={voz.nome}
+        />
 
-                        <button
-                          type="button"
-                          className={
-                            vozSelecionada ===
-                            voz.id
-                              ? 'voz ativo'
-                              : 'voz'
-                          }
-                          onClick={() =>
-                            setVozSelecionada(
-                              voz.id
-                            )
-                          }
-                        >
+        <span>
+          {voz.nome}
+        </span>
+      </button>
 
-                          <img
-                            src={
-                              voz.foto
-                            }
-                            alt={
-                              voz.nome
-                            }
-                          />
+      <audio
+        controls
+        preload="none"
+        src={voz.demonstrativo}
+      />
+    </div>
+  )
+)}
 
-                          <span>
-                            {voz.nome}
-                          </span>
+<h3 className="titulo-sexo-voz">
+  FEMININA
+</h3>
 
-                        </button>
+{vozesFemininas.map(
+  (voz) => (
+    <div
+      className="voz-card"
+      key={voz.id}
+    >
+      <button
+        type="button"
+        className={
+          vozSelecionada === voz.id
+            ? 'voz ativo'
+            : 'voz'
+        }
+        onClick={() =>
+          setVozSelecionada(voz.id)
+        }
+      >
+        <img
+          src={voz.foto}
+          alt={voz.nome}
+        />
 
-                        <audio
-                          controls
-                          preload="none"
-                          src={
-                            voz.demonstrativo
-                          }
-                        />
+        <span>
+          {voz.nome}
+        </span>
+      </button>
 
-                      </div>
-
-                    )
-                  )}
+      <audio
+        controls
+        preload="none"
+        src={voz.demonstrativo}
+      />
+    </div>
+  )
+)}
 
                 </div>
 
