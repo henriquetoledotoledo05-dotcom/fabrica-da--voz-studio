@@ -367,7 +367,8 @@ const vozesFemininas = vozes.filter(
           texto: textoFinal,
           voiceId: vozAtual.id,
           speed: velocidadeSelecionada,
-          categoria: categoriaSelecionada
+          categoria: categoriaSelecionada,
+          estilo: estiloSelecionado
         })
       }
     )
@@ -1189,120 +1190,56 @@ const vozesFemininas = vozes.filter(
               <div className="estilos">
 
                 <label>
-                  Escolha o estilo da locução
+                  Estilo da Voz
                 </label>
 
-                <div className="opcoes-estilo">
-
-                  <button
-                    type="button"
-                    className={
-                      estiloSelecionado ===
-                      'normal'
-                        ? 'estilo ativo'
-                        : 'estilo'
-                    }
-                    onClick={() =>
-                      setEstiloSelecionado(
-                        'normal'
-                      )
-                    }
-                  >
-                    <span>
-                      🎙️
-                    </span>
-
-                    <strong>
-                      Normal
-                    </strong>
-
-                    <small>
-                      Voz natural e profissional
-                    </small>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={
-                      estiloSelecionado ===
-                      'animado'
-                        ? 'estilo ativo'
-                        : 'estilo'
-                    }
-                    onClick={() =>
-                      setEstiloSelecionado(
-                        'animado'
-                      )
-                    }
-                  >
-                    <span>
-                      🔥
-                    </span>
-
-                    <strong>
-                      Animado
-                    </strong>
-
-                    <small>
-                      Mais energia e entusiasmo
-                    </small>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={
-                      estiloSelecionado ===
-                      'muitoAnimado'
-                        ? 'estilo ativo'
-                        : 'estilo'
-                    }
-                    onClick={() =>
-                      setEstiloSelecionado(
-                        'muitoAnimado'
-                      )
-                    }
-                  >
-                    <span>
-                      🚀
-                    </span>
-
-                    <strong>
-                      Muito Animado
-                    </strong>
-
-                    <small>
-                      Mais ritmo e empolgação
-                    </small>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={
-                      estiloSelecionado ===
-                      'superImpacto'
-                        ? 'estilo ativo'
-                        : 'estilo'
-                    }
-                    onClick={() =>
-                      setEstiloSelecionado(
-                        'superImpacto'
-                      )
-                    }
-                  >
-                    <span>
-                      💥
-                    </span>
-
-                    <strong>
-                      Super Impacto
-                    </strong>
-
-                    <small>
-                      Forte, intenso e marcante
-                    </small>
-                  </button>
-
-                </div>
+                <select
+                  className="seletor-estilo"
+                  value={estiloSelecionado}
+                  onChange={(e) =>
+                    setEstiloSelecionado(e.target.value)
+                  }
+                  style={{
+                    width: '100%',
+                    padding: '15px 18px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(139, 92, 246, 0.55)',
+                    background: '#171020',
+                    color: '#ffffff',
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="normal">
+                    Natural — Voz natural e profissional
+                  </option>
+                  <option value="animado">
+                    Animado — Mais energia e entusiasmo
+                  </option>
+                  <option value="muitoAnimado">
+                    Muito Animado — Mais ritmo e empolgação
+                  </option>
+                  <option value="superImpacto">
+                    Impacto — Forte, intenso e marcante
+                  </option>
+                  <option value="serio">
+                    Sério — Firme, sério e profissional
+                  </option>
+                  <option value="urgente">
+                    Urgente — Atenção e intensidade
+                  </option>
+                  <option value="comercial">
+                    Comercial — Persuasivo e vendedor
+                  </option>
+                  <option value="festa">
+                    Festa — Alegre e descontraído
+                  </option>
+                  <option value="solene">
+                    Solene — Grave e respeitoso
+                  </option>
+                </select>
 
               </div>
 

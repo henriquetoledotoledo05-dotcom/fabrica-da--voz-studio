@@ -593,14 +593,16 @@ app.post(
         voiceId,
         speed,
         categoria,
+        estilo,
       } = req.body;
       
+      console.log("ESTILO RECEBIDO:", estilo);
 
       console.log("");
       console.log(
         "================================="
       );
-      console.log("GERANDO VOZ");
+      console.log("GERANDO VOZ - ESTILO:", estilo);
       console.log(
         "================================="
       );
@@ -670,9 +672,15 @@ app.post(
       }
 
       if (prefixoCategoria) {
-        textoParaVoz = `${prefixoCategoria} ${texto}`;
-      }
+  textoParaVoz = `${prefixoCategoria} ${texto}`;
+}
 
+if (estilo === "animado") {
+  textoParaVoz = `[excited] ${texto}`;
+} else if (estilo === "superImpacto") {
+  textoParaVoz = `[shouts] ${texto}`;
+}
+console.log("Texto enviado para ElevenLabs:", textoParaVoz);
       const resposta =
         await fetch(
           `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
@@ -715,28 +723,40 @@ app.post(
 
               voice_settings: {
                 stability:
-                  categoria
-                    ? estabilidadeCategoria
-                    : (
-                        voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-                        voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-                        voiceId === "iScHbNW8K33gNo3lGgbo"
-                      )
-                      ? 0.20
-                      : 0.30,
+  estilo === "superImpacto"
+    ? 0.10
+    : categoria
+    ? estabilidadeCategoria
+    : (
+        voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+        voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+        voiceId === "iScHbNW8K33gNo3lGgbo"
+      )
+      ? 0.20
+      : 0.30,
 
                 similarity_boost: 0.80,
 
                 style:
-                  categoria
-                    ? estiloCategoria
-                    : (
-                        voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-                        voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-                        voiceId === "iScHbNW8K33gNo3lGgbo"
-                      )
-                      ? 0.90
-                      : 0.75,
+  estilo === "normal"
+    ? 0.40
+    : estilo === "animado"
+    ? 0.65
+    : estilo === "muitoAnimado"
+    ? 0.80
+    : estilo === "superImpacto"
+    ? 0.95
+    : estilo === "serio"
+    ? 0.25
+    : estilo === "urgente"
+    ? 0.90
+    : estilo === "comercial"
+    ? 0.75
+    : estilo === "festa"
+    ? 0.90
+    : estilo === "solene"
+    ? 0.35
+    : 0.40,
 
                 use_speaker_boost: true,
               },
