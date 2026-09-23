@@ -592,7 +592,9 @@ app.post(
         texto,
         voiceId,
         speed,
+        categoria,
       } = req.body;
+      
 
       console.log("");
       console.log(
@@ -640,6 +642,37 @@ app.post(
         texto
       );
 
+      // =====================================================
+      // CONFIGURAÇÃO DA LOCUÇÃO POR CATEGORIA
+      // A categoria altera a interpretação sem colocar instruções
+      // para serem faladas pelo locutor.
+      // =====================================================
+
+      let textoParaVoz = texto;
+      let prefixoCategoria = "";
+      let estabilidadeCategoria = 0.30;
+      let estiloCategoria = 0.75;
+
+      if (categoria === "Spot de Rádio") {
+        prefixoCategoria = "[excited]";
+        estabilidadeCategoria = 0.25;
+        estiloCategoria = 0.85;
+      } else if (categoria === "Chamadas de Festa") {
+        prefixoCategoria = "[excited]";
+        estabilidadeCategoria = 0.20;
+        estiloCategoria = 0.90;
+      } else if (categoria === "Chamadas Religiosas") {
+        estabilidadeCategoria = 0.40;
+        estiloCategoria = 0.65;
+      } else if (categoria === "Propaganda Comercial") {
+        estabilidadeCategoria = 0.28;
+        estiloCategoria = 0.80;
+      }
+
+      if (prefixoCategoria) {
+        textoParaVoz = `${prefixoCategoria} ${texto}`;
+      }
+
       const resposta =
         await fetch(
           `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
@@ -661,14 +694,18 @@ app.post(
             },
 
             body: JSON.stringify({
-  text:
-  voiceId === "ELBrtmIkk40wCZ5YnlwM" ||
-  voiceId === "zhza6dIY7yb1xz5MKTvQ" ||
-  voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-  voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-  voiceId === "iScHbNW8K33gNo3lGgbo"
-    ? `[excited] ${texto}`
-    : texto,
+              text:
+                prefixoCategoria
+                  ? textoParaVoz
+                  : (
+                      voiceId === "ELBrtmIkk40wCZ5YnlwM" ||
+                      voiceId === "zhza6dIY7yb1xz5MKTvQ" ||
+                      voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+                      voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+                      voiceId === "iScHbNW8K33gNo3lGgbo"
+                    )
+                    ? `[excited] ${texto}`
+                    : texto,
               // Mantido conforme o projeto atual.
               model_id:
                 "eleven_v3",
@@ -677,24 +714,32 @@ app.post(
                 "pt",
 
               voice_settings: {
-  stability:
-    voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-    voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-    voiceId === "iScHbNW8K33gNo3lGgbo"
-      ? 0.20
-      : 0.30,
+                stability:
+                  categoria
+                    ? estabilidadeCategoria
+                    : (
+                        voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+                        voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+                        voiceId === "iScHbNW8K33gNo3lGgbo"
+                      )
+                      ? 0.20
+                      : 0.30,
 
-  similarity_boost: 0.80,
+                similarity_boost: 0.80,
 
-  style:
-    voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-    voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-    voiceId === "iScHbNW8K33gNo3lGgbo"
-      ? 0.90
-      : 0.75,
+                style:
+                  categoria
+                    ? estiloCategoria
+                    : (
+                        voiceId === "21m00Tcm4TlvDq8ikWAM" ||
+                        voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
+                        voiceId === "iScHbNW8K33gNo3lGgbo"
+                      )
+                      ? 0.90
+                      : 0.75,
 
-  use_speaker_boost: true,
-},
+                use_speaker_boost: true,
+              },
 
               output_format:
                 "mp3_44100_128",
