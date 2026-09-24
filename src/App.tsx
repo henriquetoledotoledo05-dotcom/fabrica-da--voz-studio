@@ -40,9 +40,6 @@ function App() {
     setSenhaAcesso('')
   }
 
-  const [categoriaSelecionada, setCategoriaSelecionada] =
-    useState<string | null>(null)
-
   const [vozSelecionada, setVozSelecionada] =
     useState('IKne3meq5aSn9XLyUdCD')
 
@@ -367,7 +364,6 @@ const vozesFemininas = vozes.filter(
           texto: textoFinal,
           voiceId: vozAtual.id,
           speed: velocidadeSelecionada,
-          categoria: categoriaSelecionada,
           estilo: estiloSelecionado
         })
       }
@@ -996,46 +992,10 @@ const vozesFemininas = vozes.filter(
     }
 
   // =====================================================
-  // CATEGORIAS
-  // =====================================================
-
-  const categorias = [
-    {
-      emoji: '📻',
-      titulo: 'Spot de Rádio',
-      descricao:
-        'Crie spots profissionais para sua programação'
-    },
-
-    {
-      emoji: '🎉',
-      titulo: 'Chamadas de Festa',
-      descricao:
-        'Divulgue festas, eventos e shows'
-    },
-
-    {
-      emoji: '🙏',
-      titulo: 'Chamadas Religiosas',
-      descricao:
-        'Produza chamadas para igrejas e eventos religiosos'
-    },
-
-    {
-      emoji: '📢',
-      titulo: 'Propaganda Comercial',
-      descricao:
-        'Crie comerciais para empresas e lojas'
-    }
-  ]
-
-  // =====================================================
   // EDITOR
   // =====================================================
 
-  if (
-    categoriaSelecionada
-  ) {
+  {
     return (
       <div className="app">
 
@@ -1070,7 +1030,7 @@ const vozesFemininas = vozes.filter(
             </span>
 
             <h2>
-              {categoriaSelecionada}
+              Estúdio de Locução
             </h2>
 
             <p>
@@ -1079,7 +1039,7 @@ const vozesFemininas = vozes.filter(
 
           </section>
 
-          <section className="categorias">
+          <section className="editor-area">
 
             <div className="editor">
 
@@ -1811,20 +1771,6 @@ const vozesFemininas = vozes.filter(
                 </div>
               )}
 
-            {/* =================================================
-                VOLTAR
-            ================================================= */}
-
-            <button
-              className="voltar"
-              onClick={() =>
-                setCategoriaSelecionada(
-                  null
-                )
-              }
-            >
-              ← Voltar
-            </button>
 
           </div>
 
@@ -1836,113 +1782,6 @@ const vozesFemininas = vozes.filter(
     )
   }
 
-  // =====================================================
-  // TELA INICIAL
-  // =====================================================
-
-  return (
-
-    <div className="app">
-
-      <header className="topo">
-
-        <div className="logo">
-
-          <img
-            src={logoFabrica}
-            alt="Fábrica da Voz"
-          />
-
-        </div>
-
-      </header>
-
-      <main className="main">
-
-        <section className="hero">
-
-          <span className="tag">
-            INTELIGÊNCIA ARTIFICIAL
-          </span>
-
-          <h2>
-            Transforme suas ideias
-            <br />
-            em voz profissional.
-          </h2>
-
-          <p>
-            Crie spots, chamadas e propagandas com vozes
-            realistas para rádio, eventos e empresas.
-          </p>
-
-        </section>
-
-        <section className="categorias">
-
-          <h3>
-            O que você quer produzir?
-          </h3>
-
-          <div className="grid">
-
-            {categorias.map(
-              (categoria) => (
-
-                <button
-                  type="button"
-                  className="card"
-                  key={
-                    categoria.titulo
-                  }
-                  onClick={() =>
-                    setCategoriaSelecionada(
-                      categoria.titulo
-                    )
-                  }
-                >
-
-                  <span className="cardEmoji">
-                    {categoria.emoji}
-                  </span>
-
-                  <div className="cardTexto">
-
-                    <h4>
-                      {categoria.titulo}
-                    </h4>
-
-                    <p>
-                      {categoria.descricao}
-                    </p>
-
-                  </div>
-
-                  <span className="seta">
-                    →
-                  </span>
-
-                </button>
-
-              )
-            )}
-
-          </div>
-
-        </section>
-
-      </main>
-
-      <footer>
-
-        <p>
-          © 2026 Fábrica da Voz • Estúdio de Locução com IA
-        </p>
-
-      </footer>
-
-    </div>
-  )
 }
 
 export default App

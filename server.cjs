@@ -645,42 +645,43 @@ app.post(
       );
 
       // =====================================================
-      // CONFIGURAÇÃO DA LOCUÇÃO POR CATEGORIA
-      // A categoria altera a interpretação sem colocar instruções
-      // para serem faladas pelo locutor.
+      // ESTILOS DE LOCUÇÃO - ELEVEN V3
+      // No v3, a direção principal vem das Audio Tags,
+      // pontuação e estrutura do texto. Style fica em 0.
       // =====================================================
 
       let textoParaVoz = texto;
-      let prefixoCategoria = "";
-      let estabilidadeCategoria = 0.30;
-      let estiloCategoria = 0.75;
+      let estabilidadeEstilo = 0.50;
 
-      if (categoria === "Spot de Rádio") {
-        prefixoCategoria = "[excited]";
-        estabilidadeCategoria = 0.25;
-        estiloCategoria = 0.85;
-      } else if (categoria === "Chamadas de Festa") {
-        prefixoCategoria = "[excited]";
-        estabilidadeCategoria = 0.20;
-        estiloCategoria = 0.90;
-      } else if (categoria === "Chamadas Religiosas") {
-        estabilidadeCategoria = 0.40;
-        estiloCategoria = 0.65;
-      } else if (categoria === "Propaganda Comercial") {
-        estabilidadeCategoria = 0.28;
-        estiloCategoria = 0.80;
+      if (estilo === "animado") {
+        textoParaVoz = `[excited] ${texto} [happily]`;
+        estabilidadeEstilo = 0.25;
+      } else if (estilo === "muitoAnimado") {
+        textoParaVoz = `[excited] [happily] ${texto} [excited]`;
+        estabilidadeEstilo = 0.15;
+      } else if (estilo === "superImpacto") {
+        textoParaVoz = `[shouts] ${texto} [shouts]`;
+        estabilidadeEstilo = 0.10;
+      } else if (estilo === "serio") {
+        textoParaVoz = `[calm] ${texto}`;
+        estabilidadeEstilo = 0.70;
+      } else if (estilo === "urgente") {
+        textoParaVoz = `[excited] [shouts] ${texto}`;
+        estabilidadeEstilo = 0.12;
+      } else if (estilo === "comercial") {
+        textoParaVoz = `[excited] ${texto} [happily]`;
+        estabilidadeEstilo = 0.22;
+      } else if (estilo === "festa") {
+        textoParaVoz = `[excited] [happily] ${texto} [laughs]`;
+        estabilidadeEstilo = 0.12;
+      } else if (estilo === "solene") {
+        textoParaVoz = `[calm] ${texto}`;
+        estabilidadeEstilo = 0.82;
       }
 
-      if (prefixoCategoria) {
-  textoParaVoz = `${prefixoCategoria} ${texto}`;
-}
+      console.log("Texto enviado para ElevenLabs:", textoParaVoz);
+      console.log("Estabilidade do estilo:", estabilidadeEstilo);
 
-if (estilo === "animado") {
-  textoParaVoz = `[excited] ${texto}`;
-} else if (estilo === "superImpacto") {
-  textoParaVoz = `[shouts] ${texto}`;
-}
-console.log("Texto enviado para ElevenLabs:", textoParaVoz);
       const resposta =
         await fetch(
           `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
@@ -702,19 +703,8 @@ console.log("Texto enviado para ElevenLabs:", textoParaVoz);
             },
 
             body: JSON.stringify({
-              text:
-                prefixoCategoria
-                  ? textoParaVoz
-                  : (
-                      voiceId === "ELBrtmIkk40wCZ5YnlwM" ||
-                      voiceId === "zhza6dIY7yb1xz5MKTvQ" ||
-                      voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-                      voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-                      voiceId === "iScHbNW8K33gNo3lGgbo"
-                    )
-                    ? `[excited] ${texto}`
-                    : texto,
-              // Mantido conforme o projeto atual.
+              text: textoParaVoz,
+
               model_id:
                 "eleven_v3",
 
@@ -722,43 +712,8 @@ console.log("Texto enviado para ElevenLabs:", textoParaVoz);
                 "pt",
 
               voice_settings: {
-                stability:
-  estilo === "superImpacto"
-    ? 0.10
-    : categoria
-    ? estabilidadeCategoria
-    : (
-        voiceId === "21m00Tcm4TlvDq8ikWAM" ||
-        voiceId === "x8FWrDHAK5xiFTJLpnHq" ||
-        voiceId === "iScHbNW8K33gNo3lGgbo"
-      )
-      ? 0.20
-      : 0.30,
-
-                similarity_boost: 0.80,
-
-                style:
-  estilo === "normal"
-    ? 0.40
-    : estilo === "animado"
-    ? 0.65
-    : estilo === "muitoAnimado"
-    ? 0.80
-    : estilo === "superImpacto"
-    ? 0.95
-    : estilo === "serio"
-    ? 0.25
-    : estilo === "urgente"
-    ? 0.90
-    : estilo === "comercial"
-    ? 0.75
-    : estilo === "festa"
-    ? 0.90
-    : estilo === "solene"
-    ? 0.35
-    : 0.40,
-
-                use_speaker_boost: true,
+                stability: estabilidadeEstilo,
+                style: 0,
               },
 
               output_format:
