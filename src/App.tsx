@@ -16,7 +16,7 @@ type Voz = {
   demonstrativo: string
 }
 const henriqueLocutor = '/henrique-foto.png'
-const mateusLocutor = '/mateus-foto.png'
+const rafaelLocutor = '/rafael-foto.png'
 const viniciusLocutor = '/vinicius-foto.png'
 const vitorLocutor = '/vitor-foto.png'
 
@@ -249,8 +249,8 @@ function App() {
     },
         {
       id: 'xqmVsyH6TEc0qQYSNT8P',
-      nome: 'Mateus',
-      foto: mateusLocutor,
+      nome: 'Rafael',
+      foto: rafaelLocutor,
       demonstrativo: '/vozes/mateus-voz.mp3'
     },
         {
@@ -283,7 +283,7 @@ function App() {
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Mateus', 'Vinícius', 'Vitor'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
