@@ -74,6 +74,9 @@ function App() {
   const [trilhaSelecionada, setTrilhaSelecionada] =
     useState('')
 
+  const [estiloTrilhaSelecionado, setEstiloTrilhaSelecionado] =
+    useState('comercial')
+
   const [trilhaArquivo, setTrilhaArquivo] =
     useState<File | null>(null)
 
@@ -419,6 +422,81 @@ const vozesFemininas = vozes.filter(
     setGerando(false)
   }
 }
+  // =====================================================
+  // TRILHAS POR ESTILO
+  // =====================================================
+
+  const trilhasPorEstilo = {
+    comercial: [
+      { nome: 'Comercial 01', arquivo: '/trilhas/comercial/01-comercial.mp3' },
+      { nome: 'Comercial 02', arquivo: '/trilhas/comercial/02-comercial.mp3' },
+      { nome: 'Comercial 03', arquivo: '/trilhas/comercial/03-comercial.mp3' },
+    ],
+    forro: [
+      { nome: 'Forró 01', arquivo: '/trilhas/forro/01- Forró.mp3' },
+      { nome: 'Forró 02', arquivo: '/trilhas/forro/02- Forró.mp3' },
+      { nome: 'Forró 03', arquivo: '/trilhas/forro/03- Forró.mp3' },
+    ],
+    institucional: [
+      { nome: 'Institucional 01', arquivo: '/trilhas/institucional/01-Trilha institucional.mp3' },
+      { nome: 'Institucional 02', arquivo: '/trilhas/institucional/02-Trilha institucional.mp3' },
+      { nome: 'Institucional 03', arquivo: '/trilhas/institucional/03-Trilha institucional.mp3' },
+    ],
+    impacto: [
+      { nome: 'Impacto 01', arquivo: '/trilhas/impacto/01- Impacto.mp3' },
+      { nome: 'Impacto 02', arquivo: '/trilhas/impacto/02- Impacto.mp3' },
+      { nome: 'Impacto 03', arquivo: '/trilhas/impacto/03- Impacto.mp3' },
+    ],
+    gospel: [
+      { nome: 'Gospel 01', arquivo: '/trilhas/gospel/01- Gospel.mp3' },
+      { nome: 'Gospel 02', arquivo: '/trilhas/gospel/02- Gospel.mp3' },
+      { nome: 'Gospel 03', arquivo: '/trilhas/gospel/03- Gospel.mp3' },
+    ],
+    jornalistica: [
+      { nome: 'Jornalística 01', arquivo: '/trilhas/jornalistica/01-Trilha jornaslística.mp3' },
+      { nome: 'Jornalística 02', arquivo: '/trilhas/jornalistica/02-Trilha jornalística.mp3' },
+      { nome: 'Jornalística 03', arquivo: '/trilhas/jornalistica/03-Trilha jornalística.mp3' },
+    ],
+    gaucha: [
+      { nome: 'Gaúcha 01', arquivo: '/trilhas/gaucha/01- Gaúcha.mp3' },
+      { nome: 'Gaúcha 02', arquivo: '/trilhas/gaucha/02- Gaúcha.mp3' },
+      { nome: 'Gaúcha 03', arquivo: '/trilhas/gaucha/03- Gaúcha.mp3' },
+    ],
+    natal: [
+      { nome: 'Natal 01', arquivo: '/trilhas/natal/01-natal.mp3' },
+      { nome: 'Natal 02', arquivo: '/trilhas/natal/02-Natal.mp3' },
+      { nome: 'Natal 03', arquivo: '/trilhas/natal/03- Natal.mp3' },
+    ],
+    sertanejo: [
+      { nome: 'Sertanejo 01', arquivo: '/trilhas/sertanejo/01- Sertanejo.mp3' },
+      { nome: 'Sertanejo 02', arquivo: '/trilhas/sertanejo/02- Sertanejo.mp3' },
+      { nome: 'Sertanejo 03', arquivo: '/trilhas/sertanejo/03- Sertanejo.mp3' },
+    ],
+    eletronica: [
+      { nome: 'Eletrônica 01', arquivo: '/trilhas/eletronica/01- Eletrônica.mp3' },
+      { nome: 'Eletrônica 02', arquivo: '/trilhas/eletronica/02- Eletrônica.mp3' },
+      { nome: 'Eletrônica 03', arquivo: '/trilhas/eletronica/03- Eletrônica.mp3' },
+    ],
+  }
+
+  const estilosDeTrilha = [
+    { valor: 'comercial', nome: '🎙️ Comercial' },
+    { valor: 'forro', nome: '💃 Forró' },
+    { valor: 'institucional', nome: '🏢 Institucional' },
+    { valor: 'impacto', nome: '⚡ Impacto' },
+    { valor: 'gospel', nome: '✝️ Gospel' },
+    { valor: 'jornalistica', nome: '📰 Jornalística' },
+    { valor: 'gaucha', nome: '🤠 Gaúcha' },
+    { valor: 'natal', nome: '🎄 Natal' },
+    { valor: 'sertanejo', nome: '🤠 Sertanejo' },
+    { valor: 'eletronica', nome: '🎧 Eletrônica' },
+  ]
+
+  const trilhasAtuais =
+    trilhasPorEstilo[
+      estiloTrilhaSelecionado as keyof typeof trilhasPorEstilo
+    ]
+
   // =====================================================
   // SELECIONAR TRILHA DO COMPUTADOR
   // =====================================================
@@ -1528,114 +1606,86 @@ setMixAudioUrl(mixUrl)
                       </div>
 
                       {/* =================================================
-                          TRILHA 1
+                          TRILHAS POR ESTILO
                       ================================================= */}
 
-                      <div className="trilha-item">
+                      <div className="estilos" style={{ marginTop: '20px' }}>
+                        <label>
+                          🎵 Estilo da trilha
+                        </label>
 
-                        <strong>
-                          Trilha para Mercado
-                        </strong>
-
-                        <audio
-                          controls
-                          src="/trilhas/TRILHA PARA MERCADO.mp3"
-                        />
-
-                        <button
-                          type="button"
-                          className={
-                            trilhaSelecionada ===
-                            '/trilhas/TRILHA PARA MERCADO.mp3'
-                              ? 'botao-trilha ativo'
-                              : 'botao-trilha'
-                          }
-                          onClick={() => {
-                            setTrilhaSelecionada(
-                              '/trilhas/TRILHA PARA MERCADO.mp3'
-                            )
-                            setMixAudioUrl('')
+                        <select
+                          className="seletor-estilo"
+                          value={estiloTrilhaSelecionado}
+                          onChange={(e) => {
+                            setEstiloTrilhaSelecionado(e.target.value)
+                            setTrilhaSelecionada('')
                             setTrilhaArquivo(null)
                             setNomeTrilhaArquivo('')
+                            setMixAudioUrl('')
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '15px 18px',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(139, 92, 246, 0.55)',
+                            background: '#171020',
+                            color: '#ffffff',
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            outline: 'none'
                           }}
                         >
-                          ✓ Usar esta trilha
-                        </button>
-
+                          {estilosDeTrilha.map((estilo) => (
+                            <option key={estilo.valor} value={estilo.valor}>
+                              {estilo.nome}
+                            </option>
+                          ))}
+                        </select>
                       </div>
 
-                      {/* =================================================
-                          TRILHA 2
-                      ================================================= */}
+                      <div
+                        style={{
+                          display: 'grid',
+                          gap: '14px',
+                          marginTop: '18px'
+                        }}
+                      >
+                        {trilhasAtuais.map((trilha) => (
+                          <div className="trilha-item" key={trilha.arquivo}>
+                            <strong>{trilha.nome}</strong>
 
-                      <div className="trilha-item">
+                            <audio
+                              controls
+                              preload="none"
+                              style={{
+                                width: '100%',
+                                marginTop: '10px'
+                              }}
+                              src={trilha.arquivo}
+                            />
 
-                        <strong>
-                          Trilha para Mercado 2
-                        </strong>
-
-                        <audio
-                          controls
-                          src="/trilhas/TRILHA PARA MERCADO (2).mp3"
-                        />
-
-                        <button
-                          type="button"
-                          className={
-                            trilhaSelecionada ===
-                            '/trilhas/TRILHA PARA MERCADO (2).mp3'
-                              ? 'botao-trilha ativo'
-                              : 'botao-trilha'
-                          }
-                          onClick={() => {
-                            setTrilhaSelecionada(
-                              '/trilhas/TRILHA PARA MERCADO (2).mp3'
-                            )
-                            setMixAudioUrl('')
-                            setTrilhaArquivo(null)
-                            setNomeTrilhaArquivo('')
-                          }}
-                        >
-                          ✓ Usar esta trilha
-                        </button>
-
-                      </div>
-
-                      {/* =================================================
-                          TRILHA 3
-                      ================================================= */}
-
-                      <div className="trilha-item">
-
-                        <strong>
-                          Trilha para Mercado 3
-                        </strong>
-
-                        <audio
-                          controls
-                          src="/trilhas/TRILHA PARA MERCADO (3).mp3"
-                        />
-
-                        <button
-                          type="button"
-                          className={
-                            trilhaSelecionada ===
-                            '/trilhas/TRILHA PARA MERCADO (3).mp3'
-                              ? 'botao-trilha ativo'
-                              : 'botao-trilha'
-                          }
-                          onClick={() => {
-                            setTrilhaSelecionada(
-                              '/trilhas/TRILHA PARA MERCADO (3).mp3'
-                            )
-                            setMixAudioUrl('')
-                            setTrilhaArquivo(null)
-                            setNomeTrilhaArquivo('')
-                          }}
-                        >
-                          ✓ Usar esta trilha
-                        </button>
-
+                            <button
+                              type="button"
+                              className={
+                                trilhaSelecionada === trilha.arquivo
+                                  ? 'botao-trilha ativo'
+                                  : 'botao-trilha'
+                              }
+                              onClick={() => {
+                                setTrilhaSelecionada(trilha.arquivo)
+                                setMixAudioUrl('')
+                                setTrilhaArquivo(null)
+                                setNomeTrilhaArquivo('')
+                              }}
+                            >
+                              {trilhaSelecionada === trilha.arquivo
+                                ? '✓ Trilha selecionada'
+                                : `✓ Usar ${trilha.nome}`}
+                            </button>
+                          </div>
+                        ))}
                       </div>
 
                       {/* =================================================
