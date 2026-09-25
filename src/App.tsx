@@ -1,6 +1,7 @@
 import logoFabrica from './assets/logo-fabrica.png'
-import { useState } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import './App.css'
+import { supabase } from './supabase'
 
 import noahLocutor from './assets/noah-locutor.png'
 import ninaLocutora from './assets/nina-locutora-1.png'
@@ -21,27 +22,195 @@ const viniciusLocutor = '/vinicius-foto.png'
 const vitorLocutor = '/vitor-foto.png'
 
 function App() {
-    const [acessoLiberado, setAcessoLiberado] = useState(() => {
-    return sessionStorage.getItem('fabrica_acesso') === 'liberado'
-  })
+    const [acessoLiberado, setAcessoLiberado] = useState(false)
 
   const [senhaAcesso, setSenhaAcesso] = useState('')
   const [erroAcesso, setErroAcesso] = useState('')
+  const [emailAcesso, setEmailAcesso] = useState('')
+  const [creditos, setCreditos] = useState<number | null>(null)
+  const [carregandoCreditos, setCarregandoCreditos] = useState(false)
+  const [mostrarCompraCreditos, setMostrarCompraCreditos] = useState(false)
+  const [mostrarCadastro, setMostrarCadastro] = useState(false)
+  const [nomeCadastro, setNomeCadastro] = useState('')
+  const [emailCadastro, setEmailCadastro] = useState('')
+  const [senhaCadastro, setSenhaCadastro] = useState('')
+  const [confirmarSenhaCadastro, setConfirmarSenhaCadastro] = useState('')
+  const [erroCadastro, setErroCadastro] = useState('')
 
-  const entrarNaFabrica = () => {
-    if (senhaAcesso === 'fabrica@1985') {
-      sessionStorage.setItem('fabrica_acesso', 'liberado')
-      setAcessoLiberado(true)
-      setErroAcesso('')
+  const carregarCreditos = async () => {
+    setCarregandoCreditos(true)
+
+    try {
+      const { data: userData, error: userError } = await supabase.auth.getUser()
+
+      if (userError || !userData.user) {
+        setCreditos(null)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('perfis')
+        .select('creditos')
+        .eq('id', userData.user.id)
+        .maybeSingle()
+
+      if (error) {
+        console.error('Erro ao carregar créditos:', error)
+        setCreditos(null)
+        return
+      }
+
+      setCreditos(Number(data?.creditos ?? 0))
+    } finally {
+      setCarregandoCreditos(false)
+    }
+  }
+
+  useEffect(() => {
+    let ativo = true
+
+    const iniciarSessao = async () => {
+      const { data } = await supabase.auth.getSession()
+
+      if (!ativo) return
+
+      const liberado = Boolean(data.session)
+      setAcessoLiberado(liberado)
+
+      if (liberado) {
+        sessionStorage.setItem('fabrica_acesso', 'liberado')
+        await carregarCreditos()
+      } else {
+        sessionStorage.removeItem('fabrica_acesso')
+        setCreditos(null)
+      }
+    }
+
+    iniciarSessao()
+
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const liberado = Boolean(session)
+
+        setAcessoLiberado(liberado)
+
+        if (liberado) {
+          sessionStorage.setItem('fabrica_acesso', 'liberado')
+          setTimeout(() => {
+            void carregarCreditos()
+          }, 0)
+        } else {
+          sessionStorage.removeItem('fabrica_acesso')
+          setCreditos(null)
+        }
+      }
+    )
+
+    return () => {
+      ativo = false
+      listener.subscription.unsubscribe()
+    }
+  }, [])
+
+  const entrarNaFabrica = async () => {
+    const email = emailAcesso.trim()
+
+    if (!email || !senhaAcesso) {
+      setErroAcesso('Digite seu e-mail e sua senha.')
       return
     }
 
-    setErroAcesso('Senha incorreta.')
-    setSenhaAcesso('')
+    setErroAcesso('Entrando...')
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: senhaAcesso,
+    })
+
+    if (error) {
+      console.error('Erro no login:', error)
+
+      const mensagem =
+        error.message?.toLowerCase().includes('email not confirmed')
+          ? 'Confirme seu e-mail antes de entrar.'
+          : 'E-mail ou senha incorretos.'
+
+      setErroAcesso(mensagem)
+      setSenhaAcesso('')
+      return
+    }
+
+    if (data.session) {
+      sessionStorage.setItem('fabrica_acesso', 'liberado')
+      setAcessoLiberado(true)
+      setErroAcesso('')
+      setSenhaAcesso('')
+      await carregarCreditos()
+    }
   }
 
+  const validarCadastro = async () => {
+  const nome = nomeCadastro.trim()
+  const email = emailCadastro.trim()
+
+  if (!nome || !email || !senhaCadastro || !confirmarSenhaCadastro) {
+    setErroCadastro('Preencha todos os campos.')
+    return
+  }
+
+  if (!email.includes('@') || !email.includes('.')) {
+    setErroCadastro('Digite um e-mail válido.')
+    return
+  }
+
+  if (senhaCadastro.length < 6) {
+    setErroCadastro('A senha precisa ter pelo menos 6 caracteres.')
+    return
+  }
+
+  if (senhaCadastro !== confirmarSenhaCadastro) {
+    setErroCadastro('As senhas não coincidem.')
+    return
+  }
+
+  setErroCadastro('Criando sua conta...')
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password: senhaCadastro,
+    options: {
+      data: {
+        nome,
+      },
+    },
+  })
+
+  if (error) {
+    console.error('Erro no cadastro:', error)
+    setErroCadastro(error.message)
+    return
+  }
+
+  if (data.user) {
+    if (data.session) {
+      sessionStorage.setItem('fabrica_acesso', 'liberado')
+      setAcessoLiberado(true)
+      setMostrarCadastro(false)
+      setErroCadastro('')
+      setSenhaCadastro('')
+      setConfirmarSenhaCadastro('')
+      await carregarCreditos()
+    } else {
+      setErroCadastro(
+        'Conta criada com sucesso! Verifique seu e-mail para confirmar o cadastro.'
+      )
+    }
+  }
+}
+
+
   const [vozSelecionada, setVozSelecionada] =
-    useState('IKne3meq5aSn9XLyUdCD')
+    useState('rz25pon9uanPpUGOW98Y')
 
   const [estiloSelecionado, setEstiloSelecionado] =
     useState('normal')
@@ -111,107 +280,67 @@ function App() {
     useState(false)
 
   if (!acessoLiberado) {
+    if (mostrarCadastro) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'radial-gradient(circle at top, #24103d 0%, #090909 55%)', color: '#fff' }}>
+          <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(21,16,32,0.96)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
+            <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
+            <h2 style={{ margin: '0 0 8px' }}>Criar sua conta</h2>
+            <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a Fábrica da Voz.</p>
+            <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
+              <label style={{ fontWeight: 700 }}>Nome</label>
+              <input type="text" value={nomeCadastro} onChange={(e) => { setNomeCadastro(e.target.value); setErroCadastro('') }} placeholder="Seu nome" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
+              <label style={{ fontWeight: 700, marginTop: '4px' }}>E-mail</label>
+              <input type="email" value={emailCadastro} onChange={(e) => { setEmailCadastro(e.target.value); setErroCadastro('') }} placeholder="seu@email.com" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
+              <label style={{ fontWeight: 700, marginTop: '4px' }}>Senha</label>
+              <input type="password" value={senhaCadastro} onChange={(e) => { setSenhaCadastro(e.target.value); setErroCadastro('') }} placeholder="Crie uma senha" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
+              <label style={{ fontWeight: 700, marginTop: '4px' }}>Confirmar senha</label>
+              <input type="password" value={confirmarSenhaCadastro} onChange={(e) => { setConfirmarSenhaCadastro(e.target.value); setErroCadastro('') }} placeholder="Digite a senha novamente" onKeyDown={(e) => { if (e.key === 'Enter') validarCadastro() }} style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
+              <button type="button" onClick={validarCadastro} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Criar minha conta</button>
+            </div>
+            {erroCadastro && <p style={{ color: '#c084fc', marginTop: '14px', fontWeight: 600 }}>{erroCadastro}</p>}
+            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>← Voltar para entrar</button>
+          </div>
+        </div>
+      )
+    }
+
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px',
-          boxSizing: 'border-box',
-          background: '#090909',
-          color: '#fff'
-        }}
-      >
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '420px',
-            padding: '35px',
-            boxSizing: 'border-box',
-            borderRadius: '20px',
-            background: '#151515',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
-          }}
-        >
-          <img
-            src={logoFabrica}
-            alt="Fábrica da Voz"
-            style={{
-              width: '180px',
-              maxWidth: '80%',
-              marginBottom: '25px'
-            }}
-          />
-
-          <h2 style={{ marginBottom: '8px' }}>
-            🔒 Acesso restrito
-          </h2>
-
-          <p
-            style={{
-              opacity: 0.7,
-              marginBottom: '25px'
-            }}
-          >
-            Digite a senha para entrar na Fábrica da Voz.
-          </p>
-
-          <input
-            type="password"
-            value={senhaAcesso}
-            placeholder="Digite sua senha"
-            onChange={(e) => {
-              setSenhaAcesso(e.target.value)
-              setErroAcesso('')
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                entrarNaFabrica()
-              }
-            }}
-            style={{
-              width: '100%',
-              boxSizing: 'border-box',
-              padding: '15px',
-              borderRadius: '10px',
-              border: '1px solid rgba(255,255,255,0.15)',
-              background: '#222',
-              color: '#fff',
-              fontSize: '16px',
-              marginBottom: '12px'
-            }}
-          />
-
-          <button
-            type="button"
-            onClick={entrarNaFabrica}
-            style={{
-              width: '100%',
-              padding: '15px',
-              border: '0',
-              borderRadius: '10px',
-              cursor: 'pointer',
-              fontWeight: 700,
-              fontSize: '16px'
-            }}
-          >
-            Entrar
-          </button>
-
-          {erroAcesso && (
-            <p
-              style={{
-                color: '#ff6b6b',
-                marginTop: '15px',
-                fontWeight: 600
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'radial-gradient(circle at top, #24103d 0%, #090909 55%)', color: '#fff' }}>
+        <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(21,16,32,0.96)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
+          <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
+          <h2 style={{ margin: '0 0 8px' }}>Entre na Fábrica da Voz</h2>
+          <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Crie sua conta ou entre para usar seu saldo de créditos.</p>
+          <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
+            <label style={{ fontWeight: 700 }}>E-mail</label>
+            <input
+              type="email"
+              placeholder="seu@email.com"
+              value={emailAcesso}
+              onChange={(e) => {
+                setEmailAcesso(e.target.value)
+                setErroAcesso('')
               }}
-            >
-              {erroAcesso}
-            </p>
-          )}
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                padding: '14px',
+                borderRadius: '11px',
+                border: '1px solid rgba(139,92,246,0.45)',
+                background: '#171020',
+                color: '#fff',
+                fontSize: '16px'
+              }}
+            />
+            <label style={{ fontWeight: 700, marginTop: '4px' }}>Senha</label>
+            <input type="password" placeholder="Digite sua senha" value={senhaAcesso} onChange={(e) => { setSenhaAcesso(e.target.value); setErroAcesso('') }} onKeyDown={(e) => { if (e.key === 'Enter') entrarNaFabrica() }} style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
+            <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
+          </div>
+          {erroAcesso && <p style={{ color: '#ff6b6b', marginTop: '14px', fontWeight: 600 }}>{erroAcesso}</p>}
+          <div style={{ margin: '26px 0', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
+          <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda não tem uma conta?</p>
+          <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: '#171020' }}>Criar minha conta</button>
+          <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>💳 Depois do cadastro, você poderá comprar créditos para gerar suas locuções.</p>
         </div>
       </div>
     )
@@ -226,6 +355,13 @@ function App() {
       : velocidade === 'rapido'
         ? 1.25
         : 1.45
+
+  const pacotesCreditos = [
+    { creditos: 1, preco: 'R$ 4,90', destaque: false },
+    { creditos: 10, preco: 'R$ 19,90', destaque: false },
+    { creditos: 50, preco: 'R$ 69,90', destaque: true },
+    { creditos: 100, preco: 'R$ 119,90', destaque: false },
+  ]
 
   // =====================================================
   // VOZES
@@ -358,85 +494,194 @@ const vozesFemininas = vozes.filter(
     setCorrigindoTexto(false)
   }
 }
-  const gerarVoz = async () => {
-  const textoDigitado = texto.trim()
-
-  if (!textoDigitado) {
-    alert('Digite um texto para gerar a voz.')
-    return
-  }
-
-  const textoFinal = textoDigitado
-
-  setGerando(true)
-
+const iniciarPagamento = async (pacote: {
+  creditos: number
+  preco: string
+  destaque?: boolean
+}) => {
   try {
-    const resposta = await fetch(
-      '/api/gerar-voz',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          texto: textoFinal,
-          voiceId: vozAtual.id,
-          speed: velocidadeSelecionada,
-          estilo: estiloSelecionado
-        })
-      }
-    )
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession()
+
+    if (sessionError || !sessionData.session) {
+      alert('Faça login para comprar créditos.')
+      return
+    }
+
+    const mapaPacotes: Record<number, string> = {
+      1: 'credito1',
+      10: 'credito10',
+      50: 'credito50',
+      100: 'credito100',
+    }
+
+    const pacoteId = mapaPacotes[pacote.creditos]
+
+    if (!pacoteId) {
+      alert('Pacote de créditos inválido.')
+      return
+    }
+
+    const resposta = await fetch('/api/criar-pagamento', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${sessionData.session.access_token}`,
+      },
+      body: JSON.stringify({
+        pacote: pacoteId,
+      }),
+    })
+
+    const dados = await resposta.json()
 
     if (!resposta.ok) {
-      const corpoErro = await resposta.text()
-
-      let mensagem = 'Erro ao gerar a voz.'
-
-      try {
-        const dadosErro = JSON.parse(corpoErro)
-
-        mensagem =
-          dadosErro.erro ||
-          dadosErro.error ||
-          dadosErro.message ||
-          mensagem
-      } catch {
-        if (corpoErro.trim()) {
-          mensagem = corpoErro
-        }
-      }
-
-      throw new Error(mensagem)
+      throw new Error(
+        dados.erro || 'Não foi possível iniciar o pagamento.'
+      )
     }
 
-    // O servidor devolve ÁUDIO MP3, não JSON
-    const audioBlob = await resposta.blob()
-
-    if (!audioBlob.size) {
-      throw new Error('O servidor retornou um áudio vazio.')
+    if (!dados.init_point) {
+      throw new Error('O Mercado Pago não retornou o link de pagamento.')
     }
 
-    const urlAudio = URL.createObjectURL(audioBlob)
-
-    setAudioUrl(urlAudio)
-    setAudioOriginalUrl(urlAudio)
-    setMixAudioUrl('')
-
-    
-
+    window.location.href = dados.init_point
   } catch (erro) {
-    console.error('Erro ao gerar voz:', erro)
+    console.error('Erro ao iniciar pagamento:', erro)
 
     alert(
       erro instanceof Error
         ? erro.message
-        : 'Não foi possível gerar a voz.'
+        : 'Não foi possível iniciar o pagamento.'
     )
-
-  } finally {
-    setGerando(false)
   }
-}
+}  
+const gerarVoz = async () => {
+    const textoDigitado = texto.trim()
+
+    if (!textoDigitado) {
+      alert('Digite um texto para gerar a voz.')
+      return
+    }
+
+    if (textoDigitado.length > 800) {
+      alert('Cada locução pode ter no máximo 800 caracteres.')
+      return
+    }
+
+    if (carregandoCreditos) {
+      alert('Aguarde o carregamento do seu saldo de créditos.')
+      return
+    }
+
+    if (creditos === null) {
+      await carregarCreditos()
+      alert('Não foi possível confirmar seu saldo. Tente novamente.')
+      return
+    }
+
+    if (creditos <= 0) {
+      alert('Você não tem créditos suficientes. Compre créditos para gerar uma nova locução.')
+      return
+    }
+
+    const textoFinal = textoDigitado
+
+    setGerando(true)
+
+    try {
+      const resposta = await fetch(
+        '/api/gerar-voz',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            texto: textoFinal,
+            voiceId: vozAtual.id,
+            speed: velocidadeSelecionada,
+            estilo: estiloSelecionado
+          })
+        }
+      )
+
+      if (!resposta.ok) {
+        const corpoErro = await resposta.text()
+
+        let mensagem = 'Erro ao gerar a voz.'
+
+        try {
+          const dadosErro = JSON.parse(corpoErro)
+
+          mensagem =
+            dadosErro.erro ||
+            dadosErro.error ||
+            dadosErro.message ||
+            mensagem
+        } catch {
+          if (corpoErro.trim()) {
+            mensagem = corpoErro
+          }
+        }
+
+        throw new Error(mensagem)
+      }
+
+      const audioBlob = await resposta.blob()
+
+      if (!audioBlob.size) {
+        throw new Error('O servidor retornou um áudio vazio.')
+      }
+
+      const urlAudio = URL.createObjectURL(audioBlob)
+
+      setAudioUrl(urlAudio)
+      setAudioOriginalUrl(urlAudio)
+      setMixAudioUrl('')
+
+      // Desconta 1 crédito somente depois que a geração deu certo.
+      const { data: userData, error: userError } =
+        await supabase.auth.getUser()
+
+      if (userError || !userData.user) {
+        throw new Error('A locução foi gerada, mas não foi possível identificar sua conta para atualizar os créditos.')
+      }
+
+      const novoSaldo = Math.max(0, creditos - 1)
+
+      const { data: perfilAtualizado, error: erroCredito } =
+        await supabase
+          .from('perfis')
+          .update({ creditos: novoSaldo })
+          .eq('id', userData.user.id)
+          .select('creditos')
+          .maybeSingle()
+
+      if (erroCredito) {
+        console.error('Erro ao descontar crédito:', erroCredito)
+        await carregarCreditos()
+        throw new Error('A locução foi gerada, mas não foi possível atualizar seu saldo de créditos. Não gere novamente até conferir o saldo.')
+      }
+
+      if (!perfilAtualizado) {
+        await carregarCreditos()
+        throw new Error('A locução foi gerada, mas não foi possível confirmar o desconto do crédito.')
+      }
+
+      setCreditos(Number(perfilAtualizado.creditos))
+    } catch (erro) {
+      console.error('Erro ao gerar voz:', erro)
+
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : 'Não foi possível gerar a voz.'
+      )
+    } finally {
+      setGerando(false)
+    }
+  }
   // =====================================================
   // TRILHAS POR ESTILO
   // =====================================================
@@ -517,7 +762,7 @@ const vozesFemininas = vozes.filter(
   // =====================================================
 
   const selecionarTrilhaArquivo = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: ChangeEvent<HTMLInputElement>
   ) => {
     const arquivo =
       e.target.files?.[0]
@@ -1251,6 +1496,156 @@ const vozesFemininas = vozes.filter(
 
         </header>
 
+        {mostrarCompraCreditos && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 1000,
+              background: 'rgba(0,0,0,0.78)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+              boxSizing: 'border-box',
+              overflowY: 'auto'
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '850px',
+                padding: '28px',
+                borderRadius: '22px',
+                background: '#151020',
+                border: '1px solid rgba(139,92,246,0.45)',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.65)',
+                color: '#fff',
+                boxSizing: 'border-box'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '15px',
+                  marginBottom: '8px'
+                }}
+              >
+                <h2 style={{ margin: 0 }}>💳 Comprar créditos</h2>
+                <button
+                  type="button"
+                  onClick={() => setMostrarCompraCreditos(false)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: '#c084fc',
+                    fontSize: '26px',
+                    cursor: 'pointer',
+                    lineHeight: 1
+                  }}
+                  aria-label="Fechar"
+                >
+                  ×
+                </button>
+              </div>
+
+              <p style={{ margin: '0 0 20px', opacity: 0.72 }}>
+                1 crédito = 1 locução de até 800 caracteres.
+              </p>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                  gap: '14px'
+                }}
+              >
+                {pacotesCreditos.map((pacote) => (
+                  <div
+                    key={pacote.creditos}
+                    style={{
+                      position: 'relative',
+                      padding: '22px 16px',
+                      borderRadius: '16px',
+                      background: pacote.destaque
+                        ? 'linear-gradient(145deg, rgba(124,58,237,0.32), rgba(76,29,149,0.28))'
+                        : 'rgba(255,255,255,0.04)',
+                      border: pacote.destaque
+                        ? '1px solid #8b5cf6'
+                        : '1px solid rgba(255,255,255,0.10)',
+                      textAlign: 'center'
+                    }}
+                  >
+                    {pacote.destaque && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '-10px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          padding: '4px 10px',
+                          borderRadius: '20px',
+                          background: '#8b5cf6',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        MAIS ESCOLHIDO
+                      </div>
+                    )}
+
+                    <div style={{ fontSize: '30px', fontWeight: 800 }}>
+                      {pacote.creditos}
+                    </div>
+                    <div style={{ opacity: 0.72, marginBottom: '10px' }}>
+                      {pacote.creditos === 1 ? 'crédito' : 'créditos'}
+                    </div>
+                    <div style={{ fontSize: '21px', fontWeight: 800, color: '#c084fc', marginBottom: '16px' }}>
+                      {pacote.preco}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => iniciarPagamento(pacote)}
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        borderRadius: '10px',
+                        border: '1px solid #8b5cf6',
+                        background: pacote.destaque
+                          ? 'linear-gradient(135deg, #7c3aed, #4c1d95)'
+                          : '#171020',
+                        color: '#fff',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Comprar
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  marginTop: '20px',
+                  padding: '13px 15px',
+                  borderRadius: '11px',
+                  background: 'rgba(139,92,246,0.08)',
+                  border: '1px solid rgba(139,92,246,0.20)',
+                  color: '#c084fc',
+                  textAlign: 'center',
+                  fontSize: '13px'
+                }}
+              >
+                🔒 O pagamento será integrado depois. Esta tela já está pronta com os pacotes de créditos.
+              </div>
+            </div>
+          </div>
+        )}
+
         <main className="main">
 
           <section className="hero">
@@ -1276,6 +1671,41 @@ const vozesFemininas = vozes.filter(
               <h3>
                 Crie sua locução
               </h3>
+
+              <div
+                style={{
+                  margin: '8px 0 18px',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  background: 'rgba(139, 92, 246, 0.10)',
+                  border: '1px solid rgba(139, 92, 246, 0.25)',
+                  color: '#c084fc',
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  flexWrap: 'wrap'
+                }}
+              >
+                <span>💳 Créditos disponíveis: {creditos === null ? '...' : creditos}</span>
+                <button
+                  type="button"
+                  onClick={() => setMostrarCompraCreditos(true)}
+                  style={{
+                    padding: '8px 13px',
+                    borderRadius: '9px',
+                    border: '1px solid #8b5cf6',
+                    background: 'linear-gradient(135deg, #7c3aed, #4c1d95)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  + Comprar créditos
+                </button>
+              </div>
 
               {/* =================================================
                   VOZES
@@ -1515,12 +1945,13 @@ const vozesFemininas = vozes.filter(
   id="campoTextoLocucao"
   className="campo-texto"
   value={texto}
-  onChange={(e) => setTexto(e.target.value)}
+  onChange={(e) => setTexto(e.target.value.slice(0, 800))}
+  maxLength={800}
   placeholder="Digite aqui o texto que você quer transformar..."
 />
 
 <div className="contador-caracteres">
-  {texto.length} caracteres
+  {texto.length}/800 caracteres
 </div>
 <button
   type="button"

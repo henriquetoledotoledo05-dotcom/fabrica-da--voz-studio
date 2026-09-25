@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const { MercadoPagoConfig, Preference } = require("mercadopago");
+const { createClient } = require("@supabase/supabase-js");
 const OpenAI = require("openai");
 const ffmpegPath = require("ffmpeg-static");
 const { spawn } = require("child_process");
@@ -9,12 +11,112 @@ const fs = require("fs");
 const os = require("os");
 
 dotenv.config();
+
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+const mercadoPagoClient = new MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+});
+
+const preferenceClient = new Preference(mercadoPagoClient);
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
 const app = express();
+app.use(express.json());
 const PORT = Number(process.env.PORT) || 3010;
+const PACOTES_CREDITOS = {
+  credito1: {
+    titulo: "1 crédito",
+    creditos: 1,
+    valor: 4.90,
+  },
+  credito10: {
+    titulo: "10 créditos",
+    creditos: 10,
+    valor: 19.90,
+  },
+  credito50: {
+    titulo: "50 créditos",
+    creditos: 50,
+    valor: 69.90,
+  },
+  credito100: {
+    titulo: "100 créditos",
+    creditos: 100,
+    valor: 119.90,
+  },
+};
+app.post("/api/criar-pagamento", async (req, res) => {
+  try {
+    const { pacote } = req.body;
+
+    const pacoteSelecionado = PACOTES_CREDITOS[pacote];
+
+    if (!pacoteSelecionado) {
+      return res.status(400).json({
+        erro: "Pacote de créditos inválido.",
+      });
+    }
+
+    const authHeader = req.headers.authorization || "";
+
+    if (!authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        erro: "Usuário não autenticado.",
+      });
+    }
+
+    const accessToken = authHeader.replace("Bearer ", "");
+
+    const {
+      data: { user },
+      error: erroUsuario,
+    } = await supabaseAdmin.auth.getUser(accessToken);
+
+    if (erroUsuario || !user) {
+      return res.status(401).json({
+        erro: "Sessão do usuário inválida.",
+      });
+    }
+
+    const preference = await preferenceClient.create({
+      body: {
+        items: [
+          {
+            title: pacoteSelecionado.titulo,
+            quantity: 1,
+            currency_id: "BRL",
+            unit_price: pacoteSelecionado.valor,
+          },
+        ],
+
+        external_reference: `${user.id}|${pacote}`,
+
+        metadata: {
+          user_id: user.id,
+          pacote: pacote,
+          creditos: pacoteSelecionado.creditos,
+        },
+      },
+    });
+
+    return res.json({
+      id: preference.id,
+      init_point: preference.init_point,
+    });
+  } catch (erro) {
+    console.error("Erro ao criar pagamento:", erro);
+
+    return res.status(500).json({
+      erro: "Não foi possível criar o pagamento.",
+    });
+  }
+});
 
 // =====================================================
 // CONFIGURAÇÃO
