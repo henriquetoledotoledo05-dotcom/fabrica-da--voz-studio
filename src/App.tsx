@@ -957,19 +957,40 @@ const vozesFemininas = vozes.filter(
         // =================================================
 
         const renderizado =
-          await offline.startRendering()
+  await offline.startRendering()
 
-        const wavBlob =
-          audioBufferParaWav(
-            renderizado
-          )
+const wavBlob =
+  audioBufferParaWav(
+    renderizado
+  )
 
-        const mixUrl =
-          URL.createObjectURL(
-            wavBlob
-          )
+const respostaMix =
+  await fetch(
+    '/api/converter-mp3',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'audio/wav',
+      },
+      body: wavBlob,
+    }
+  )
 
-        setMixAudioUrl(mixUrl)
+if (!respostaMix.ok) {
+  throw new Error(
+    'Não foi possível converter a mixagem para MP3.'
+  )
+}
+
+const mp3Blob =
+  await respostaMix.blob()
+
+const mixUrl =
+  URL.createObjectURL(
+    mp3Blob
+  )
+
+setMixAudioUrl(mixUrl)
         
 
         await contexto.close()

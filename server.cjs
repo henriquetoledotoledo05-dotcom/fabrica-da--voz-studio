@@ -1049,7 +1049,153 @@ app.post(
     }
   }
 );
+// =====================================================
+// CONVERTER WAV PARA MP3
+// =====================================================
 
+app.post(
+  "/api/converter-mp3",
+  async (req, res) => {
+    try {
+      const partes = [];
+
+      req.on("data", (parte) => {
+        partes.push(parte);
+      });
+
+      req.on("end", () => {
+        const wavBuffer =
+          Buffer.concat(partes);
+
+        if (!wavBuffer.length) {
+          return res.status(400).json({
+            erro:
+              "Áudio WAV não informado.",
+          });
+        }
+
+        const ffmpeg = spawn(
+          ffmpegPath,
+          [
+            "-hide_banner",
+            "-loglevel",
+            "error",
+
+            "-i",
+            "pipe:0",
+
+            "-c:a",
+            "libmp3lame",
+
+            "-b:a",
+            "192k",
+
+            "-ar",
+            "44100",
+
+            "-ac",
+            "2",
+
+            "-f",
+            "mp3",
+
+            "pipe:1",
+          ]
+        );
+
+        const partesMp3 = [];
+        let erro = "";
+
+        ffmpeg.stdout.on(
+          "data",
+          (parte) => {
+            partesMp3.push(parte);
+          }
+        );
+
+        ffmpeg.stderr.on(
+          "data",
+          (parte) => {
+            erro += parte.toString();
+          }
+        );
+
+        ffmpeg.on(
+          "error",
+          (err) => {
+            console.error(
+              "ERRO AO CONVERTER MP3:",
+              err
+            );
+
+            if (!res.headersSent) {
+              res.status(500).json({
+                erro:
+                  "Erro ao converter para MP3.",
+              });
+            }
+          }
+        );
+
+        ffmpeg.on(
+          "close",
+          (codigo) => {
+            if (codigo !== 0) {
+              console.error(
+                "FFmpeg conversão:",
+                erro
+              );
+
+              if (!res.headersSent) {
+                res.status(500).json({
+                  erro:
+                    erro ||
+                    "Não foi possível converter o áudio para MP3.",
+                });
+              }
+
+              return;
+            }
+
+            const mp3Buffer =
+              Buffer.concat(partesMp3);
+
+            res.set({
+              "Content-Type":
+                "audio/mpeg",
+
+              "Content-Length":
+                mp3Buffer.length.toString(),
+
+              "Content-Disposition":
+                'attachment; filename="fabrica-da-voz-mixagem.mp3"',
+
+              "Cache-Control":
+                "no-store",
+            });
+
+            res.send(mp3Buffer);
+          }
+        );
+
+        ffmpeg.stdin.end(
+          wavBuffer
+        );
+      });
+    } catch (erro) {
+      console.error(
+        "ERRO NA CONVERSÃO PARA MP3:",
+        erro
+      );
+
+      res.status(500).json({
+        erro:
+          erro.message ||
+          "Erro ao converter para MP3.",
+      });
+    }
+  }
+);
 // =====================================================
 // HEALTH CHECK
 // =====================================================
