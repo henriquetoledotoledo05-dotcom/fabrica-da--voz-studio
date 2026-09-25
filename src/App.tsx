@@ -80,6 +80,9 @@ function App() {
   const [trilhaArquivo, setTrilhaArquivo] =
     useState<File | null>(null)
 
+  const [trilhaArquivoUrl, setTrilhaArquivoUrl] =
+    useState('')
+
   const [nomeTrilhaArquivo, setNomeTrilhaArquivo] =
     useState('')
 
@@ -94,6 +97,18 @@ function App() {
 
   const [segundosFinal, setSegundosFinal] =
     useState(5)
+
+  const [inicioTrilha, setInicioTrilha] =
+    useState(0)
+
+  const [trilhaEmPrevia, setTrilhaEmPrevia] =
+    useState('')
+
+  const [tempoPreviaTrilha, setTempoPreviaTrilha] =
+    useState(0)
+
+  const [pontoTrilhaConfirmado, setPontoTrilhaConfirmado] =
+    useState(false)
 
   if (!acessoLiberado) {
     return (
@@ -540,6 +555,9 @@ const vozesFemininas = vozes.filter(
     setTrilhaArquivo(
       arquivo
     )
+    setTrilhaArquivoUrl(
+      URL.createObjectURL(arquivo)
+    )
     setMixAudioUrl('')
 
     setNomeTrilhaArquivo(
@@ -547,6 +565,10 @@ const vozesFemininas = vozes.filter(
     )
 
     setTrilhaSelecionada('')
+    setInicioTrilha(0)
+    setPontoTrilhaConfirmado(false)
+    setTrilhaEmPrevia('')
+    setTempoPreviaTrilha(0)
   }
 
   // =====================================================
@@ -849,6 +871,14 @@ const vozesFemininas = vozes.filter(
             ) || 0
           )
 
+        const pontoInicioTrilha =
+          trilha.duration > 0
+            ? Math.min(
+                Math.max(0, Number(inicioTrilha) || 0),
+                Math.max(0, trilha.duration - 0.01)
+              )
+            : 0
+
         const duracaoVoz =
           voz.duration
 
@@ -919,8 +949,12 @@ const vozesFemininas = vozes.filter(
         )
 
         // =================================================
-        // TRILHA / DUCKING
+        // TRILHA / DUCKING AUTOMÁTICO
         // =================================================
+        // A trilha começa no volume escolhido,
+        // abaixa suavemente quando a voz entra,
+        // permanece baixa durante a locução
+        // e sobe novamente quando a voz termina.
 
         const trilhaGain =
           offline.createGain()
@@ -934,37 +968,110 @@ const vozesFemininas = vozes.filter(
             )
           )
 
+        // 30% do volume escolhido durante a voz.
         const volumeDuranteVoz =
           volumeNormal * 0.30
 
-        trilhaGain.gain.setValueAtTime(
-          volumeNormal,
-          0
-        )
+        // Tempo da transição do ducking.
+        const duracaoEntradaVoz =
+          Math.min(
+            0.8,
+            Math.max(
+              0.25,
+              duracaoVoz / 10
+            )
+          )
 
-        trilhaGain.gain.setValueAtTime(
-          volumeNormal,
-          inicio
-        )
-
-        trilhaGain.gain.setValueAtTime(
-          volumeDuranteVoz,
-          inicio + 0.01
-        )
+        const duracaoSaidaVoz =
+          Math.min(
+            0.8,
+            Math.max(
+              0.25,
+              duracaoVoz / 10
+            )
+          )
 
         const fimDaVoz =
           inicio +
           duracaoVoz
 
+        // Volume normal desde o começo.
+        trilhaGain.gain.setValueAtTime(
+          volumeNormal,
+          0
+        )
+
+        if (inicio > 0) {
+          // Trilha começa alta e abaixa suavemente
+          // exatamente na entrada da locução.
+          const inicioDucking =
+            Math.max(
+              0,
+              inicio -
+                duracaoEntradaVoz
+            )
+
+          trilhaGain.gain.setValueAtTime(
+            volumeNormal,
+            inicioDucking
+          )
+
+          trilhaGain.gain.linearRampToValueAtTime(
+            volumeDuranteVoz,
+            inicio
+          )
+        } else {
+          // Se a locução começar imediatamente,
+          // a trilha começa no volume normal e
+          // abaixa suavemente logo no início.
+          trilhaGain.gain.setValueAtTime(
+            volumeNormal,
+            0
+          )
+
+          const fimEntradaDucking =
+            Math.min(
+              duracaoTotal,
+              duracaoEntradaVoz
+            )
+
+          if (fimEntradaDucking > 0) {
+            trilhaGain.gain.linearRampToValueAtTime(
+              volumeDuranteVoz,
+              fimEntradaDucking
+            )
+          }
+        }
+
+        // Mantém a trilha baixa durante toda a locução.
         trilhaGain.gain.setValueAtTime(
           volumeDuranteVoz,
           fimDaVoz
         )
 
-        trilhaGain.gain.setValueAtTime(
-          volumeNormal,
-          fimDaVoz + 0.01
-        )
+        // Depois que o locutor termina,
+        // a trilha sobe suavemente novamente.
+        const fimSubidaTrilha =
+          Math.min(
+            duracaoTotal,
+            fimDaVoz +
+              duracaoSaidaVoz
+          )
+
+        if (
+          fimSubidaTrilha >
+          fimDaVoz
+        ) {
+          trilhaGain.gain.linearRampToValueAtTime(
+            volumeNormal,
+            fimSubidaTrilha
+          )
+        } else {
+          trilhaGain.gain.setValueAtTime(
+            volumeNormal,
+            fimDaVoz
+          )
+        }
 
         // =================================================
         // FADE FINAL
@@ -975,9 +1082,14 @@ const vozesFemininas = vozes.filter(
             duracaoTotal -
             final
 
+          // Garante que o fade final comece
+          // sempre no volume normal da trilha.
           trilhaGain.gain.setValueAtTime(
             volumeNormal,
-            fadeOutInicio
+            Math.max(
+              0,
+              fadeOutInicio
+            )
           )
 
           trilhaGain.gain.linearRampToValueAtTime(
@@ -995,6 +1107,7 @@ const vozesFemininas = vozes.filter(
         // =================================================
 
         let trilhaAtual = 0
+        let primeiraParteTrilha = true
 
         while (
           trilhaAtual <
@@ -1014,20 +1127,35 @@ const vozesFemininas = vozes.filter(
             duracaoTotal -
             trilhaAtual
 
+          const offsetFonte =
+            primeiraParteTrilha
+              ? pontoInicioTrilha
+              : 0
+
+          const duracaoDisponivel =
+            trilha.duration -
+            offsetFonte
+
           const duracaoFonte =
             Math.min(
-              trilha.duration,
+              duracaoDisponivel,
               restante
             )
 
+          if (duracaoFonte <= 0) {
+            break
+          }
+
           trilhaSource.start(
             trilhaAtual,
-            0,
+            offsetFonte,
             duracaoFonte
           )
 
           trilhaAtual +=
-            trilha.duration
+            duracaoFonte
+
+          primeiraParteTrilha = false
         }
 
         // =================================================
@@ -1035,41 +1163,43 @@ const vozesFemininas = vozes.filter(
         // =================================================
 
         const renderizado =
-  await offline.startRendering()
+          await offline.startRendering()
 
-const wavBlob =
-  audioBufferParaWav(
-    renderizado
-  )
+        const wavBlob =
+          audioBufferParaWav(
+            renderizado
+          )
 
-const respostaMix =
-  await fetch(
-    '/api/converter-mp3',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'audio/wav',
-      },
-      body: wavBlob,
-    }
-  )
+        const respostaMix =
+          await fetch(
+            '/api/converter-mp3',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type':
+                  'audio/wav',
+              },
+              body: wavBlob,
+            }
+          )
 
-if (!respostaMix.ok) {
-  throw new Error(
-    'Não foi possível converter a mixagem para MP3.'
-  )
-}
+        if (!respostaMix.ok) {
+          throw new Error(
+            'Não foi possível converter a mixagem para MP3.'
+          )
+        }
 
-const mp3Blob =
-  await respostaMix.blob()
+        const mp3Blob =
+          await respostaMix.blob()
 
-const mixUrl =
-  URL.createObjectURL(
-    mp3Blob
-  )
+        const mixUrl =
+          URL.createObjectURL(
+            mp3Blob
+          )
 
-setMixAudioUrl(mixUrl)
-        
+        setMixAudioUrl(
+          mixUrl
+        )
 
         await contexto.close()
 
@@ -1089,6 +1219,7 @@ setMixAudioUrl(mixUrl)
         setMixando(false)
       }
     }
+
 
   // =====================================================
   // EDITOR
@@ -1591,16 +1722,39 @@ setMixAudioUrl(mixUrl)
                         )}
 
                         {trilhaArquivo && (
-                          <audio
-                            controls
-                            style={{
-                              width: '100%',
-                              marginTop: '10px'
-                            }}
-                            src={URL.createObjectURL(
-                              trilhaArquivo
-                            )}
-                          />
+                          <>
+                            <audio
+                              controls
+                              style={{
+                                width: '100%',
+                                marginTop: '10px'
+                              }}
+                              src={trilhaArquivoUrl}
+                              onTimeUpdate={(e) => {
+                                setTrilhaEmPrevia('__arquivo__')
+                                setTempoPreviaTrilha(e.currentTarget.currentTime)
+                              }}
+                            />
+
+                            <button
+                              type="button"
+                              className="botao-trilha"
+                              style={{
+                                marginTop: '10px',
+                                width: '100%'
+                              }}
+                              onClick={() => {
+                                setInicioTrilha(tempoPreviaTrilha)
+                                setTrilhaSelecionada('')
+                                setPontoTrilhaConfirmado(true)
+                                setMixAudioUrl('')
+                              }}
+                            >
+                              {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
+                                ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
+                                : `📍 Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                            </button>
+                          </>
                         )}
 
                       </div>
@@ -1621,8 +1775,12 @@ setMixAudioUrl(mixUrl)
                             setEstiloTrilhaSelecionado(e.target.value)
                             setTrilhaSelecionada('')
                             setTrilhaArquivo(null)
+                             setTrilhaArquivoUrl('')
                             setNomeTrilhaArquivo('')
                             setMixAudioUrl('')
+                            setInicioTrilha(0)
+                            setTrilhaEmPrevia('')
+                            setTempoPreviaTrilha(0)
                           }}
                           style={{
                             width: '100%',
@@ -1664,7 +1822,37 @@ setMixAudioUrl(mixUrl)
                                 marginTop: '10px'
                               }}
                               src={trilha.arquivo}
+                              onTimeUpdate={(e) => {
+                                setTrilhaEmPrevia(trilha.arquivo)
+                                setTempoPreviaTrilha(e.currentTarget.currentTime)
+                              }}
                             />
+
+                            <button
+                              type="button"
+                              className="botao-trilha"
+                              style={{
+                                marginTop: '10px',
+                                width: '100%'
+                              }}
+                              onClick={() => {
+                                setTrilhaSelecionada(trilha.arquivo)
+                             setTrilhaArquivoUrl('')
+                                setTrilhaArquivo(null)
+                                setNomeTrilhaArquivo('')
+                                setInicioTrilha(
+                                  trilhaEmPrevia === trilha.arquivo
+                                    ? tempoPreviaTrilha
+                                    : 0
+                                )
+                                setPontoTrilhaConfirmado(true)
+                                setMixAudioUrl('')
+                              }}
+                            >
+                              {pontoTrilhaConfirmado && trilhaSelecionada === trilha.arquivo
+                                ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
+                                : `📍 Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                            </button>
 
                             <button
                               type="button"
@@ -1675,9 +1863,12 @@ setMixAudioUrl(mixUrl)
                               }
                               onClick={() => {
                                 setTrilhaSelecionada(trilha.arquivo)
+                             setTrilhaArquivoUrl('')
                                 setMixAudioUrl('')
                                 setTrilhaArquivo(null)
                                 setNomeTrilhaArquivo('')
+                                 setInicioTrilha(0)
+                                 setPontoTrilhaConfirmado(false)
                               }}
                             >
                               {trilhaSelecionada === trilha.arquivo
@@ -1687,6 +1878,38 @@ setMixAudioUrl(mixUrl)
                           </div>
                         ))}
                       </div>
+
+                       {trilhaSelecionada || trilhaArquivo ? (
+                         <div
+                           style={{
+                             marginTop: '18px',
+                             padding: '16px',
+                             borderRadius: '12px',
+                             background: 'rgba(139, 92, 246, 0.10)',
+                             border: '1px solid rgba(139, 92, 246, 0.35)',
+                             textAlign: 'center'
+                           }}
+                         >
+                            {pontoTrilhaConfirmado
+                              ? <>✓ <strong>Ponto de início selecionado:</strong>{' '}
+                                  {Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}
+                                  :
+                                  {Math.floor(inicioTrilha % 60).toString().padStart(2, '0')}
+                                </>
+                              : <>📍 <strong>Início da trilha:</strong> 00:00</>}
+                            <div
+                              style={{
+                                marginTop: '6px',
+                                fontSize: '13px',
+                                opacity: 0.75
+                              }}
+                            >
+                              {pontoTrilhaConfirmado
+                                ? '✓ Ponto confirmado. Agora é só mixar a voz com a trilha.'
+                                : 'Ouça a trilha, posicione no trecho desejado e clique em “Usar este ponto”.'}
+                           </div>
+                         </div>
+                       ) : null}
 
                       {/* =================================================
                           VOLUMES
