@@ -1529,7 +1529,7 @@ const gerarVoz = async () => {
                 '25px'
             }}
           >
-            Seu estúdio de locução profissional
+            Seu estúdio de voz profissional
           </p>
 
         </header>
@@ -1689,15 +1689,15 @@ const gerarVoz = async () => {
           <section className="hero">
 
             <span className="tag">
-              ESTÚDIO DE LOCAÇÃO
+              ESTÚDIO DE VOZ
             </span>
 
             <h2>
-              Estúdio de Locução
+              Crie sua voz profissional com inteligência artificial.
             </h2>
 
             <p>
-              Crie sua locução profissional com inteligência artificial.
+              Transforme seu texto em uma locução profissional em poucos segundos.
             </p>
 
           </section>
@@ -1707,7 +1707,7 @@ const gerarVoz = async () => {
             <div className="editor">
 
               <h3>
-                Crie sua locução
+                Crie seu áudio
               </h3>
 
               <div
