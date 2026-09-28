@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -114,6 +115,291 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
     return res.status(500).json({
       erro: "Não foi possível criar o pagamento.",
+    });
+  }
+});
+
+// =====================================================
+// WEBHOOK MERCADO PAGO - PAGAMENTOS (LEGACY)
+// =====================================================
+// O Checkout Pro desta aplicação usa o tópico "payment".
+// O Mercado Pago envia data.id; consultamos o pagamento
+// diretamente na API e só liberamos créditos quando status=approved.
+// A função do Supabase impede que o mesmo pagamento seja creditado duas vezes.
+
+function extrairAssinaturaMercadoPago(xSignature) {
+  const resultado = { ts: null, v1: null };
+
+  if (!xSignature || typeof xSignature !== "string") {
+    return resultado;
+  }
+
+  for (const parte of xSignature.split(",")) {
+    const [chave, ...resto] = parte.split("=");
+
+    if (!chave || !resto.length) continue;
+
+    const valor = resto.join("=").trim();
+    const chaveLimpa = chave.trim();
+
+    if (chaveLimpa === "ts") resultado.ts = valor;
+    if (chaveLimpa === "v1") resultado.v1 = valor;
+  }
+
+  return resultado;
+}
+
+function validarAssinaturaMercadoPago(req, dataId) {
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+
+  if (!secret) {
+    throw new Error(
+      "MERCADOPAGO_WEBHOOK_SECRET não configurada no servidor."
+    );
+  }
+
+  const xSignature = req.headers["x-signature"];
+  const xRequestId = req.headers["x-request-id"];
+
+  if (!xSignature || !xRequestId || !dataId) {
+    return false;
+  }
+
+  const { ts, v1 } = extrairAssinaturaMercadoPago(xSignature);
+
+  if (!ts || !v1) {
+    return false;
+  }
+
+  // Manifesto oficial do Mercado Pago:
+  // id:[data.id_url];request-id:[x-request-id_header];ts:[ts_header];
+  const manifest =
+    `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+  const assinaturaCalculada = crypto
+    .createHmac("sha256", secret)
+    .update(manifest)
+    .digest("hex");
+
+  const esperado = Buffer.from(assinaturaCalculada, "utf8");
+  const recebido = Buffer.from(String(v1), "utf8");
+
+  if (esperado.length !== recebido.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(esperado, recebido);
+}
+
+app.post("/api/mercadopago/webhook", async (req, res) => {
+  try {
+    console.log("");
+    console.log("=================================");
+    console.log("WEBHOOK MERCADO PAGO RECEBIDO");
+    console.log("=================================");
+
+    const dataId = String(
+      req.query["data.id"] ||
+      req.body?.data?.id ||
+      ""
+    ).trim();
+
+    const tipo = String(
+      req.query.type ||
+      req.body?.type ||
+      ""
+    ).trim();
+
+    console.log("Tipo:", tipo);
+    console.log("Order ID:", dataId);
+
+    if (!validarAssinaturaMercadoPago(req, dataId)) {
+      console.error("Webhook Mercado Pago rejeitado: assinatura inválida.");
+      return res.status(401).json({
+        erro: "Assinatura do webhook inválida.",
+      });
+    }
+
+    // Para Checkout Pro, o Webhook atual usa o evento Order (Mercado Pago).
+    if (tipo && tipo !== "order") {
+      console.log("Webhook ignorado: tipo de evento não é order.");
+      return res.status(200).json({
+        recebido: true,
+        processado: false,
+      });
+    }
+
+    if (!dataId) {
+      console.error("Webhook recebido sem data.id.");
+      return res.status(400).json({
+        erro: "ID da order não informado.",
+      });
+    }
+
+    if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+      throw new Error(
+        "MERCADOPAGO_ACCESS_TOKEN não configurado."
+      );
+    }
+
+    // Consultamos a Order diretamente no Mercado Pago.
+    const respostaOrder = await fetch(
+      `https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization:
+            `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!respostaOrder.ok) {
+      const detalhes = await respostaOrder.text();
+
+      console.error(
+        "Erro ao consultar order no Mercado Pago:",
+        detalhes
+      );
+
+      // 5xx permite nova tentativa do Mercado Pago.
+      return res.status(502).json({
+        erro: "Não foi possível consultar a order no Mercado Pago.",
+      });
+    }
+
+    const order = await respostaOrder.json();
+
+    console.log("Status da order:", order.status);
+    console.log("Status detail:", order.status_detail);
+    console.log("External reference:", order.external_reference);
+
+    // Pagamento efetivamente processado e creditado.
+    if (
+      order.status !== "processed" ||
+      order.status_detail !== "accredited"
+    ) {
+      console.log(
+        "Order ainda não está processada/acreditada. Nenhum crédito será adicionado."
+      );
+
+      return res.status(200).json({
+        recebido: true,
+        processado: false,
+        status: order.status,
+        status_detail: order.status_detail,
+      });
+    }
+
+    const externalReference =
+      String(order.external_reference || "").trim();
+
+    let userId = "";
+    let pacote = "";
+
+    // O fluxo atual grava: UUID|pacote
+    const separador = externalReference.indexOf("|");
+
+    if (separador > 0) {
+      userId = externalReference.slice(0, separador).trim();
+      pacote = externalReference.slice(separador + 1).trim();
+    }
+
+    // Fallback para metadata caso a referência externa não esteja disponível.
+    if ((!userId || !pacote) && order.metadata) {
+      userId = String(order.metadata.user_id || "").trim();
+      pacote = String(order.metadata.pacote || "").trim();
+    }
+
+    if (!userId || !pacote) {
+      console.error(
+        "Não foi possível identificar usuário/pacote da order.",
+        {
+          externalReference,
+          metadata: order.metadata || null,
+        }
+      );
+
+      return res.status(400).json({
+        erro: "Não foi possível identificar o usuário e o pacote da order.",
+      });
+    }
+
+    const pacoteSelecionado = PACOTES_CREDITOS[pacote];
+
+    if (!pacoteSelecionado) {
+      console.error("Pacote não encontrado:", pacote);
+
+      return res.status(400).json({
+        erro: "Pacote de créditos não encontrado.",
+      });
+    }
+
+    // O Checkout Pro/Orders pode informar o total pago em total_paid_amount.
+    const valorPago = Number(
+      order.total_paid_amount ?? order.total_amount
+    );
+    const valorEsperado = Number(pacoteSelecionado.valor);
+
+    if (
+      !Number.isFinite(valorPago) ||
+      Math.abs(valorPago - valorEsperado) > 0.01
+    ) {
+      console.error(
+        "Valor da order diferente do pacote:",
+        {
+          valorPago,
+          valorEsperado,
+          pacote,
+        }
+      );
+
+      return res.status(400).json({
+        erro: "Valor da order não corresponde ao pacote.",
+      });
+    }
+
+    const { data, error } = await supabaseAdmin.rpc(
+      "processar_pagamento_aprovado",
+      {
+        p_mercado_pago_id: String(order.id || dataId),
+        p_user_id: userId,
+        p_pacote: pacote,
+        p_creditos: pacoteSelecionado.creditos,
+        p_valor: valorPago,
+      }
+    );
+
+    if (error) {
+      console.error(
+        "ERRO AO PROCESSAR PAGAMENTO NO SUPABASE:",
+        error
+      );
+
+      // 5xx permite nova tentativa do Mercado Pago.
+      return res.status(500).json({
+        erro: "Não foi possível registrar o pagamento no Supabase.",
+      });
+    }
+
+    console.log("Pagamento processado pelo Supabase:", data);
+    console.log(
+      "Créditos adicionados:",
+      pacoteSelecionado.creditos
+    );
+
+    return res.status(200).json({
+      recebido: true,
+      processado: true,
+      orderId: String(order.id || dataId),
+      creditos: pacoteSelecionado.creditos,
+    });
+  } catch (erro) {
+    console.error("ERRO NO WEBHOOK MERCADO PAGO:", erro);
+
+    return res.status(500).json({
+      erro: erro?.message || "Erro interno no webhook.",
     });
   }
 });
