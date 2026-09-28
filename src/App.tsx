@@ -1994,6 +1994,22 @@ const gerarVoz = async () => {
                 Texto da locução
               </label>
 
+              <div
+                style={{
+                  margin: '10px 0 12px',
+                  padding: '12px 14px',
+                  borderRadius: '10px',
+                  background: 'rgba(245, 197, 66, 0.08)',
+                  border: '1px solid rgba(245, 197, 66, 0.45)',
+                  color: '#f5c542',
+                  fontWeight: 700,
+                  lineHeight: 1.45,
+                  fontSize: '14px'
+                }}
+              >
+                🟡 <strong>ATENÇÃO:</strong> confira cuidadosamente o texto antes de gerar sua locução. <strong>O crédito é utilizado no momento da geração, por isso revise seu texto antes de confirmar.</strong>
+              </div>
+
               <textarea
   id="campoTextoLocucao"
   className="campo-texto"
