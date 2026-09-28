@@ -682,6 +682,82 @@ MUITO IMPORTANTE:
     });
   }
 });
+
+// =====================================================
+// AUTENTICAÇÃO E CRÉDITOS
+// =====================================================
+
+async function autenticarUsuario(req) {
+  const authHeader = req.headers.authorization || "";
+
+  if (!authHeader.startsWith("Bearer ")) {
+    throw new Error("Usuário não autenticado.");
+  }
+
+  const accessToken = authHeader.replace("Bearer ", "").trim();
+
+  if (!accessToken) {
+    throw new Error("Token de autenticação não informado.");
+  }
+
+  const {
+    data: { user },
+    error,
+  } = await supabaseAdmin.auth.getUser(accessToken);
+
+  if (error || !user) {
+    throw new Error("Sessão do usuário inválida.");
+  }
+
+  return user;
+}
+
+async function consumirCreditos(userId, quantidade) {
+  const { data, error } = await supabaseAdmin.rpc(
+    "consumir_creditos",
+    {
+      p_user_id: userId,
+      p_quantidade: quantidade,
+    }
+  );
+
+  if (error) {
+    console.error("ERRO AO CONSUMIR CRÉDITOS:", error);
+    throw new Error(
+      error.message || "Não foi possível consumir os créditos."
+    );
+  }
+
+  return data;
+}
+
+async function devolverCreditos(userId, quantidade) {
+  const { data, error } = await supabaseAdmin.rpc(
+    "devolver_creditos",
+    {
+      p_user_id: userId,
+      p_quantidade: quantidade,
+    }
+  );
+
+  if (error) {
+    console.error("ERRO AO DEVOLVER CRÉDITOS:", error);
+    return null;
+  }
+
+  return data;
+}
+
+function calcularCreditosNecessarios(texto) {
+  const quantidadeCaracteres = texto.trim().length;
+
+  if (quantidadeCaracteres <= 0) {
+    return 0;
+  }
+
+  return Math.ceil(quantidadeCaracteres / 800);
+}
+
 // =====================================================
 // GERAR VOZ - ELEVENLABS
 // =====================================================
@@ -689,6 +765,9 @@ MUITO IMPORTANTE:
 app.post(
   "/api/gerar-voz",
   async (req, res) => {
+    let usuarioId = null;
+    let creditosConsumidos = 0;
+
     try {
       const {
         texto,
@@ -697,17 +776,13 @@ app.post(
         categoria,
         estilo,
       } = req.body;
-      
+
       console.log("ESTILO RECEBIDO:", estilo);
 
       console.log("");
-      console.log(
-        "================================="
-      );
+      console.log("=================================");
       console.log("GERANDO VOZ - ESTILO:", estilo);
-      console.log(
-        "================================="
-      );
+      console.log("=================================");
 
       if (
         !texto ||
@@ -721,127 +796,151 @@ app.post(
 
       if (!voiceId) {
         return res.status(400).json({
-          erro:
-            "Nenhuma voz foi selecionada.",
+          erro: "Nenhuma voz foi selecionada.",
         });
       }
 
-      if (
-        !process.env
-          .ELEVENLABS_API_KEY
-      ) {
+      if (!process.env.ELEVENLABS_API_KEY) {
         return res.status(500).json({
           erro:
             "ELEVENLABS_API_KEY não configurada no arquivo .env.",
         });
       }
 
-      console.log(
-        "Voice ID:",
-        voiceId
+      const textoLimpo = texto.trim();
+      const quantidadeCaracteres = textoLimpo.length;
+      const creditosNecessarios =
+        calcularCreditosNecessarios(textoLimpo);
+
+      console.log("Quantidade de caracteres:", quantidadeCaracteres);
+      console.log("Créditos necessários:", creditosNecessarios);
+
+      // =====================================================
+      // AUTENTICAR USUÁRIO
+      // =====================================================
+
+      const usuario = await autenticarUsuario(req);
+      usuarioId = usuario.id;
+
+      // =====================================================
+      // CONSUMIR CRÉDITOS
+      //
+      // 1 a 800       = 1 crédito
+      // 801 a 1600    = 2 créditos
+      // 1601 a 2400   = 3 créditos
+      // etc.
+      // =====================================================
+
+      await consumirCreditos(
+        usuarioId,
+        creditosNecessarios
       );
 
+      creditosConsumidos = creditosNecessarios;
+
       console.log(
-        "Texto:",
-        texto
+        "Créditos consumidos:",
+        creditosConsumidos
       );
+
+      console.log("Voice ID:", voiceId);
+      console.log("Texto:", textoLimpo);
 
       // =====================================================
       // ESTILOS DE LOCUÇÃO - ELEVEN V3
-      // No v3, a direção principal vem das Audio Tags,
-      // pontuação e estrutura do texto. Style fica em 0.
       // =====================================================
 
-      let textoParaVoz = texto;
+      let textoParaVoz = textoLimpo;
       let estabilidadeEstilo = 0.50;
 
       if (estilo === "animado") {
-        textoParaVoz = `[excited] ${texto} [happily]`;
+        textoParaVoz = `[excited] ${textoLimpo} [happily]`;
         estabilidadeEstilo = 0.25;
       } else if (estilo === "muitoAnimado") {
-        textoParaVoz = `[excited] [happily] ${texto} [excited]`;
+        textoParaVoz = `[excited] [happily] ${textoLimpo} [excited]`;
         estabilidadeEstilo = 0.15;
       } else if (estilo === "superImpacto") {
-        textoParaVoz = `[shouts] ${texto} [shouts]`;
+        textoParaVoz = `[shouts] ${textoLimpo} [shouts]`;
         estabilidadeEstilo = 0.10;
       } else if (estilo === "serio") {
-        textoParaVoz = `[calm] ${texto}`;
+        textoParaVoz = `[calm] ${textoLimpo}`;
         estabilidadeEstilo = 0.70;
       } else if (estilo === "urgente") {
-        textoParaVoz = `[excited] [shouts] ${texto}`;
+        textoParaVoz = `[excited] [shouts] ${textoLimpo}`;
         estabilidadeEstilo = 0.12;
       } else if (estilo === "comercial") {
-        textoParaVoz = `[excited] ${texto} [happily]`;
+        textoParaVoz = `[excited] ${textoLimpo} [happily]`;
         estabilidadeEstilo = 0.22;
       } else if (estilo === "festa") {
-        textoParaVoz = `[excited] [happily] ${texto} [laughs]`;
+        textoParaVoz = `[excited] [happily] ${textoLimpo} [laughs]`;
         estabilidadeEstilo = 0.12;
       } else if (estilo === "solene") {
-        textoParaVoz = `[calm] ${texto}`;
+        textoParaVoz = `[calm] ${textoLimpo}`;
         estabilidadeEstilo = 0.82;
       }
 
-      console.log("Texto enviado para ElevenLabs:", textoParaVoz);
-      console.log("Estabilidade do estilo:", estabilidadeEstilo);
+      console.log(
+        "Texto enviado para ElevenLabs:",
+        textoParaVoz
+      );
+      console.log(
+        "Estabilidade do estilo:",
+        estabilidadeEstilo
+      );
 
-      const resposta =
-        await fetch(
-          `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
-            voiceId
-          )}`,
-          {
-            method: "POST",
+      // =====================================================
+      // ELEVENLABS
+      // =====================================================
 
-            headers: {
-              "xi-api-key":
-                process.env
-                  .ELEVENLABS_API_KEY,
+      const resposta = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
+          voiceId
+        )}`,
+        {
+          method: "POST",
 
-              "Content-Type":
-                "application/json",
+          headers: {
+            "xi-api-key":
+              process.env.ELEVENLABS_API_KEY,
 
-              "Accept":
-                "audio/mpeg",
+            "Content-Type":
+              "application/json",
+
+            "Accept":
+              "audio/mpeg",
+          },
+
+          body: JSON.stringify({
+            text: textoParaVoz,
+
+            model_id:
+              "eleven_v3",
+
+            language_code:
+              "pt",
+
+            voice_settings: {
+              stability: estabilidadeEstilo,
+              style: 0,
             },
 
-            body: JSON.stringify({
-              text: textoParaVoz,
-
-              model_id:
-                "eleven_v3",
-
-              language_code:
-                "pt",
-
-              voice_settings: {
-                stability: estabilidadeEstilo,
-                style: 0,
-              },
-
-              output_format:
-                "mp3_44100_128",
-            }),
-          }
-        );
+            output_format:
+              "mp3_44100_128",
+          }),
+        }
+      );
 
       if (!resposta.ok) {
         const erroApi =
           await resposta.text();
 
-        console.error(
-          "ELEVENLABS ERRO:"
-        );
-        console.error(
-          erroApi
-        );
+        console.error("ELEVENLABS ERRO:");
+        console.error(erroApi);
 
-        return res
-          .status(resposta.status)
-          .json({
-            erro:
-              erroApi ||
-              "Erro na ElevenLabs.",
-          });
+        throw new Error(
+          erroApi ||
+          "Erro na ElevenLabs."
+        );
       }
 
       let audio =
@@ -850,10 +949,9 @@ app.post(
         );
 
       if (!audio.length) {
-        return res.status(500).json({
-          erro:
-            "A ElevenLabs retornou um áudio vazio.",
-        });
+        throw new Error(
+          "A ElevenLabs retornou um áudio vazio."
+        );
       }
 
       console.log(
@@ -862,7 +960,10 @@ app.post(
         "bytes"
       );
 
-      // Velocidade opcional.
+      // =====================================================
+      // VELOCIDADE OPCIONAL
+      // =====================================================
+
       if (
         speed !== undefined &&
         speed !== null &&
@@ -875,6 +976,12 @@ app.post(
           );
       }
 
+      if (!audio.length) {
+        throw new Error(
+          "O áudio ficou vazio após o processamento."
+        );
+      }
+
       res.set({
         "Content-Type":
           "audio/mpeg",
@@ -884,6 +991,10 @@ app.post(
 
         "Cache-Control":
           "no-store",
+
+        // Informa ao frontend quantos créditos foram usados.
+        "X-Creditos-Consumidos":
+          creditosConsumidos.toString(),
       });
 
       res.send(audio);
@@ -894,14 +1005,45 @@ app.post(
       );
       console.error(erro);
 
-      res.status(500).json({
-        erro:
-          erro.message ||
-          "Não foi possível gerar a voz.",
+      // =====================================================
+      // DEVOLVER CRÉDITOS SE A GERAÇÃO FALHAR
+      // =====================================================
+
+      if (
+        usuarioId &&
+        creditosConsumidos > 0
+      ) {
+        await devolverCreditos(
+          usuarioId,
+          creditosConsumidos
+        );
+
+        console.log(
+          "Créditos devolvidos:",
+          creditosConsumidos
+        );
+      }
+
+      const mensagem =
+        erro?.message ||
+        "Não foi possível gerar a voz.";
+
+      const semCreditos =
+        mensagem.toLowerCase().includes(
+          "créditos insuficientes"
+        );
+
+      res.status(
+        semCreditos ? 402 : 500
+      ).json({
+        erro: semCreditos
+          ? "Você não possui créditos suficientes para gerar essa locução."
+          : mensagem,
       });
     }
   }
 );
+
 
 // =====================================================
 // MIXAGEM COM TRILHA DA FÁBRICA

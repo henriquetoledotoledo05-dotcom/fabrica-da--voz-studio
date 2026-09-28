@@ -202,7 +202,7 @@ function App() {
       await carregarCreditos()
     } else {
       setErroCadastro(
-        'Conta criada com sucesso! Verifique seu e-mail para confirmar o cadastro.'
+        '✅ Cadastro realizado! Enviamos um link de confirmação para o seu e-mail. Abra seu e-mail e clique no link para confirmar sua conta. Depois, volte aqui e faça login.'
       )
     }
   }
@@ -279,6 +279,16 @@ function App() {
   const [pontoTrilhaConfirmado, setPontoTrilhaConfirmado] =
     useState(false)
 
+  const sairDaFabrica = async () => {
+    await supabase.auth.signOut()
+    sessionStorage.removeItem('fabrica_acesso')
+    setAcessoLiberado(false)
+    setCreditos(null)
+    setEmailAcesso('')
+    setSenhaAcesso('')
+    setErroAcesso('')
+  }
+
   if (!acessoLiberado) {
     if (mostrarCadastro) {
       return (
@@ -337,6 +347,41 @@ function App() {
             <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
           </div>
           {erroAcesso && <p style={{ color: '#ff6b6b', marginTop: '14px', fontWeight: 600 }}>{erroAcesso}</p>}
+          <a
+            href="https://wa.me/5512991581880"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              width: '100%',
+              boxSizing: 'border-box',
+              padding: '13px 18px',
+              marginTop: '18px',
+              borderRadius: '11px',
+              background: '#25D366',
+              color: '#fff',
+              textDecoration: 'none',
+              fontWeight: 700,
+              fontSize: '15px',
+            }}
+          >
+            💬 Falar no WhatsApp
+          </a>
+
+          <div
+            style={{
+              marginTop: '9px',
+              fontSize: '13px',
+              opacity: 0.7,
+              textAlign: 'center',
+            }}
+          >
+            (12) 99158-1880
+          </div>
+
           <div style={{ margin: '26px 0', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
           <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda não tem uma conta?</p>
           <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: '#171020' }}>Criar minha conta</button>
@@ -564,10 +609,10 @@ const gerarVoz = async () => {
       return
     }
 
-    if (textoDigitado.length > 800) {
-      alert('Cada locução pode ter no máximo 800 caracteres.')
-      return
-    }
+    const creditosNecessarios = Math.max(
+      1,
+      Math.ceil(textoDigitado.length / 800)
+    )
 
     if (carregandoCreditos) {
       alert('Aguarde o carregamento do seu saldo de créditos.')
@@ -580,8 +625,25 @@ const gerarVoz = async () => {
       return
     }
 
-    if (creditos <= 0) {
-      alert('Você não tem créditos suficientes. Compre créditos para gerar uma nova locução.')
+    if (creditos < creditosNecessarios) {
+      alert(
+        `Você precisa de ${creditosNecessarios} crédito${
+          creditosNecessarios === 1 ? '' : 's'
+        } para gerar essa locução. Seu saldo atual é de ${creditos} crédito${
+          creditos === 1 ? '' : 's'
+        }.`
+      )
+      return
+    }
+
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession()
+
+    if (
+      sessionError ||
+      !sessionData.session
+    ) {
+      alert('Sua sessão expirou. Faça login novamente.')
       return
     }
 
@@ -595,7 +657,8 @@ const gerarVoz = async () => {
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionData.session.access_token}`,
           },
           body: JSON.stringify({
             texto: textoFinal,
@@ -634,42 +697,16 @@ const gerarVoz = async () => {
         throw new Error('O servidor retornou um áudio vazio.')
       }
 
-      const urlAudio = URL.createObjectURL(audioBlob)
+      const urlAudio =
+        URL.createObjectURL(audioBlob)
 
       setAudioUrl(urlAudio)
       setAudioOriginalUrl(urlAudio)
       setMixAudioUrl('')
 
-      // Desconta 1 crédito somente depois que a geração deu certo.
-      const { data: userData, error: userError } =
-        await supabase.auth.getUser()
-
-      if (userError || !userData.user) {
-        throw new Error('A locução foi gerada, mas não foi possível identificar sua conta para atualizar os créditos.')
-      }
-
-      const novoSaldo = Math.max(0, creditos - 1)
-
-      const { data: perfilAtualizado, error: erroCredito } =
-        await supabase
-          .from('perfis')
-          .update({ creditos: novoSaldo })
-          .eq('id', userData.user.id)
-          .select('creditos')
-          .maybeSingle()
-
-      if (erroCredito) {
-        console.error('Erro ao descontar crédito:', erroCredito)
-        await carregarCreditos()
-        throw new Error('A locução foi gerada, mas não foi possível atualizar seu saldo de créditos. Não gere novamente até conferir o saldo.')
-      }
-
-      if (!perfilAtualizado) {
-        await carregarCreditos()
-        throw new Error('A locução foi gerada, mas não foi possível confirmar o desconto do crédito.')
-      }
-
-      setCreditos(Number(perfilAtualizado.creditos))
+      // O servidor já descontou os créditos com segurança.
+      // Apenas atualizamos o saldo exibido na tela.
+      await carregarCreditos()
     } catch (erro) {
       console.error('Erro ao gerar voz:', erro)
 
@@ -682,6 +719,7 @@ const gerarVoz = async () => {
       setGerando(false)
     }
   }
+
   // =====================================================
   // TRILHAS POR ESTILO
   // =====================================================
@@ -1705,6 +1743,21 @@ const gerarVoz = async () => {
                 >
                   + Comprar créditos
                 </button>
+                <button
+                  type="button"
+                  onClick={sairDaFabrica}
+                  style={{
+                    padding: '8px 13px',
+                    borderRadius: '9px',
+                    border: '1px solid rgba(255,255,255,0.20)',
+                    background: 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Sair
+                </button>
               </div>
 
               {/* =================================================
@@ -1945,13 +1998,13 @@ const gerarVoz = async () => {
   id="campoTextoLocucao"
   className="campo-texto"
   value={texto}
-  onChange={(e) => setTexto(e.target.value.slice(0, 800))}
-  maxLength={800}
+  onChange={(e) => setTexto(e.target.value)}
+  
   placeholder="Digite aqui o texto que você quer transformar..."
 />
 
 <div className="contador-caracteres">
-  {texto.length}/800 caracteres
+  {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
 </div>
 <button
   type="button"

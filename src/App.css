@@ -2842,3 +2842,96 @@ button.voltar:hover,
   text-align: center;
   margin: 20px 0 10px;
 }
+/* =========================================================
+   CORREÇÃO DA TELA DE CRÉDITOS NO CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Janela de compra de créditos */
+  .app > div {
+    max-width: 100%;
+  }
+
+  /* Evita cartões largos demais */
+  .app button,
+  .app input,
+  .app textarea {
+    max-width: 100%;
+  }
+
+}
+
+/* Celulares bem pequenos */
+@media (max-width: 400px) {
+
+  .main {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+}
+/* =========================================================
+   CORREÇÃO DA TELA DE CRÉDITOS NO CELULAR
+   ========================================================= */
+
+@media (max-width: 600px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .app button,
+  .app input,
+  .app textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 400px) {
+  .main {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
