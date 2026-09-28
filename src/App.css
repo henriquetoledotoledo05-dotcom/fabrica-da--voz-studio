@@ -2935,3 +2935,235 @@ button.voltar:hover,
     padding-right: 8px;
   }
 }
+
+/* =========================================================
+   NOVA IDENTIDADE VISUAL — FÁBRICA DA VOZ
+   ROXO NEON + DOURADO + PRETO
+   ========================================================= */
+
+:root {
+  --fv-preto: #07050b;
+  --fv-preto-2: #0d0a12;
+  --fv-fundo: #110c18;
+  --fv-card: #17111f;
+  --fv-card-2: #1d1528;
+
+  --fv-roxo: #a855f7;
+  --fv-roxo-neon: #c026ff;
+  --fv-roxo-escuro: #6d28d9;
+  --fv-roxo-claro: #d8b4fe;
+
+  --fv-dourado: #f5c542;
+  --fv-dourado-claro: #ffd966;
+  --fv-dourado-escuro: #c99700;
+
+  --fv-branco: #ffffff;
+  --fv-cinza: #d1d5db;
+  --fv-cinza-escuro: #9ca3af;
+}
+
+/* Fundo geral */
+html,
+body,
+#root,
+.app {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.10), transparent 32%),
+    linear-gradient(180deg, var(--fv-preto) 0%, var(--fv-fundo) 100%) !important;
+  color: var(--fv-cinza) !important;
+}
+
+/* Áreas principais */
+.main,
+.editor,
+.vozes,
+.painel-trilhas,
+.editor-tempo,
+.card,
+.voz-card {
+  color: var(--fv-cinza) !important;
+}
+
+/* Títulos principais em branco */
+.app > header:not(.topo) h1,
+.hero h2,
+.hero h3,
+.editor > h3,
+.vozes > label,
+.editor > label,
+.titulo-previa,
+.painel-trilhas > h3,
+.editor-tempo h3,
+.cardTexto h4 {
+  color: var(--fv-branco) !important;
+}
+
+/* Títulos importantes e valores em dourado */
+.hero .tag,
+.titulo-sexo-voz,
+.contador-caracteres,
+.preco,
+.valor,
+.valor-credito,
+.creditos,
+.saldo,
+.destaque,
+.destaque-valor {
+  color: var(--fv-dourado) !important;
+}
+
+/* Textos secundários */
+.app > header:not(.topo) p,
+.hero p,
+.cardTexto p,
+.editor-tempo > p,
+.resultado-pos-geracao p,
+.painel-trilhas p {
+  color: var(--fv-cinza) !important;
+}
+
+/* Cards */
+.card,
+.voz-card {
+  background: linear-gradient(145deg, var(--fv-card), var(--fv-card-2)) !important;
+  border-color: rgba(168, 85, 247, 0.28) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.30) !important;
+}
+
+.card:hover,
+.voz-card:hover {
+  border-color: rgba(245, 197, 66, 0.55) !important;
+  box-shadow:
+    0 0 0 1px rgba(245, 197, 66, 0.12),
+    0 12px 30px rgba(0, 0, 0, 0.38) !important;
+}
+
+/* Campos */
+.campo-texto,
+input,
+textarea,
+select {
+  background: #0d0913 !important;
+  color: var(--fv-branco) !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+.campo-texto::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: var(--fv-cinza-escuro) !important;
+}
+
+.campo-texto:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--fv-roxo-neon) !important;
+  box-shadow: 0 0 0 3px rgba(192, 38, 255, 0.16) !important;
+  outline: none !important;
+}
+
+/* Botões principais — roxo neon */
+.botao-gerar,
+.botao-corrigir,
+.botao-trilha,
+.botao-download,
+.botao-download-mixagem,
+.botao-usar-trilha {
+  background: linear-gradient(135deg, var(--fv-roxo-neon), var(--fv-roxo-escuro)) !important;
+  color: var(--fv-branco) !important;
+  border-color: rgba(216, 180, 254, 0.85) !important;
+  box-shadow:
+    0 0 0 2px rgba(168, 85, 247, 0.10),
+    0 8px 22px rgba(109, 40, 217, 0.28) !important;
+}
+
+.botao-gerar:hover:not(:disabled),
+.botao-corrigir:hover,
+.botao-trilha:hover,
+.botao-download:hover,
+.botao-download-mixagem:hover,
+.botao-usar-trilha:hover {
+  background: linear-gradient(135deg, #d946ef, #7e22ce) !important;
+  border-color: var(--fv-dourado-claro) !important;
+  box-shadow:
+    0 0 14px rgba(192, 38, 255, 0.25),
+    0 10px 26px rgba(109, 40, 217, 0.35) !important;
+}
+
+/* Botão selecionado */
+.botao-trilha.ativo,
+.botao-usar-trilha.ativo,
+.botao-usar-trilha.selecionado {
+  background: linear-gradient(135deg, var(--fv-dourado), var(--fv-dourado-escuro)) !important;
+  color: #160f00 !important;
+  border-color: #ffe58a !important;
+  box-shadow: 0 0 16px rgba(245, 197, 66, 0.25) !important;
+}
+
+/* Locutor selecionado */
+.voz.ativo {
+  background: linear-gradient(145deg, #7e22ce, #4c1d95) !important;
+  border-color: var(--fv-dourado) !important;
+  box-shadow:
+    0 0 0 2px rgba(245, 197, 66, 0.14),
+    0 0 22px rgba(168, 85, 247, 0.30) !important;
+  color: var(--fv-branco) !important;
+}
+
+.voz.ativo span {
+  color: var(--fv-dourado-claro) !important;
+}
+
+.voz.ativo img {
+  border-color: var(--fv-dourado) !important;
+  box-shadow: 0 0 14px rgba(245, 197, 66, 0.25) !important;
+}
+
+/* Locutor normal */
+.voz {
+  background: #15101d !important;
+  border-color: rgba(168, 85, 247, 0.30) !important;
+  color: var(--fv-branco) !important;
+}
+
+.voz:hover {
+  border-color: var(--fv-roxo-neon) !important;
+  box-shadow: 0 0 16px rgba(192, 38, 255, 0.16) !important;
+}
+
+.voz span {
+  color: var(--fv-branco) !important;
+}
+
+/* Links / voltar */
+.voltar {
+  color: var(--fv-dourado) !important;
+  border-color: rgba(245, 197, 66, 0.35) !important;
+}
+
+.voltar:hover {
+  color: var(--fv-dourado-claro) !important;
+  border-color: var(--fv-dourado) !important;
+}
+
+/* Pequenos detalhes roxos */
+a {
+  color: var(--fv-roxo-claro);
+}
+
+a:hover {
+  color: var(--fv-dourado-claro);
+}
+
+/* Barras e detalhes de destaque */
+hr {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+/* Mantém o dourado discreto em destaques */
+strong,
+b {
+  color: inherit;
+}
+
