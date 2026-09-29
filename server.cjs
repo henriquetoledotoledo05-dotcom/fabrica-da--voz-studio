@@ -174,7 +174,7 @@ function validarAssinaturaMercadoPago(req, dataId) {
   // Manifesto oficial do Mercado Pago:
   // id:[data.id_url];request-id:[x-request-id_header];ts:[ts_header];
   const manifest =
-    `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+  `id:${String(dataId).toLowerCase()};request-id:${xRequestId};ts:${ts};`;
 
   const assinaturaCalculada = crypto
     .createHmac("sha256", secret)
