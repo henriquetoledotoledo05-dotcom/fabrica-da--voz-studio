@@ -1183,33 +1183,40 @@ app.post(
       // =====================================================
 
       let textoParaVoz = textoLimpo;
-      let estabilidadeEstilo = 0.50;
+let estabilidadeEstilo = 0.50;
 
-      if (estilo === "animado") {
-        textoParaVoz = `[excited] ${textoLimpo} [happily]`;
-        estabilidadeEstilo = 0.25;
-      } else if (estilo === "muitoAnimado") {
-        textoParaVoz = `[excited] [happily] ${textoLimpo} [excited]`;
-        estabilidadeEstilo = 0.15;
-      } else if (estilo === "superImpacto") {
-        textoParaVoz = `[shouts] ${textoLimpo} [shouts]`;
-        estabilidadeEstilo = 0.10;
-      } else if (estilo === "serio") {
-        textoParaVoz = `[calm] ${textoLimpo}`;
-        estabilidadeEstilo = 0.70;
-      } else if (estilo === "urgente") {
-        textoParaVoz = `[excited] [shouts] ${textoLimpo}`;
-        estabilidadeEstilo = 0.12;
-      } else if (estilo === "comercial") {
-        textoParaVoz = `[excited] ${textoLimpo} [happily]`;
-        estabilidadeEstilo = 0.22;
-      } else if (estilo === "festa") {
-        textoParaVoz = `[excited] [happily] ${textoLimpo} [laughs]`;
-        estabilidadeEstilo = 0.12;
-      } else if (estilo === "solene") {
-        textoParaVoz = `[calm] ${textoLimpo}`;
-        estabilidadeEstilo = 0.82;
-      }
+if (estilo === "animado") {
+  textoParaVoz = `[excited] ${textoLimpo} [happily]`;
+  estabilidadeEstilo = 0.18;
+
+} else if (estilo === "muitoAnimado") {
+  textoParaVoz = `[excited] [happily] ${textoLimpo} [excited] [happily]`;
+  estabilidadeEstilo = 0.08;
+
+} else if (estilo === "superImpacto") {
+  textoParaVoz = `[shouts] ${textoLimpo} [shouts] [excited]`;
+  estabilidadeEstilo = 0.05;
+
+} else if (estilo === "serio") {
+  textoParaVoz = `[calm] [serious] ${textoLimpo}`;
+  estabilidadeEstilo = 0.72;
+
+} else if (estilo === "urgente") {
+  textoParaVoz = `[excited] [shouts] ${textoLimpo} [shouts]`;
+  estabilidadeEstilo = 0.06;
+
+} else if (estilo === "comercial") {
+  textoParaVoz = `[excited] ${textoLimpo} [happily] [excited]`;
+  estabilidadeEstilo = 0.15;
+
+} else if (estilo === "festa") {
+  textoParaVoz = `[excited] [happily] ${textoLimpo} [laughs] [happily]`;
+  estabilidadeEstilo = 0.08;
+
+} else if (estilo === "solene") {
+  textoParaVoz = `[calm] [serious] ${textoLimpo}`;
+  estabilidadeEstilo = 0.82;
+}
 
       console.log(
         "Texto enviado para ElevenLabs:",
