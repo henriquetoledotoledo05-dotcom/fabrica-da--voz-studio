@@ -9,6 +9,8 @@ import celsoLocutor from './assets/celso-locutor.png'
 import pedroLocutor from './assets/pedro-locutor.png'
 import gabyLocutora from './assets/gaby-locutor.png'
 import luizaLocutora from './assets/luisa-locutor.png'
+import lourencoLocutor from './assets/lourenco-locutor.png'
+import gustavoLocutor from './assets/gustavo-locutor.png'
 
 type Voz = {
   id: string
@@ -20,6 +22,8 @@ const henriqueLocutor = '/henrique-foto.png'
 const rafaelLocutor = '/rafael-foto.png'
 const viniciusLocutor = '/vinicius-foto.png'
 const vitorLocutor = '/vitor-foto.png'
+
+
 
 function App() {
     const [acessoLiberado, setAcessoLiberado] = useState(false)
@@ -466,6 +470,20 @@ function App() {
     },
 
     {
+      id: 'DQRaZFBAlsnenMlFVe0R',
+      nome: 'Lourenço',
+      foto: lourencoLocutor,
+      demonstrativo: '/vozes/lourenco.mp3'
+    },
+
+    {
+      id: 'g2E836wHBXhsWq15NkoD',
+      nome: 'Gustavo',
+      foto: gustavoLocutor,
+      demonstrativo: '/vozes/gustavo.mp3'
+    },
+
+    {
       id: 'myEJoaX0UkuoJmX7w2Rf',
       nome: 'Luiza',
       foto: luizaLocutora,
@@ -482,7 +500,7 @@ function App() {
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
@@ -1805,7 +1823,7 @@ const gerarVoz = async () => {
 
       <audio
         controls
-        preload="none"
+        preload="metadata"
         src={voz.demonstrativo}
       />
     </div>
@@ -1845,7 +1863,7 @@ const gerarVoz = async () => {
 
       <audio
         controls
-        preload="none"
+        preload="metadata"
         src={voz.demonstrativo}
       />
     </div>
@@ -1993,22 +2011,6 @@ const gerarVoz = async () => {
               <label>
                 Texto da locução
               </label>
-
-              <div
-                style={{
-                  margin: '10px 0 12px',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  background: 'rgba(245, 197, 66, 0.08)',
-                  border: '1px solid rgba(245, 197, 66, 0.45)',
-                  color: '#f5c542',
-                  fontWeight: 700,
-                  lineHeight: 1.45,
-                  fontSize: '14px'
-                }}
-              >
-                🟡 <strong>ATENÇÃO:</strong> confira cuidadosamente o texto antes de gerar sua locução. <strong>O crédito é utilizado no momento da geração, por isso revise seu texto antes de confirmar.</strong>
-              </div>
 
               <textarea
   id="campoTextoLocucao"
