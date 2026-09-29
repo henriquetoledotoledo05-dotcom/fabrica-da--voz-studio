@@ -120,12 +120,14 @@ app.post("/api/criar-pagamento", async (req, res) => {
 });
 
 // =====================================================
-// WEBHOOK MERCADO PAGO - PAGAMENTOS (LEGACY)
+// WEBHOOK MERCADO PAGO - PAYMENT + ORDER
 // =====================================================
-// O Checkout Pro desta aplicação usa o tópico "payment".
-// O Mercado Pago envia data.id; consultamos o pagamento
-// diretamente na API e só liberamos créditos quando status=approved.
-// A função do Supabase impede que o mesmo pagamento seja creditado duas vezes.
+// Esta aplicação usa Checkout Pro pela API de Preferências
+// (/checkout/preferences). Para esse fluxo, o evento correto
+// é "Pagamentos" (tópico payment). Mantemos suporte a "order"
+// também para compatibilidade futura.
+// O mesmo pagamento não pode gerar créditos duas vezes porque
+// o Supabase controla mercado_pago_id como UNIQUE.
 
 function extrairAssinaturaMercadoPago(xSignature) {
   const resultado = { ts: null, v1: null };
@@ -136,7 +138,6 @@ function extrairAssinaturaMercadoPago(xSignature) {
 
   for (const parte of xSignature.split(",")) {
     const [chave, ...resto] = parte.split("=");
-
     if (!chave || !resto.length) continue;
 
     const valor = resto.join("=").trim();
@@ -171,10 +172,10 @@ function validarAssinaturaMercadoPago(req, dataId) {
     return false;
   }
 
-  // Manifesto oficial do Mercado Pago:
-  // id:[data.id_url];request-id:[x-request-id_header];ts:[ts_header];
+  // Manifesto oficial do Mercado Pago.
+  // O data.id é usado em minúsculas no cálculo da assinatura.
   const manifest =
-  `id:${String(dataId).toLowerCase()};request-id:${xRequestId};ts:${ts};`;
+    `id:${String(dataId).toLowerCase()};request-id:${xRequestId};ts:${ts};`;
 
   const assinaturaCalculada = crypto
     .createHmac("sha256", secret)
@@ -208,10 +209,17 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       req.query.type ||
       req.body?.type ||
       ""
-    ).trim();
+    ).trim().toLowerCase();
 
     console.log("Tipo:", tipo);
-    console.log("Order ID:", dataId);
+    console.log("ID do recurso:", dataId);
+
+    if (!dataId) {
+      console.error("Webhook recebido sem data.id.");
+      return res.status(400).json({
+        erro: "ID do recurso não informado.",
+      });
+    }
 
     if (!validarAssinaturaMercadoPago(req, dataId)) {
       console.error("Webhook Mercado Pago rejeitado: assinatura inválida.");
@@ -220,19 +228,11 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       });
     }
 
-    // Para Checkout Pro, o Webhook atual usa o evento Order (Mercado Pago).
-    if (tipo && tipo !== "order") {
-      console.log("Webhook ignorado: tipo de evento não é order.");
+    if (tipo !== "payment" && tipo !== "order") {
+      console.log("Webhook ignorado: tipo não suportado:", tipo);
       return res.status(200).json({
         recebido: true,
         processado: false,
-      });
-    }
-
-    if (!dataId) {
-      console.error("Webhook recebido sem data.id.");
-      return res.status(400).json({
-        erro: "ID da order não informado.",
       });
     }
 
@@ -242,58 +242,110 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       );
     }
 
-    // Consultamos a Order diretamente no Mercado Pago.
-    const respostaOrder = await fetch(
-      `https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization:
-            `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
-          Accept: "application/json",
-        },
-      }
-    );
+    let recurso;
+    let statusAprovado = false;
+    let externalReference = "";
+    let metadata = null;
+    let valorPago = NaN;
+    let recursoId = dataId;
 
-    if (!respostaOrder.ok) {
-      const detalhes = await respostaOrder.text();
-
-      console.error(
-        "Erro ao consultar order no Mercado Pago:",
-        detalhes
+    if (tipo === "payment") {
+      // Checkout Pro via Preferences API: consultar pagamento.
+      const respostaPagamento = await fetch(
+        `https://api.mercadopago.com/v1/payments/${encodeURIComponent(dataId)}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization:
+              `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+            Accept: "application/json",
+          },
+        }
       );
 
-      // 5xx permite nova tentativa do Mercado Pago.
-      return res.status(502).json({
-        erro: "Não foi possível consultar a order no Mercado Pago.",
-      });
+      if (!respostaPagamento.ok) {
+        const detalhes = await respostaPagamento.text();
+        console.error(
+          "Erro ao consultar pagamento no Mercado Pago:",
+          detalhes
+        );
+        return res.status(502).json({
+          erro: "Não foi possível consultar o pagamento no Mercado Pago.",
+        });
+      }
+
+      recurso = await respostaPagamento.json();
+      recursoId = String(recurso.id || dataId);
+      statusAprovado =
+        recurso.status === "approved" &&
+        (recurso.status_detail === "accredited" ||
+          !recurso.status_detail);
+      externalReference = String(
+        recurso.external_reference || ""
+      ).trim();
+      metadata = recurso.metadata || null;
+      valorPago = Number(recurso.transaction_amount);
+
+      console.log("Status do pagamento:", recurso.status);
+      console.log("Status detail:", recurso.status_detail);
+      console.log("External reference:", externalReference);
+      console.log("Valor do pagamento:", valorPago);
+    } else {
+      // Compatibilidade com Checkout Pro via Orders API.
+      const respostaOrder = await fetch(
+        `https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization:
+              `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!respostaOrder.ok) {
+        const detalhes = await respostaOrder.text();
+        console.error(
+          "Erro ao consultar order no Mercado Pago:",
+          detalhes
+        );
+        return res.status(502).json({
+          erro: "Não foi possível consultar a order no Mercado Pago.",
+        });
+      }
+
+      recurso = await respostaOrder.json();
+      recursoId = String(recurso.id || dataId);
+      statusAprovado =
+        recurso.status === "processed" &&
+        recurso.status_detail === "accredited";
+      externalReference = String(
+        recurso.external_reference || ""
+      ).trim();
+      metadata = recurso.metadata || null;
+      valorPago = Number(
+        recurso.total_paid_amount ?? recurso.total_amount
+      );
+
+      console.log("Status da order:", recurso.status);
+      console.log("Status detail:", recurso.status_detail);
+      console.log("External reference:", externalReference);
+      console.log("Valor da order:", valorPago);
     }
 
-    const order = await respostaOrder.json();
-
-    console.log("Status da order:", order.status);
-    console.log("Status detail:", order.status_detail);
-    console.log("External reference:", order.external_reference);
-
-    // Pagamento efetivamente processado e creditado.
-    if (
-      order.status !== "processed" ||
-      order.status_detail !== "accredited"
-    ) {
+    if (!statusAprovado) {
       console.log(
-        "Order ainda não está processada/acreditada. Nenhum crédito será adicionado."
+        "Pagamento ainda não está aprovado/acreditado. Nenhum crédito será adicionado."
       );
 
       return res.status(200).json({
         recebido: true,
         processado: false,
-        status: order.status,
-        status_detail: order.status_detail,
+        status: recurso.status,
+        status_detail: recurso.status_detail,
       });
     }
-
-    const externalReference =
-      String(order.external_reference || "").trim();
 
     let userId = "";
     let pacote = "";
@@ -307,22 +359,22 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
     }
 
     // Fallback para metadata caso a referência externa não esteja disponível.
-    if ((!userId || !pacote) && order.metadata) {
-      userId = String(order.metadata.user_id || "").trim();
-      pacote = String(order.metadata.pacote || "").trim();
+    if ((!userId || !pacote) && metadata) {
+      userId = String(metadata.user_id || "").trim();
+      pacote = String(metadata.pacote || "").trim();
     }
 
     if (!userId || !pacote) {
       console.error(
-        "Não foi possível identificar usuário/pacote da order.",
+        "Não foi possível identificar usuário/pacote do pagamento.",
         {
           externalReference,
-          metadata: order.metadata || null,
+          metadata,
         }
       );
 
       return res.status(400).json({
-        erro: "Não foi possível identificar o usuário e o pacote da order.",
+        erro: "Não foi possível identificar o usuário e o pacote do pagamento.",
       });
     }
 
@@ -330,16 +382,11 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (!pacoteSelecionado) {
       console.error("Pacote não encontrado:", pacote);
-
       return res.status(400).json({
         erro: "Pacote de créditos não encontrado.",
       });
     }
 
-    // O Checkout Pro/Orders pode informar o total pago em total_paid_amount.
-    const valorPago = Number(
-      order.total_paid_amount ?? order.total_amount
-    );
     const valorEsperado = Number(pacoteSelecionado.valor);
 
     if (
@@ -347,7 +394,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       Math.abs(valorPago - valorEsperado) > 0.01
     ) {
       console.error(
-        "Valor da order diferente do pacote:",
+        "Valor do pagamento diferente do pacote:",
         {
           valorPago,
           valorEsperado,
@@ -356,14 +403,14 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       );
 
       return res.status(400).json({
-        erro: "Valor da order não corresponde ao pacote.",
+        erro: "Valor do pagamento não corresponde ao pacote.",
       });
     }
 
     const { data, error } = await supabaseAdmin.rpc(
       "processar_pagamento_aprovado",
       {
-        p_mercado_pago_id: String(order.id || dataId),
+        p_mercado_pago_id: recursoId,
         p_user_id: userId,
         p_pacote: pacote,
         p_creditos: pacoteSelecionado.creditos,
@@ -377,7 +424,6 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
         error
       );
 
-      // 5xx permite nova tentativa do Mercado Pago.
       return res.status(500).json({
         erro: "Não foi possível registrar o pagamento no Supabase.",
       });
@@ -392,7 +438,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
     return res.status(200).json({
       recebido: true,
       processado: true,
-      orderId: String(order.id || dataId),
+      paymentId: recursoId,
       creditos: pacoteSelecionado.creditos,
     });
   } catch (erro) {
