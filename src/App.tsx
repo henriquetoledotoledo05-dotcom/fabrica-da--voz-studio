@@ -41,7 +41,7 @@ function App() {
   const [confirmarSenhaCadastro, setConfirmarSenhaCadastro] = useState('')
   const [erroCadastro, setErroCadastro] = useState('')
 
-  const carregarCreditos = async () => {
+  const carregarCreditos = async (tentativa = 0) => {
     setCarregandoCreditos(true)
 
     try {
@@ -58,13 +58,20 @@ function App() {
         .eq('id', userData.user.id)
         .maybeSingle()
 
-      if (error) {
+      if (error || !data) {
         console.error('Erro ao carregar créditos:', error)
+
+        if (tentativa < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          await carregarCreditos(tentativa + 1)
+          return
+        }
+
         setCreditos(null)
         return
       }
 
-      setCreditos(Number(data?.creditos ?? 0))
+      setCreditos(Number(data.creditos ?? 0))
     } finally {
       setCarregandoCreditos(false)
     }
@@ -1755,7 +1762,30 @@ const gerarVoz = async () => {
                   flexWrap: 'wrap'
                 }}
               >
-                <span>💳 Créditos disponíveis: {creditos === null ? '...' : creditos}</span>
+                <span>
+                  💳 Créditos disponíveis:{' '}
+                  <strong>{creditos === null ? '...' : creditos}</strong>
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => void carregarCreditos()}
+                  disabled={carregandoCreditos}
+                  title="Atualizar saldo de créditos"
+                  style={{
+                    padding: '8px 11px',
+                    borderRadius: '9px',
+                    border: '1px solid rgba(192,132,252,0.45)',
+                    background: 'rgba(124,58,237,0.16)',
+                    color: '#c084fc',
+                    cursor: carregandoCreditos ? 'wait' : 'pointer',
+                    fontWeight: 700,
+                    opacity: carregandoCreditos ? 0.65 : 1
+                  }}
+                >
+                  {carregandoCreditos ? '⏳' : '🔄'}
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setMostrarCompraCreditos(true)}
@@ -2723,6 +2753,26 @@ const gerarVoz = async () => {
                             marginTop: '22px'
                           }}
                         >
+
+                          <div
+                            style={{
+                              margin: '0 0 12px',
+                              padding: '13px 15px',
+                              borderRadius: '12px',
+                              border: '1px solid rgba(234,179,8,0.45)',
+                              background: 'rgba(234,179,8,0.08)',
+                              color: '#facc15',
+                              lineHeight: 1.45,
+                              fontSize: '14px'
+                            }}
+                          >
+                            <strong>💡 DICA IMPORTANTE</strong>
+                            <div style={{ marginTop: '5px', color: '#f3f3f3' }}>
+                              Você pode trocar a trilha, os efeitos, o volume e a posição dos efeitos
+                              e <strong>mixar novamente quantas vezes quiser sem gastar novos créditos.</strong>
+                              O crédito é descontado somente ao gerar a locução.
+                            </div>
+                          </div>
 
                           <button
                             type="button"
