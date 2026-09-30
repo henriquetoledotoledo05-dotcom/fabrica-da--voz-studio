@@ -219,11 +219,22 @@ function App() {
   const [estiloSelecionado, setEstiloSelecionado] =
     useState('normal')
 
+  const [reverbAtivo, setReverbAtivo] = useState(false)
+
+  const [efeitoSelecionado, setEfeitoSelecionado] = useState('')
+  const [volumeEfeito, setVolumeEfeito] = useState(70)
+  const [posicaoEfeito, setPosicaoEfeito] = useState(0)
+  const [efeito2Selecionado, setEfeito2Selecionado] = useState('')
+  const [volumeEfeito2, setVolumeEfeito2] = useState(70)
+  const [posicaoEfeito2, setPosicaoEfeito2] = useState(3)
+  const [mostrarSegundoEfeito, setMostrarSegundoEfeito] = useState(false)
+    
   const [velocidade, setVelocidade] =
-    useState('normal')
+    useState('normal')  
 
   const [texto, setTexto] =
     useState('')
+  
   const [corrigindoTexto, setCorrigindoTexto] = useState(false)  
 
   const [audioUrl, setAudioUrl] =
@@ -682,7 +693,8 @@ const gerarVoz = async () => {
             texto: textoFinal,
             voiceId: vozAtual.id,
             speed: velocidadeSelecionada,
-            estilo: estiloSelecionado
+            estilo: estiloSelecionado,
+            reverb: reverbAtivo
           })
         }
       )
@@ -1061,6 +1073,45 @@ const gerarVoz = async () => {
     )
   }
 
+  // Remove o silêncio inicial do efeito para que a posição escolhida
+  // seja o ponto em que o som AUDÍVEL começa.
+  const removerSilencioInicialDoEfeito = (buffer: AudioBuffer): AudioBuffer => {
+    const threshold = 0.015
+    const maxFramesAnalise = buffer.length
+    let primeiroFrame = buffer.length
+
+    for (let i = 0; i < maxFramesAnalise; i++) {
+      let maiorPico = 0
+
+      for (let canal = 0; canal < buffer.numberOfChannels; canal++) {
+        maiorPico = Math.max(maiorPico, Math.abs(buffer.getChannelData(canal)[i]))
+      }
+
+      if (maiorPico >= threshold) {
+        primeiroFrame = i
+        break
+      }
+    }
+
+    if (primeiroFrame <= 0 || primeiroFrame >= buffer.length) {
+      return buffer
+    }
+
+    const novoBuffer = contexto.createBuffer(
+      buffer.numberOfChannels,
+      buffer.length - primeiroFrame,
+      buffer.sampleRate
+    )
+
+    for (let canal = 0; canal < buffer.numberOfChannels; canal++) {
+      const origem = buffer.getChannelData(canal)
+      const destino = novoBuffer.getChannelData(canal)
+      destino.set(origem.subarray(primeiroFrame))
+    }
+
+    return novoBuffer
+  }
+
   // =====================================================
   // MIXAR VOZ + TRILHA
   // =====================================================
@@ -1155,7 +1206,30 @@ const gerarVoz = async () => {
           await contexto.decodeAudioData(
             trilhaBuffer.slice(0)
           )
+        let efeito: AudioBuffer | null = null
+        let efeito2: AudioBuffer | null = null
 
+        if (efeitoSelecionado) {
+          const efeitoResponse =
+            await contexto.decodeAudioData(
+              await (
+                await fetch(efeitoSelecionado)
+              ).arrayBuffer()
+            )
+
+          efeito = removerSilencioInicialDoEfeito(efeitoResponse)
+        }
+
+        if (mostrarSegundoEfeito && efeito2Selecionado) {
+          const efeito2Response =
+            await contexto.decodeAudioData(
+              await (
+                await fetch(efeito2Selecionado)
+              ).arrayBuffer()
+            )
+
+          efeito2 = removerSilencioInicialDoEfeito(efeito2Response)
+        }
         const inicio =
           Math.max(
             0,
@@ -1183,10 +1257,29 @@ const gerarVoz = async () => {
         const duracaoVoz =
           voz.duration
 
-        const duracaoTotal =
-          inicio +
-          duracaoVoz +
-          final
+        const posicaoEfeitoNormalizada = Math.max(
+          0,
+          Number(posicaoEfeito) || 0
+        )
+
+        const posicaoEfeito2Normalizada = Math.max(
+          0,
+          Number(posicaoEfeito2) || 0
+        )
+
+        const fimEfeito1 = efeito
+          ? posicaoEfeitoNormalizada + efeito.duration
+          : 0
+
+        const fimEfeito2 = efeito2
+          ? posicaoEfeito2Normalizada + efeito2.duration
+          : 0
+
+        const duracaoTotal = Math.max(
+          inicio + duracaoVoz + final,
+          fimEfeito1,
+          fimEfeito2
+        )
 
         const sampleRate =
           contexto.sampleRate
@@ -1238,17 +1331,156 @@ const gerarVoz = async () => {
         )
 
         vozSource.connect(
-          vozGain
-        )
+  vozGain
+)
 
-        vozGain.connect(
-          offline.destination
-        )
+if (reverbAtivo) {
+  const reverbDelay = offline.createDelay(1.0)
+  const reverbGain = offline.createGain()
+
+  reverbDelay.delayTime.value = 0.18
+  reverbGain.gain.value = 0.22
+
+  vozGain.connect(reverbDelay)
+  reverbDelay.connect(reverbGain)
+  reverbGain.connect(offline.destination)
+}
+
+vozGain.connect(
+  offline.destination
+)
 
         vozSource.start(
           inicio
         )
+        // =================================================
+        // EFEITO SONORO
+        // =================================================
 
+        if (efeito) {
+          const efeitoSource =
+            offline.createBufferSource()
+
+          efeitoSource.buffer = efeito
+
+          const efeitoGain = offline.createGain()
+          const efeitoCompressor = offline.createDynamicsCompressor()
+
+          // 100% agora entrega ganho extra, porque alguns efeitos
+          // possuem o arquivo original gravado em volume baixo.
+          const volumeEfeitoNormalizado = Math.max(
+            0,
+            Math.min(2.2, (volumeEfeito / 100) * 2.2)
+          )
+
+          efeitoGain.gain.setValueAtTime(
+            volumeEfeitoNormalizado,
+            0
+          )
+
+          // Controla os picos para o efeito ficar forte sem estourar.
+          efeitoCompressor.threshold.value = -18
+          efeitoCompressor.knee.value = 12
+          efeitoCompressor.ratio.value = 8
+          efeitoCompressor.attack.value = 0.003
+          efeitoCompressor.release.value = 0.15
+
+          efeitoSource.connect(efeitoGain)
+          efeitoGain.connect(efeitoCompressor)
+          efeitoCompressor.connect(offline.destination)
+
+          // Alguns arquivos de efeito possuem silêncio no começo.
+          // Detectamos o primeiro ponto com áudio para que o efeito
+          // seja ouvido exatamente no segundo escolhido pelo usuário.
+          let primeiroFrameComSom = 0
+          const limiteSom = 0.008
+
+          for (let frame = 0; frame < efeito.length; frame++) {
+            let maiorAmostra = 0
+
+            for (let canal = 0; canal < efeito.numberOfChannels; canal++) {
+              maiorAmostra = Math.max(
+                maiorAmostra,
+                Math.abs(efeito.getChannelData(canal)[frame])
+              )
+            }
+
+            if (maiorAmostra >= limiteSom) {
+              primeiroFrameComSom = frame
+              break
+            }
+          }
+
+          const offsetSom = primeiroFrameComSom / efeito.sampleRate
+          const duracaoEfeitoComSom = Math.max(0.01, efeito.duration - offsetSom)
+
+          efeitoSource.start(
+            posicaoEfeitoNormalizada,
+            offsetSom,
+            duracaoEfeitoComSom
+          )
+        }
+
+        if (efeito2) {
+          const efeito2Source =
+            offline.createBufferSource()
+
+          efeito2Source.buffer = efeito2
+
+          const efeito2Gain = offline.createGain()
+          const efeito2Compressor = offline.createDynamicsCompressor()
+
+          // Mesmo reforço do efeito 1 para manter os dois com a mesma escala.
+          const volumeEfeito2Normalizado = Math.max(
+            0,
+            Math.min(2.2, (volumeEfeito2 / 100) * 2.2)
+          )
+
+          efeito2Gain.gain.setValueAtTime(
+            volumeEfeito2Normalizado,
+            0
+          )
+
+          efeito2Compressor.threshold.value = -18
+          efeito2Compressor.knee.value = 12
+          efeito2Compressor.ratio.value = 8
+          efeito2Compressor.attack.value = 0.003
+          efeito2Compressor.release.value = 0.15
+
+          efeito2Source.connect(efeito2Gain)
+          efeito2Gain.connect(efeito2Compressor)
+          efeito2Compressor.connect(offline.destination)
+
+          // Mesmo tratamento para o segundo efeito: elimina o silêncio
+          // inicial do arquivo sem alterar o segundo escolhido.
+          let primeiroFrameComSom2 = 0
+          const limiteSom2 = 0.008
+
+          for (let frame = 0; frame < efeito2.length; frame++) {
+            let maiorAmostra = 0
+
+            for (let canal = 0; canal < efeito2.numberOfChannels; canal++) {
+              maiorAmostra = Math.max(
+                maiorAmostra,
+                Math.abs(efeito2.getChannelData(canal)[frame])
+              )
+            }
+
+            if (maiorAmostra >= limiteSom2) {
+              primeiroFrameComSom2 = frame
+              break
+            }
+          }
+
+          const offsetSom2 = primeiroFrameComSom2 / efeito2.sampleRate
+          const duracaoEfeito2ComSom = Math.max(0.01, efeito2.duration - offsetSom2)
+
+          efeito2Source.start(
+            posicaoEfeito2Normalizada,
+            offsetSom2,
+            duracaoEfeito2ComSom
+          )
+        }
         // =================================================
         // TRILHA / DUCKING AUTOMÁTICO
         // =================================================
@@ -1933,7 +2165,6 @@ const gerarVoz = async () => {
                 </select>
 
               </div>
-
               {/* =================================================
                   VELOCIDADE
               ================================================= */}
@@ -2495,6 +2726,209 @@ const gerarVoz = async () => {
                             Durante a voz, a trilha é reduzida automaticamente para deixar o locutor em destaque.
                           </small>
 
+                        </div>
+                      )}
+
+                      {/* =================================================
+                          FINALIZAÇÃO DO ÁUDIO
+                      ================================================= */}
+
+                      {(trilhaSelecionada || trilhaArquivo) && (
+                        <div
+                          style={{
+                            marginTop: '20px',
+                            padding: '18px',
+                            borderRadius: '14px',
+                            background: 'rgba(124, 58, 237, 0.08)',
+                            border: '1px solid rgba(139, 92, 246, 0.35)'
+                          }}
+                        >
+                          <div
+                            style={{
+                              color: '#ffffff',
+                              fontSize: '17px',
+                              fontWeight: 800,
+                              marginBottom: '14px'
+                            }}
+                          >
+                            🎛️ Finalização do áudio
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setReverbAtivo(!reverbAtivo)}
+                            style={{
+                              width: '100%',
+                              padding: '14px 18px',
+                              borderRadius: '12px',
+                              border: reverbAtivo
+                                ? '1px solid #a855f7'
+                                : '1px solid rgba(139, 92, 246, 0.55)',
+                              background: reverbAtivo
+                                ? 'linear-gradient(135deg, #7c3aed, #a855f7)'
+                                : '#171020',
+                              color: '#ffffff',
+                              fontSize: '16px',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              transition: '0.2s'
+                            }}
+                          >
+                            {reverbAtivo ? '✨ Reverb: ATIVADO' : '✨ Reverb: DESLIGADO'}
+                          </button>
+
+                          <div style={{ marginTop: '12px' }}>
+                            <div
+                              style={{
+                                color: '#ffffff',
+                                fontSize: '16px',
+                                fontWeight: 700,
+                                marginBottom: '8px'
+                              }}
+                            >
+                              🎧 Efeitos sonoros
+                            </div>
+
+                            <select
+                              value={efeitoSelecionado}
+                              onChange={(e) => setEfeitoSelecionado(e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '14px',
+                                borderRadius: '12px',
+                                border: '1px solid rgba(139, 92, 246, 0.55)',
+                                background: '#171020',
+                                color: '#ffffff',
+                                fontSize: '15px',
+                                outline: 'none'
+                              }}
+                            >
+                              <option value="">Nenhum efeito</option>
+                              <option value="/efeitos/Laser.mp3">Laser</option>
+                              <option value="/efeitos/Impacto.mp3">Impacto</option>
+                              <option value="/efeitos/Transmissão.mp3">Transmissão</option>
+                              <option value="/efeitos/Buzina.mp3">Buzina</option>
+                              <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                            </select>
+
+                            {efeitoSelecionado && (
+                              <div
+                                style={{
+                                  marginTop: '12px',
+                                  padding: '12px',
+                                  borderRadius: '12px',
+                                  background: 'rgba(139,92,246,0.08)',
+                                  border: '1px solid rgba(139,92,246,0.18)'
+                                }}
+                              >
+                                <div style={{ color: '#c084fc', fontWeight: 700, marginBottom: '10px' }}>
+                                  Efeito 1
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', marginBottom: '6px' }}>
+                                  <span>Volume</span>
+                                  <strong style={{ color: '#facc15' }}>{volumeEfeito}%</strong>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  value={volumeEfeito}
+                                  onChange={(e) => setVolumeEfeito(Number(e.target.value))}
+                                  style={{ width: '100%', accentColor: '#a855f7' }}
+                                />
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
+                                  <span>Posição na locução</span>
+                                  <strong style={{ color: '#facc15' }}>{posicaoEfeito.toFixed(1)}s</strong>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="60"
+                                  step="0.1"
+                                  value={posicaoEfeito}
+                                  onChange={(e) => setPosicaoEfeito(Number(e.target.value))}
+                                  style={{ width: '100%', accentColor: '#a855f7' }}
+                                />
+                              </div>
+                            )}
+
+                            {efeitoSelecionado && !mostrarSegundoEfeito && (
+                              <button
+                                type="button"
+                                onClick={() => setMostrarSegundoEfeito(true)}
+                                style={{
+                                  width: '100%',
+                                  marginTop: '10px',
+                                  padding: '11px',
+                                  borderRadius: '10px',
+                                  border: '1px solid rgba(250,204,21,0.45)',
+                                  background: 'rgba(250,204,21,0.08)',
+                                  color: '#facc15',
+                                  fontWeight: 700,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                ➕ Adicionar segundo efeito
+                              </button>
+                            )}
+
+                            {mostrarSegundoEfeito && (
+                              <div
+                                style={{
+                                  marginTop: '12px',
+                                  padding: '12px',
+                                  borderRadius: '12px',
+                                  background: 'rgba(139,92,246,0.08)',
+                                  border: '1px solid rgba(139,92,246,0.18)'
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                  <span style={{ color: '#c084fc', fontWeight: 700 }}>Efeito 2</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setMostrarSegundoEfeito(false)
+                                      setEfeito2Selecionado('')
+                                    }}
+                                    style={{ border: 'none', background: 'transparent', color: '#f87171', cursor: 'pointer', fontWeight: 700 }}
+                                  >
+                                    Remover
+                                  </button>
+                                </div>
+
+                                <select
+                                  value={efeito2Selecionado}
+                                  onChange={(e) => setEfeito2Selecionado(e.target.value)}
+                                  style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid rgba(139,92,246,0.55)', background: '#171020', color: '#ffffff', fontSize: '15px', outline: 'none' }}
+                                >
+                                  <option value="">Nenhum efeito</option>
+                                  <option value="/efeitos/Laser.mp3">Laser</option>
+                                  <option value="/efeitos/Impacto.mp3">Impacto</option>
+                                  <option value="/efeitos/Transmissão.mp3">Transmissão</option>
+                                  <option value="/efeitos/Buzina.mp3">Buzina</option>
+                                  <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                                </select>
+
+                                {efeito2Selecionado && (
+                                  <>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
+                                      <span>Volume</span>
+                                      <strong style={{ color: '#facc15' }}>{volumeEfeito2}%</strong>
+                                    </div>
+                                    <input type="range" min="0" max="100" value={volumeEfeito2} onChange={(e) => setVolumeEfeito2(Number(e.target.value))} style={{ width: '100%', accentColor: '#a855f7' }} />
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
+                                      <span>Posição na locução</span>
+                                      <strong style={{ color: '#facc15' }}>{posicaoEfeito2.toFixed(1)}s</strong>
+                                    </div>
+                                    <input type="range" min="0" max="60" step="0.1" value={posicaoEfeito2} onChange={(e) => setPosicaoEfeito2(Number(e.target.value))} style={{ width: '100%', accentColor: '#a855f7' }} />
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
 
