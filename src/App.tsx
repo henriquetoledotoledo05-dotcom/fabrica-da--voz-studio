@@ -18,6 +18,20 @@ type Voz = {
   foto: string
   demonstrativo: string
 }
+
+type HistoricoVinheta = {
+  id: string
+  user_id: string
+  texto: string
+  nome_voz: string | null
+  estilo: string | null
+  arquivo_path: string
+  tipo: string
+  criado_em: string
+  expira_em: string
+  url?: string
+}
+
 const henriqueLocutor = '/henrique-foto.png'
 const rafaelLocutor = '/rafael-foto.png'
 const viniciusLocutor = '/vinicius-foto.png'
@@ -91,9 +105,11 @@ function App() {
       if (liberado) {
         sessionStorage.setItem('fabrica_acesso', 'liberado')
         await carregarCreditos()
+        await carregarHistorico()
       } else {
         sessionStorage.removeItem('fabrica_acesso')
         setCreditos(null)
+        setHistorico([])
       }
     }
 
@@ -109,10 +125,12 @@ function App() {
           sessionStorage.setItem('fabrica_acesso', 'liberado')
           setTimeout(() => {
             void carregarCreditos()
+            void carregarHistorico()
           }, 0)
         } else {
           sessionStorage.removeItem('fabrica_acesso')
           setCreditos(null)
+          setHistorico([])
         }
       }
     )
@@ -259,6 +277,12 @@ function App() {
   const [mixando, setMixando] =
     useState(false)
 
+  const [mostrarHistorico, setMostrarHistorico] =
+    useState(false)
+
+  const [historico, setHistorico] = useState<HistoricoVinheta[]>([])
+  const [carregandoHistorico, setCarregandoHistorico] = useState(false)
+
   const [mostrarTrilhas, setMostrarTrilhas] =
     useState(false)
 
@@ -301,11 +325,179 @@ function App() {
   const [pontoTrilhaConfirmado, setPontoTrilhaConfirmado] =
     useState(false)
 
+
+  // =====================================================
+  // HISTÓRICO DE VINHETAS — 3 DIAS
+  // =====================================================
+
+  const carregarHistorico = async () => {
+    setCarregandoHistorico(true)
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      const usuario = sessionData.session?.user
+
+      if (sessionError || !usuario) {
+        setHistorico([])
+        return
+      }
+
+      const agora = new Date().toISOString()
+
+      const { data: expirados, error: erroExpirados } = await supabase
+        .from('historico_vinhetas')
+        .select('id, arquivo_path')
+        .eq('user_id', usuario.id)
+        .lte('expira_em', agora)
+
+      if (!erroExpirados && expirados?.length) {
+        const caminhos = expirados
+          .map((item) => item.arquivo_path)
+          .filter(Boolean)
+
+        if (caminhos.length) {
+          await supabase.storage
+            .from('historico-vinhetas')
+            .remove(caminhos)
+        }
+
+        await supabase
+          .from('historico_vinhetas')
+          .delete()
+          .eq('user_id', usuario.id)
+          .lte('expira_em', agora)
+      }
+
+      const { data, error } = await supabase
+        .from('historico_vinhetas')
+        .select('*')
+        .eq('user_id', usuario.id)
+        .gt('expira_em', agora)
+        .order('criado_em', { ascending: false })
+
+      if (error) {
+        console.error('Erro ao carregar histórico:', error)
+        setHistorico([])
+        return
+      }
+
+      const itens = await Promise.all(
+        (data || []).map(async (item) => {
+          const { data: signedData, error: signedError } =
+            await supabase.storage
+              .from('historico-vinhetas')
+              .createSignedUrl(item.arquivo_path, 60 * 60)
+
+          return {
+            ...item,
+            url: signedError ? undefined : signedData?.signedUrl
+          } as HistoricoVinheta
+        })
+      )
+
+      setHistorico(itens)
+    } catch (erro) {
+      console.error('Erro ao carregar histórico:', erro)
+      setHistorico([])
+    } finally {
+      setCarregandoHistorico(false)
+    }
+  }
+
+  const salvarNoHistorico = async (
+    blob: Blob,
+    tipo: string
+  ) => {
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      const usuario = sessionData.session?.user
+
+      if (sessionError || !usuario) {
+        console.error('Não foi possível identificar o usuário para salvar o histórico.')
+        return
+      }
+
+      const id = crypto.randomUUID()
+      const caminho = `${usuario.id}/${id}.mp3`
+
+      const { error: uploadError } = await supabase.storage
+        .from('historico-vinhetas')
+        .upload(caminho, blob, {
+          contentType: 'audio/mpeg',
+          upsert: false
+        })
+
+      if (uploadError) {
+        console.error('Erro ao salvar áudio no Storage:', uploadError)
+        return
+      }
+
+      const { error: insertError } = await supabase
+        .from('historico_vinhetas')
+        .insert({
+          id,
+          user_id: usuario.id,
+          texto: texto.trim() || 'Áudio gerado',
+          nome_voz: vozAtual.nome,
+          estilo: estiloSelecionado,
+          arquivo_path: caminho,
+          tipo,
+          criado_em: new Date().toISOString(),
+          expira_em: new Date(
+            Date.now() + 3 * 24 * 60 * 60 * 1000
+          ).toISOString()
+        })
+
+      if (insertError) {
+        console.error('Erro ao registrar histórico:', insertError)
+        await supabase.storage
+          .from('historico-vinhetas')
+          .remove([caminho])
+        return
+      }
+
+      await carregarHistorico()
+    } catch (erro) {
+      console.error('Erro ao salvar histórico:', erro)
+    }
+  }
+
+  const excluirDoHistorico = async (item: HistoricoVinheta) => {
+    const { error: storageError } = await supabase.storage
+      .from('historico-vinhetas')
+      .remove([item.arquivo_path])
+
+    if (storageError) {
+      console.error('Erro ao excluir áudio:', storageError)
+      return
+    }
+
+    const { error } = await supabase
+      .from('historico_vinhetas')
+      .delete()
+      .eq('id', item.id)
+
+    if (error) {
+      console.error('Erro ao excluir registro:', error)
+      return
+    }
+
+    setHistorico((atual) =>
+      atual.filter((itemAtual) => itemAtual.id !== item.id)
+    )
+  }
+
   const sairDaFabrica = async () => {
     await supabase.auth.signOut()
     sessionStorage.removeItem('fabrica_acesso')
     setAcessoLiberado(false)
     setCreditos(null)
+    setHistorico([])
+    setMostrarHistorico(false)
     setEmailAcesso('')
     setSenhaAcesso('')
     setErroAcesso('')
@@ -740,6 +932,8 @@ const gerarVoz = async () => {
       setAudioUrl(urlAudio)
       setAudioOriginalUrl(urlAudio)
       setMixAudioUrl('')
+
+      await salvarNoHistorico(audioBlob, 'locucao')
 
       // O servidor já descontou os créditos com segurança.
       // Apenas atualizamos o saldo exibido na tela.
@@ -1525,6 +1719,8 @@ const gerarVoz = async () => {
       const mixUrl = URL.createObjectURL(mp3Blob)
       setMixAudioUrl(mixUrl)
 
+      await salvarNoHistorico(mp3Blob, 'mixagem')
+
       await contexto.close()
     } catch (erro) {
       console.error('Erro na mixagem:', erro)
@@ -1719,6 +1915,179 @@ const gerarVoz = async () => {
           </div>
         )}
 
+
+        {mostrarHistorico && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 1100,
+              background: 'rgba(0,0,0,0.82)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+              boxSizing: 'border-box',
+              overflowY: 'auto'
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '900px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                padding: '26px',
+                borderRadius: '22px',
+                background: '#151020',
+                border: '1px solid rgba(139,92,246,0.45)',
+                boxShadow: '0 24px 80px rgba(0,0,0,0.65)',
+                color: '#fff',
+                boxSizing: 'border-box'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '12px',
+                  marginBottom: '18px'
+                }}
+              >
+                <div>
+                  <h2 style={{ margin: 0 }}>🕘 Histórico de vinhetas</h2>
+                  <div style={{ marginTop: '5px', color: '#aaa', fontSize: '13px' }}>
+                    Seus áudios ficam disponíveis por 3 dias e não consomem novos créditos.
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setMostrarHistorico(false)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: '#c084fc',
+                    fontSize: '28px',
+                    cursor: 'pointer'
+                  }}
+                  aria-label="Fechar histórico"
+                >
+                  ×
+                </button>
+              </div>
+
+              {carregandoHistorico ? (
+                <div style={{ padding: '35px 10px', textAlign: 'center', color: '#c084fc', fontWeight: 700 }}>
+                  ⏳ Carregando seu histórico...
+                </div>
+              ) : historico.length === 0 ? (
+                <div style={{ padding: '35px 10px', textAlign: 'center', color: '#aaa' }}>
+                  Você ainda não tem vinhetas no histórico.
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gap: '14px' }}>
+                  {historico.map((item) => {
+                    const criado = new Date(item.criado_em)
+                    const expira = new Date(item.expira_em)
+
+                    return (
+                      <div
+                        key={item.id}
+                        style={{
+                          padding: '17px',
+                          borderRadius: '15px',
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.10)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '7px' }}>
+                          <strong>
+                            {item.tipo === 'mixagem' ? '🎵 Mixagem' : '🎙️ Locução'}
+                            {item.nome_voz ? ` — ${item.nome_voz}` : ''}
+                          </strong>
+                          <span style={{ color: '#c084fc', fontSize: '12px' }}>
+                            {item.estilo || 'Natural'}
+                          </span>
+                        </div>
+
+                        <div style={{ color: '#999', fontSize: '12px', marginBottom: '8px' }}>
+                          Gerada em {criado.toLocaleString('pt-BR')} · expira em {expira.toLocaleString('pt-BR')}
+                        </div>
+
+                        <div style={{ color: '#ddd', fontSize: '13px', lineHeight: 1.45, marginBottom: '11px' }}>
+                          {item.texto}
+                        </div>
+
+                        {item.url ? (
+                          <>
+                            <audio
+                              className="player-audio"
+                              controls
+                              preload="none"
+                              src={item.url}
+                              style={{ width: '100%' }}
+                            />
+
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '9px' }}>
+                              <a
+                                className="botao-download"
+                                href={item.url}
+                                download={`fabrica-da-voz-${item.id}.mp3`}
+                              >
+                                ⬇️ Baixar novamente
+                              </a>
+
+                              <button
+                                type="button"
+                                onClick={() => void excluirDoHistorico(item)}
+                                style={{
+                                  padding: '10px 14px',
+                                  borderRadius: '9px',
+                                  border: '1px solid rgba(255,255,255,0.15)',
+                                  background: 'rgba(255,255,255,0.05)',
+                                  color: '#aaa',
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                🗑️ Excluir
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div style={{ color: '#facc15', fontSize: '13px' }}>
+                            Não foi possível carregar este áudio agora.
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => void carregarHistorico()}
+                disabled={carregandoHistorico}
+                style={{
+                  width: '100%',
+                  marginTop: '18px',
+                  padding: '12px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(139,92,246,0.45)',
+                  background: 'rgba(124,58,237,0.12)',
+                  color: '#c084fc',
+                  fontWeight: 700,
+                  cursor: carregandoHistorico ? 'wait' : 'pointer'
+                }}
+              >
+                🔄 Atualizar histórico
+              </button>
+            </div>
+          </div>
+        )}
+
         <main className="main">
 
           <section className="hero">
@@ -1784,6 +2153,25 @@ const gerarVoz = async () => {
                   }}
                 >
                   {carregandoCreditos ? '⏳' : '🔄'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMostrarHistorico(true)
+                    void carregarHistorico()
+                  }}
+                  style={{
+                    padding: '8px 13px',
+                    borderRadius: '9px',
+                    border: '1px solid rgba(255,255,255,0.20)',
+                    background: 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🕘 Histórico (3 dias)
                 </button>
 
                 <button
