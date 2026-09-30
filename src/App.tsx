@@ -2587,6 +2587,7 @@ const gerarVoz = async () => {
                               <option value="/efeitos/Transmissão.mp3">Transmissão</option>
                               <option value="/efeitos/Buzina.mp3">Buzina</option>
                               <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                              <option value="/efeitos/Demonstrativo.mp3">Demonstrativo</option>
                             </select>
 
                             {efeitoSelecionado && (
