@@ -271,7 +271,7 @@ function App() {
     useState('')
 
   const [volumeTrilha, setVolumeTrilha] =
-    useState(28)
+    useState(70)
 
   const [volumeVoz, setVolumeVoz] =
     useState(100)
@@ -1073,686 +1073,464 @@ const gerarVoz = async () => {
     )
   }
 
-  // Remove o silêncio inicial do efeito para que a posição escolhida
-  // seja o ponto em que o som AUDÍVEL começa.
-  const removerSilencioInicialDoEfeito = (buffer: AudioBuffer): AudioBuffer => {
-    const threshold = 0.015
-    const maxFramesAnalise = buffer.length
-    let primeiroFrame = buffer.length
-
-    for (let i = 0; i < maxFramesAnalise; i++) {
-      let maiorPico = 0
-
-      for (let canal = 0; canal < buffer.numberOfChannels; canal++) {
-        maiorPico = Math.max(maiorPico, Math.abs(buffer.getChannelData(canal)[i]))
-      }
-
-      if (maiorPico >= threshold) {
-        primeiroFrame = i
-        break
-      }
-    }
-
-    if (primeiroFrame <= 0 || primeiroFrame >= buffer.length) {
-      return buffer
-    }
-
-    const novoBuffer = contexto.createBuffer(
-      buffer.numberOfChannels,
-      buffer.length - primeiroFrame,
-      buffer.sampleRate
-    )
-
-    for (let canal = 0; canal < buffer.numberOfChannels; canal++) {
-      const origem = buffer.getChannelData(canal)
-      const destino = novoBuffer.getChannelData(canal)
-      destino.set(origem.subarray(primeiroFrame))
-    }
-
-    return novoBuffer
-  }
-
   // =====================================================
   // MIXAR VOZ + TRILHA
   // =====================================================
 
-  const mixarVozComTrilha =
-    async () => {
-      if (!audioUrl) {
-        alert(
-          'Gere uma voz primeiro.'
-        )
-
-        return
-      }
-
-      if (
-        !trilhaSelecionada &&
-        !trilhaArquivo
-      ) {
-        alert(
-          'Escolha uma trilha ou envie sua própria trilha.'
-        )
-
-        return
-      }
-
-      setMixando(true)
-
-      try {
-        const vozResponse =
-          await fetch(
-            audioOriginalUrl
-          )
-
-        if (!vozResponse.ok) {
-          throw new Error(
-            'Não foi possível acessar o áudio da voz.'
-          )
-        }
-
-        const vozBuffer =
-          await vozResponse.arrayBuffer()
-
-        let trilhaBuffer:
-          ArrayBuffer
-
-        if (
-          trilhaArquivo
-        ) {
-          trilhaBuffer =
-            await trilhaArquivo.arrayBuffer()
-        } else {
-          const trilhaResponse =
-            await fetch(
-              trilhaSelecionada
-            )
-
-          if (
-            !trilhaResponse.ok
-          ) {
-            throw new Error(
-              'Não foi possível carregar a trilha selecionada.'
-            )
-          }
-
-          trilhaBuffer =
-            await trilhaResponse.arrayBuffer()
-        }
-
-        const AudioContextClass =
-          window.AudioContext ||
-          (
-            window as typeof window & {
-              webkitAudioContext?: typeof AudioContext
-            }
-          ).webkitAudioContext
-
-        if (!AudioContextClass) {
-          throw new Error(
-            'Seu navegador não suporta mixagem de áudio.'
-          )
-        }
-
-        const contexto =
-          new AudioContextClass()
-
-        const voz =
-          await contexto.decodeAudioData(
-            vozBuffer.slice(0)
-          )
-
-        const trilha =
-          await contexto.decodeAudioData(
-            trilhaBuffer.slice(0)
-          )
-        let efeito: AudioBuffer | null = null
-        let efeito2: AudioBuffer | null = null
-
-        if (efeitoSelecionado) {
-          const efeitoResponse =
-            await contexto.decodeAudioData(
-              await (
-                await fetch(efeitoSelecionado)
-              ).arrayBuffer()
-            )
-
-          efeito = removerSilencioInicialDoEfeito(efeitoResponse)
-        }
-
-        if (mostrarSegundoEfeito && efeito2Selecionado) {
-          const efeito2Response =
-            await contexto.decodeAudioData(
-              await (
-                await fetch(efeito2Selecionado)
-              ).arrayBuffer()
-            )
-
-          efeito2 = removerSilencioInicialDoEfeito(efeito2Response)
-        }
-        const inicio =
-          Math.max(
-            0,
-            Number(
-              segundosInicio
-            ) || 0
-          )
-
-        const final =
-          Math.max(
-            0,
-            Number(
-              segundosFinal
-            ) || 0
-          )
-
-        const pontoInicioTrilha =
-          trilha.duration > 0
-            ? Math.min(
-                Math.max(0, Number(inicioTrilha) || 0),
-                Math.max(0, trilha.duration - 0.01)
-              )
-            : 0
-
-        const duracaoVoz =
-          voz.duration
-
-        const posicaoEfeitoNormalizada = Math.max(
-          0,
-          Number(posicaoEfeito) || 0
-        )
-
-        const posicaoEfeito2Normalizada = Math.max(
-          0,
-          Number(posicaoEfeito2) || 0
-        )
-
-        const fimEfeito1 = efeito
-          ? posicaoEfeitoNormalizada + efeito.duration
-          : 0
-
-        const fimEfeito2 = efeito2
-          ? posicaoEfeito2Normalizada + efeito2.duration
-          : 0
-
-        const duracaoTotal = Math.max(
-          inicio + duracaoVoz + final,
-          fimEfeito1,
-          fimEfeito2
-        )
-
-        const sampleRate =
-          contexto.sampleRate
-
-        const canais =
-          Math.max(
-            2,
-            voz.numberOfChannels
-          )
-
-        const frames =
-          Math.ceil(
-            duracaoTotal *
-            sampleRate
-          )
-
-        const offline =
-          new OfflineAudioContext(
-            canais,
-            frames,
-            sampleRate
-          )
-
-        // =================================================
-        // VOZ
-        // =================================================
-
-        const vozSource =
-          offline.createBufferSource()
-
-        vozSource.buffer =
-          voz
-
-        const vozGain =
-          offline.createGain()
-
-        const volumeVozNormalizado =
-          Math.max(
-            0,
-            Math.min(
-              1.5,
-              volumeVoz / 100
-            )
-          )
-
-        vozGain.gain.setValueAtTime(
-          volumeVozNormalizado,
-          0
-        )
-
-        vozSource.connect(
-  vozGain
-)
-
-if (reverbAtivo) {
-  const reverbDelay = offline.createDelay(1.0)
-  const reverbGain = offline.createGain()
-
-  reverbDelay.delayTime.value = 0.18
-  reverbGain.gain.value = 0.22
-
-  vozGain.connect(reverbDelay)
-  reverbDelay.connect(reverbGain)
-  reverbGain.connect(offline.destination)
-}
-
-vozGain.connect(
-  offline.destination
-)
-
-        vozSource.start(
-          inicio
-        )
-        // =================================================
-        // EFEITO SONORO
-        // =================================================
-
-        if (efeito) {
-          const efeitoSource =
-            offline.createBufferSource()
-
-          efeitoSource.buffer = efeito
-
-          const efeitoGain = offline.createGain()
-          const efeitoCompressor = offline.createDynamicsCompressor()
-
-          // 100% agora entrega ganho extra, porque alguns efeitos
-          // possuem o arquivo original gravado em volume baixo.
-          const volumeEfeitoNormalizado = Math.max(
-            0,
-            Math.min(2.2, (volumeEfeito / 100) * 2.2)
-          )
-
-          efeitoGain.gain.setValueAtTime(
-            volumeEfeitoNormalizado,
-            0
-          )
-
-          // Controla os picos para o efeito ficar forte sem estourar.
-          efeitoCompressor.threshold.value = -18
-          efeitoCompressor.knee.value = 12
-          efeitoCompressor.ratio.value = 8
-          efeitoCompressor.attack.value = 0.003
-          efeitoCompressor.release.value = 0.15
-
-          efeitoSource.connect(efeitoGain)
-          efeitoGain.connect(efeitoCompressor)
-          efeitoCompressor.connect(offline.destination)
-
-          // Alguns arquivos de efeito possuem silêncio no começo.
-          // Detectamos o primeiro ponto com áudio para que o efeito
-          // seja ouvido exatamente no segundo escolhido pelo usuário.
-          let primeiroFrameComSom = 0
-          const limiteSom = 0.008
-
-          for (let frame = 0; frame < efeito.length; frame++) {
-            let maiorAmostra = 0
-
-            for (let canal = 0; canal < efeito.numberOfChannels; canal++) {
-              maiorAmostra = Math.max(
-                maiorAmostra,
-                Math.abs(efeito.getChannelData(canal)[frame])
-              )
-            }
-
-            if (maiorAmostra >= limiteSom) {
-              primeiroFrameComSom = frame
-              break
-            }
-          }
-
-          const offsetSom = primeiroFrameComSom / efeito.sampleRate
-          const duracaoEfeitoComSom = Math.max(0.01, efeito.duration - offsetSom)
-
-          efeitoSource.start(
-            posicaoEfeitoNormalizada,
-            offsetSom,
-            duracaoEfeitoComSom
-          )
-        }
-
-        if (efeito2) {
-          const efeito2Source =
-            offline.createBufferSource()
-
-          efeito2Source.buffer = efeito2
-
-          const efeito2Gain = offline.createGain()
-          const efeito2Compressor = offline.createDynamicsCompressor()
-
-          // Mesmo reforço do efeito 1 para manter os dois com a mesma escala.
-          const volumeEfeito2Normalizado = Math.max(
-            0,
-            Math.min(2.2, (volumeEfeito2 / 100) * 2.2)
-          )
-
-          efeito2Gain.gain.setValueAtTime(
-            volumeEfeito2Normalizado,
-            0
-          )
-
-          efeito2Compressor.threshold.value = -18
-          efeito2Compressor.knee.value = 12
-          efeito2Compressor.ratio.value = 8
-          efeito2Compressor.attack.value = 0.003
-          efeito2Compressor.release.value = 0.15
-
-          efeito2Source.connect(efeito2Gain)
-          efeito2Gain.connect(efeito2Compressor)
-          efeito2Compressor.connect(offline.destination)
-
-          // Mesmo tratamento para o segundo efeito: elimina o silêncio
-          // inicial do arquivo sem alterar o segundo escolhido.
-          let primeiroFrameComSom2 = 0
-          const limiteSom2 = 0.008
-
-          for (let frame = 0; frame < efeito2.length; frame++) {
-            let maiorAmostra = 0
-
-            for (let canal = 0; canal < efeito2.numberOfChannels; canal++) {
-              maiorAmostra = Math.max(
-                maiorAmostra,
-                Math.abs(efeito2.getChannelData(canal)[frame])
-              )
-            }
-
-            if (maiorAmostra >= limiteSom2) {
-              primeiroFrameComSom2 = frame
-              break
-            }
-          }
-
-          const offsetSom2 = primeiroFrameComSom2 / efeito2.sampleRate
-          const duracaoEfeito2ComSom = Math.max(0.01, efeito2.duration - offsetSom2)
-
-          efeito2Source.start(
-            posicaoEfeito2Normalizada,
-            offsetSom2,
-            duracaoEfeito2ComSom
-          )
-        }
-        // =================================================
-        // TRILHA / DUCKING AUTOMÁTICO
-        // =================================================
-        // A trilha começa no volume escolhido,
-        // abaixa suavemente quando a voz entra,
-        // permanece baixa durante a locução
-        // e sobe novamente quando a voz termina.
-
-        const trilhaGain =
-          offline.createGain()
-
-        const volumeNormal =
-          Math.max(
-            0,
-            Math.min(
-              1,
-              volumeTrilha / 100
-            )
-          )
-
-        // 30% do volume escolhido durante a voz.
-        const volumeDuranteVoz =
-          volumeNormal * 0.30
-
-        // Tempo da transição do ducking.
-        const duracaoEntradaVoz =
-          Math.min(
-            0.8,
-            Math.max(
-              0.25,
-              duracaoVoz / 10
-            )
-          )
-
-        const duracaoSaidaVoz =
-          Math.min(
-            0.8,
-            Math.max(
-              0.25,
-              duracaoVoz / 10
-            )
-          )
-
-        const fimDaVoz =
-          inicio +
-          duracaoVoz
-
-        // Volume normal desde o começo.
-        trilhaGain.gain.setValueAtTime(
-          volumeNormal,
-          0
-        )
-
-        if (inicio > 0) {
-          // Trilha começa alta e abaixa suavemente
-          // exatamente na entrada da locução.
-          const inicioDucking =
-            Math.max(
-              0,
-              inicio -
-                duracaoEntradaVoz
-            )
-
-          trilhaGain.gain.setValueAtTime(
-            volumeNormal,
-            inicioDucking
-          )
-
-          trilhaGain.gain.linearRampToValueAtTime(
-            volumeDuranteVoz,
-            inicio
-          )
-        } else {
-          // Se a locução começar imediatamente,
-          // a trilha começa no volume normal e
-          // abaixa suavemente logo no início.
-          trilhaGain.gain.setValueAtTime(
-            volumeNormal,
-            0
-          )
-
-          const fimEntradaDucking =
-            Math.min(
-              duracaoTotal,
-              duracaoEntradaVoz
-            )
-
-          if (fimEntradaDucking > 0) {
-            trilhaGain.gain.linearRampToValueAtTime(
-              volumeDuranteVoz,
-              fimEntradaDucking
-            )
-          }
-        }
-
-        // Mantém a trilha baixa durante toda a locução.
-        trilhaGain.gain.setValueAtTime(
-          volumeDuranteVoz,
-          fimDaVoz
-        )
-
-        // Depois que o locutor termina,
-        // a trilha sobe suavemente novamente.
-        const fimSubidaTrilha =
-          Math.min(
-            duracaoTotal,
-            fimDaVoz +
-              duracaoSaidaVoz
-          )
-
-        if (
-          fimSubidaTrilha >
-          fimDaVoz
-        ) {
-          trilhaGain.gain.linearRampToValueAtTime(
-            volumeNormal,
-            fimSubidaTrilha
-          )
-        } else {
-          trilhaGain.gain.setValueAtTime(
-            volumeNormal,
-            fimDaVoz
-          )
-        }
-
-        // =================================================
-        // FADE FINAL
-        // =================================================
-
-        if (final > 0) {
-          const fadeOutInicio =
-            duracaoTotal -
-            final
-
-          // Garante que o fade final comece
-          // sempre no volume normal da trilha.
-          trilhaGain.gain.setValueAtTime(
-            volumeNormal,
-            Math.max(
-              0,
-              fadeOutInicio
-            )
-          )
-
-          trilhaGain.gain.linearRampToValueAtTime(
-            0,
-            duracaoTotal
-          )
-        }
-
-        trilhaGain.connect(
-          offline.destination
-        )
-
-        // =================================================
-        // REPETIR TRILHA
-        // =================================================
-
-        let trilhaAtual = 0
-        let primeiraParteTrilha = true
-
-        while (
-          trilhaAtual <
-          duracaoTotal
-        ) {
-          const trilhaSource =
-            offline.createBufferSource()
-
-          trilhaSource.buffer =
-            trilha
-
-          trilhaSource.connect(
-            trilhaGain
-          )
-
-          const restante =
-            duracaoTotal -
-            trilhaAtual
-
-          const offsetFonte =
-            primeiraParteTrilha
-              ? pontoInicioTrilha
-              : 0
-
-          const duracaoDisponivel =
-            trilha.duration -
-            offsetFonte
-
-          const duracaoFonte =
-            Math.min(
-              duracaoDisponivel,
-              restante
-            )
-
-          if (duracaoFonte <= 0) {
-            break
-          }
-
-          trilhaSource.start(
-            trilhaAtual,
-            offsetFonte,
-            duracaoFonte
-          )
-
-          trilhaAtual +=
-            duracaoFonte
-
-          primeiraParteTrilha = false
-        }
-
-        // =================================================
-        // RENDERIZAR
-        // =================================================
-
-        const renderizado =
-          await offline.startRendering()
-
-        const wavBlob =
-          audioBufferParaWav(
-            renderizado
-          )
-
-        const respostaMix =
-          await fetch(
-            '/api/converter-mp3',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type':
-                  'audio/wav',
-              },
-              body: wavBlob,
-            }
-          )
-
-        if (!respostaMix.ok) {
-          throw new Error(
-            'Não foi possível converter a mixagem para MP3.'
-          )
-        }
-
-        const mp3Blob =
-          await respostaMix.blob()
-
-        const mixUrl =
-          URL.createObjectURL(
-            mp3Blob
-          )
-
-        setMixAudioUrl(
-          mixUrl
-        )
-
-        await contexto.close()
-
-      } catch (erro) {
-        console.error(
-          'Erro na mixagem:',
-          erro
-        )
-
-        alert(
-          erro instanceof Error
-            ? erro.message
-            : 'Não foi possível mixar a voz com a trilha.'
-        )
-
-      } finally {
-        setMixando(false)
-      }
+  const mixarVozComTrilha = async () => {
+    if (!audioUrl) {
+      alert('Gere uma voz primeiro.')
+      return
     }
 
+    if (!trilhaSelecionada && !trilhaArquivo) {
+      alert('Escolha uma trilha ou envie sua própria trilha.')
+      return
+    }
+
+    setMixando(true)
+
+    try {
+      const vozResponse = await fetch(audioOriginalUrl)
+
+      if (!vozResponse.ok) {
+        throw new Error('Não foi possível acessar o áudio da voz.')
+      }
+
+      const vozBuffer = await vozResponse.arrayBuffer()
+
+      let trilhaBuffer: ArrayBuffer
+
+      if (trilhaArquivo) {
+        trilhaBuffer = await trilhaArquivo.arrayBuffer()
+      } else {
+        const trilhaResponse = await fetch(trilhaSelecionada)
+
+        if (!trilhaResponse.ok) {
+          throw new Error('Não foi possível carregar a trilha selecionada.')
+        }
+
+        trilhaBuffer = await trilhaResponse.arrayBuffer()
+      }
+
+      const AudioContextClass =
+        window.AudioContext ||
+        (
+          window as typeof window & {
+            webkitAudioContext?: typeof AudioContext
+          }
+        ).webkitAudioContext
+
+      if (!AudioContextClass) {
+        throw new Error('Seu navegador não suporta mixagem de áudio.')
+      }
+
+      const contexto = new AudioContextClass()
+
+      const voz = await contexto.decodeAudioData(vozBuffer.slice(0))
+      const trilha = await contexto.decodeAudioData(trilhaBuffer.slice(0))
+
+      // -----------------------------------------------------
+      // CARREGAR EFEITOS
+      // -----------------------------------------------------
+      // encodeURI evita problemas com nomes como "Transmissão.mp3".
+      const carregarEfeito = async (
+        caminho: string
+      ): Promise<AudioBuffer> => {
+        const resposta = await fetch(encodeURI(caminho))
+
+        if (!resposta.ok) {
+          throw new Error(`Não foi possível carregar o efeito: ${caminho}`)
+        }
+
+        const dados = await resposta.arrayBuffer()
+
+        if (!dados.byteLength) {
+          throw new Error(`O efeito está vazio: ${caminho}`)
+        }
+
+        return contexto.decodeAudioData(dados.slice(0))
+      }
+
+      let efeito: AudioBuffer | null = null
+      let efeito2: AudioBuffer | null = null
+
+      if (efeitoSelecionado) {
+        efeito = await carregarEfeito(efeitoSelecionado)
+      }
+
+      if (mostrarSegundoEfeito && efeito2Selecionado) {
+        efeito2 = await carregarEfeito(efeito2Selecionado)
+      }
+
+      const inicio = Math.max(0, Number(segundosInicio) || 0)
+      const final = Math.max(0, Number(segundosFinal) || 0)
+
+      const pontoInicioTrilha =
+        trilha.duration > 0
+          ? Math.min(
+              Math.max(0, Number(inicioTrilha) || 0),
+              Math.max(0, trilha.duration - 0.01)
+            )
+          : 0
+
+      const duracaoVoz = voz.duration
+
+      // Os efeitos são posicionados em relação ao INÍCIO DA TRILHA,
+      // nunca em relação ao início da voz.
+      const posicaoEfeitoNormalizada = Math.max(
+        0,
+        Number(posicaoEfeito) || 0
+      )
+
+      const posicaoEfeito2Normalizada = Math.max(
+        0,
+        Number(posicaoEfeito2) || 0
+      )
+
+      // Remove eventual silêncio do começo do arquivo para que o efeito
+      // aconteça no segundo escolhido pelo usuário.
+      const encontrarOffsetComSom = (buffer: AudioBuffer) => {
+        const limiteSom = 0.008
+
+        for (let frame = 0; frame < buffer.length; frame++) {
+          let maiorAmostra = 0
+
+          for (let canal = 0; canal < buffer.numberOfChannels; canal++) {
+            maiorAmostra = Math.max(
+              maiorAmostra,
+              Math.abs(buffer.getChannelData(canal)[frame])
+            )
+          }
+
+          if (maiorAmostra >= limiteSom) {
+            return frame / buffer.sampleRate
+          }
+        }
+
+        return 0
+      }
+
+      const offsetSom1 = efeito
+        ? encontrarOffsetComSom(efeito)
+        : 0
+
+      const offsetSom2 = efeito2
+        ? encontrarOffsetComSom(efeito2)
+        : 0
+
+      const duracaoEfeito1 = efeito
+        ? Math.max(0.01, efeito.duration - offsetSom1)
+        : 0
+
+      const duracaoEfeito2 = efeito2
+        ? Math.max(0.01, efeito2.duration - offsetSom2)
+        : 0
+
+      const fimEfeito1 = efeito
+        ? posicaoEfeitoNormalizada + duracaoEfeito1
+        : 0
+
+      const fimEfeito2 = efeito2
+        ? posicaoEfeito2Normalizada + duracaoEfeito2
+        : 0
+
+      // -----------------------------------------------------
+      // TEMPOS DO DUCKING
+      // -----------------------------------------------------
+      // Não existe fade no início.
+      // A trilha começa imediatamente no volume escolhido.
+      // Depois da voz, reservamos tempo para a trilha subir antes
+      // de começar o fade final.
+      const duracaoEntradaVoz = Math.min(
+        0.8,
+        Math.max(0.25, duracaoVoz / 10)
+      )
+
+      const duracaoSaidaVoz = Math.min(
+        0.8,
+        Math.max(0.25, duracaoVoz / 10)
+      )
+
+      const fimDaVoz = inicio + duracaoVoz
+      const fimSubidaTrilha = fimDaVoz + duracaoSaidaVoz
+
+      // O fade final só começa DEPOIS da subida da trilha.
+      const duracaoTotal = Math.max(
+        inicio + duracaoVoz + duracaoSaidaVoz + final,
+        fimEfeito1,
+        fimEfeito2,
+        0.01
+      )
+
+      const sampleRate = contexto.sampleRate
+      const canais = Math.max(2, voz.numberOfChannels)
+      const frames = Math.max(
+        1,
+        Math.ceil(duracaoTotal * sampleRate)
+      )
+
+      const offline = new OfflineAudioContext(
+        canais,
+        frames,
+        sampleRate
+      )
+
+      // -----------------------------------------------------
+      // VOZ
+      // -----------------------------------------------------
+      const vozSource = offline.createBufferSource()
+      vozSource.buffer = voz
+
+      const vozGain = offline.createGain()
+
+      const volumeVozNormalizado = Math.max(
+        0,
+        Math.min(1.5, volumeVoz / 100)
+      )
+
+      vozGain.gain.setValueAtTime(volumeVozNormalizado, 0)
+      vozSource.connect(vozGain)
+
+      if (reverbAtivo) {
+        const reverbDelay = offline.createDelay(1.0)
+        const reverbGain = offline.createGain()
+
+        reverbDelay.delayTime.value = 0.18
+        reverbGain.gain.value = 0.22
+
+        vozGain.connect(reverbDelay)
+        reverbDelay.connect(reverbGain)
+        reverbGain.connect(offline.destination)
+      }
+
+      vozGain.connect(offline.destination)
+      vozSource.start(inicio)
+
+      // -----------------------------------------------------
+      // FUNÇÃO PARA INSERIR EFEITO
+      // -----------------------------------------------------
+      const adicionarEfeito = (
+        buffer: AudioBuffer,
+        posicao: number,
+        volume: number,
+        offsetSom: number,
+        duracaoSom: number
+      ) => {
+        const source = offline.createBufferSource()
+        source.buffer = buffer
+
+        const gain = offline.createGain()
+        const compressor = offline.createDynamicsCompressor()
+
+        const volumeNormalizado = Math.max(
+          0,
+          Math.min(2.2, (volume / 100) * 2.2)
+        )
+
+        gain.gain.setValueAtTime(volumeNormalizado, 0)
+
+        compressor.threshold.value = -18
+        compressor.knee.value = 12
+        compressor.ratio.value = 8
+        compressor.attack.value = 0.003
+        compressor.release.value = 0.15
+
+        source.connect(gain)
+        gain.connect(compressor)
+        compressor.connect(offline.destination)
+
+        // IMPORTANTE: posição absoluta desde o começo da trilha.
+        source.start(posicao, offsetSom, duracaoSom)
+      }
+
+      if (efeito) {
+        adicionarEfeito(
+          efeito,
+          posicaoEfeitoNormalizada,
+          volumeEfeito,
+          offsetSom1,
+          duracaoEfeito1
+        )
+      }
+
+      if (efeito2) {
+        adicionarEfeito(
+          efeito2,
+          posicaoEfeito2Normalizada,
+          volumeEfeito2,
+          offsetSom2,
+          duracaoEfeito2
+        )
+      }
+
+      // -----------------------------------------------------
+      // TRILHA + DUCKING
+      // -----------------------------------------------------
+      const trilhaGain = offline.createGain()
+
+      const volumeNormal = Math.max(
+        0,
+        Math.min(1, volumeTrilha / 100)
+      )
+
+      // 30% do volume escolhido durante a voz.
+      const volumeDuranteVoz = volumeNormal * 0.30
+
+      // SEM FADE NO INÍCIO.
+      // A trilha começa imediatamente alta no volume escolhido.
+      trilhaGain.gain.setValueAtTime(volumeNormal, 0)
+
+      if (inicio > 0) {
+        const inicioDucking = Math.max(
+          0,
+          inicio - duracaoEntradaVoz
+        )
+
+        // Mantém a trilha normal até começar a descida.
+        trilhaGain.gain.setValueAtTime(
+          volumeNormal,
+          inicioDucking
+        )
+
+        // Abaixa suavemente até o nível da locução.
+        trilhaGain.gain.linearRampToValueAtTime(
+          volumeDuranteVoz,
+          inicio
+        )
+      } else {
+        // Se a voz começa em 0, apenas fazemos a descida da trilha.
+        trilhaGain.gain.linearRampToValueAtTime(
+          volumeDuranteVoz,
+          Math.min(duracaoEntradaVoz, fimDaVoz)
+        )
+      }
+
+      // Mantém baixa durante toda a locução.
+      trilhaGain.gain.setValueAtTime(
+        volumeDuranteVoz,
+        fimDaVoz
+      )
+
+      // Quando o locutor termina, sobe novamente para o volume normal.
+      trilhaGain.gain.linearRampToValueAtTime(
+        volumeNormal,
+        fimSubidaTrilha
+      )
+
+      // -----------------------------------------------------
+      // FADE FINAL — SOMENTE NO FINAL
+      // -----------------------------------------------------
+      if (final > 0) {
+        const fadeOutInicio = Math.max(
+          fimSubidaTrilha,
+          duracaoTotal - final
+        )
+
+        // Garante que o fade começa com a trilha já alta.
+        trilhaGain.gain.setValueAtTime(
+          volumeNormal,
+          fadeOutInicio
+        )
+
+        trilhaGain.gain.linearRampToValueAtTime(
+          0,
+          duracaoTotal
+        )
+      } else {
+        // Sem fade configurado, mantém a trilha no volume normal
+        // até o final reservado para a subida.
+        trilhaGain.gain.setValueAtTime(
+          volumeNormal,
+          Math.min(fimSubidaTrilha, duracaoTotal)
+        )
+      }
+
+      trilhaGain.connect(offline.destination)
+
+      // -----------------------------------------------------
+      // REPETIR TRILHA
+      // -----------------------------------------------------
+      let trilhaAtual = 0
+      let primeiraParteTrilha = true
+
+      while (trilhaAtual < duracaoTotal) {
+        const trilhaSource = offline.createBufferSource()
+        trilhaSource.buffer = trilha
+        trilhaSource.connect(trilhaGain)
+
+        const restante = duracaoTotal - trilhaAtual
+
+        const offsetFonte = primeiraParteTrilha
+          ? pontoInicioTrilha
+          : 0
+
+        const duracaoDisponivel = trilha.duration - offsetFonte
+        const duracaoFonte = Math.min(
+          duracaoDisponivel,
+          restante
+        )
+
+        if (duracaoFonte <= 0) {
+          break
+        }
+
+        trilhaSource.start(
+          trilhaAtual,
+          offsetFonte,
+          duracaoFonte
+        )
+
+        trilhaAtual += duracaoFonte
+        primeiraParteTrilha = false
+      }
+
+      // -----------------------------------------------------
+      // RENDERIZAR
+      // -----------------------------------------------------
+      const renderizado = await offline.startRendering()
+
+      const wavBlob = audioBufferParaWav(renderizado)
+
+      const respostaMix = await fetch(
+        '/api/converter-mp3',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'audio/wav',
+          },
+          body: wavBlob,
+        }
+      )
+
+      if (!respostaMix.ok) {
+        throw new Error(
+          'Não foi possível converter a mixagem para MP3.'
+        )
+      }
+
+      const mp3Blob = await respostaMix.blob()
+
+      if (!mp3Blob.size) {
+        throw new Error('A mixagem retornou um áudio vazio.')
+      }
+
+      const mixUrl = URL.createObjectURL(mp3Blob)
+      setMixAudioUrl(mixUrl)
+
+      await contexto.close()
+    } catch (erro) {
+      console.error('Erro na mixagem:', erro)
+
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : 'Não foi possível mixar a voz com a trilha.'
+      )
+    } finally {
+      setMixando(false)
+    }
+  }
 
   // =====================================================
   // EDITOR
