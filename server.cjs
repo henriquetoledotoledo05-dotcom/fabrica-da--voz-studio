@@ -2282,14 +2282,14 @@ app.post('/api/gerar-voz', async (req, res) => {
     // [happily] etc. da ElevenLabs porque não são instruções equivalentes na Cartesia.
     // Os presets abaixo ajustam levemente velocidade e volume para cada estilo.
         const presetsEstilo = {
-  animado:       { speed: 1.06, volume: 1.08 },
-  muitoAnimado:  { speed: 1.12, volume: 1.16 },
-  superImpacto:  { speed: 1.08, volume: 1.22 },
-  serio:         { speed: 0.96, volume: 0.96 },
-  urgente:       { speed: 1.10, volume: 1.12 },
-  comercial:     { speed: 1.03, volume: 1.05 },
-  festa:         { speed: 1.10, volume: 1.14 },
-  solene:        { speed: 0.94, volume: 0.96 },
+  animado:       { speed: 1.06, volume: 1.08, emotion: 'excited' },
+  muitoAnimado:  { speed: 1.12, volume: 1.16, emotion: 'excited' },
+  superImpacto:  { speed: 1.08, volume: 1.22, emotion: 'excited' },
+  serio:         { speed: 0.96, volume: 0.96, emotion: 'neutral' },
+  urgente:       { speed: 1.10, volume: 1.12, emotion: 'angry' },
+  comercial:     { speed: 1.03, volume: 1.05, emotion: 'content' },
+  festa:         { speed: 1.10, volume: 1.14, emotion: 'excited' },
+  solene:        { speed: 0.94, volume: 0.96, emotion: 'neutral' },
 };
 
 const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
@@ -2315,6 +2315,7 @@ const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
        generation_config: {
   speed: preset.speed,
   volume: preset.volume,
+  emotion: preset.emotion,
 },
       }),
     });
