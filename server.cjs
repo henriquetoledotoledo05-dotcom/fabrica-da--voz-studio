@@ -1,52 +1,26 @@
 const crypto = require("crypto");
 
-
-
 const express = require("express");
-
-
 
 const cors = require("cors");
 
-
-
 const dotenv = require("dotenv");
-
-
 
 const { MercadoPagoConfig, Preference } = require("mercadopago");
 
-
-
 const { createClient } = require("@supabase/supabase-js");
-
-
 
 const OpenAI = require("openai");
 
-
-
 const ffmpegPath = require("ffmpeg-static");
-
-
 
 const { spawn } = require("child_process");
 
-
-
 const path = require("path");
-
-
 
 const fs = require("fs");
 
-
-
 const os = require("os");
-
-
-
-
 
 
 
@@ -54,3879 +28,1939 @@ dotenv.config();
 
 
 
-
-
-
-
 const supabaseAdmin = createClient(
 
+  process.env.SUPABASE_URL,
 
-
-  process.env.SUPABASE_URL,
-
-
-
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-
-
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 
 );
-
-
-
-
 
 
 
 const mercadoPagoClient = new MercadoPagoConfig({
 
-
-
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
-
-
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
 
 });
-
-
-
-
 
 
 
 const preferenceClient = new Preference(mercadoPagoClient);
 
-
-
 const openai = new OpenAI({
 
-
-
-  apiKey: process.env.OPENAI_API_KEY,
-
-
+  apiKey: process.env.OPENAI_API_KEY,
 
 });
-
-
-
-
 
 
 
 const app = express();
 
-
-
 app.use(express.json());
-
-
 
 const PORT = Number(process.env.PORT) || 3010;
 
-
-
 const PACOTES_CREDITOS = {
 
+  credito1: {
 
+    titulo: "1 crédito",
 
-  credito1: {
+    creditos: 1,
 
+    valor: 4.90,
 
+  },
 
-    titulo: "1 crédito",
+  credito10: {
 
+    titulo: "10 créditos",
 
+    creditos: 10,
 
-    creditos: 1,
+    valor: 19.90,
 
+  },
 
+  credito50: {
 
-    valor: 4.90,
+    titulo: "50 créditos",
 
+    creditos: 50,
 
+    valor: 69.90,
 
-  },
+  },
 
+  credito100: {
 
+    titulo: "100 créditos",
 
-  credito10: {
+    creditos: 100,
 
+    valor: 119.90,
 
-
-    titulo: "10 créditos",
-
-
-
-    creditos: 10,
-
-
-
-    valor: 19.90,
-
-
-
-  },
-
-
-
-  credito50: {
-
-
-
-    titulo: "50 créditos",
-
-
-
-    creditos: 50,
-
-
-
-    valor: 69.90,
-
-
-
-  },
-
-
-
-  credito100: {
-
-
-
-    titulo: "100 créditos",
-
-
-
-    creditos: 100,
-
-
-
-    valor: 119.90,
-
-
-
-  },
-
-
+  },
 
 };
 
-
-
 app.post("/api/criar-pagamento", async (req, res) => {
 
+  try {
 
+    const { pacote } = req.body;
 
-  try {
 
 
+    const pacoteSelecionado = PACOTES_CREDITOS[pacote];
 
-    const { pacote } = req.body;
 
 
+    if (!pacoteSelecionado) {
 
+      return res.status(400).json({
 
+        erro: "Pacote de créditos inválido.",
 
+      });
 
+    }
 
-    const pacoteSelecionado = PACOTES_CREDITOS[pacote];
 
 
+    const authHeader = req.headers.authorization || "";
 
 
 
+    if (!authHeader.startsWith("Bearer ")) {
 
+      return res.status(401).json({
 
-    if (!pacoteSelecionado) {
+        erro: "Usuário não autenticado.",
 
+      });
 
+    }
 
-      return res.status(400).json({
 
 
+    const accessToken = authHeader.replace("Bearer ", "");
 
-        erro: "Pacote de créditos inválido.",
 
 
+    const {
 
-      });
+      data: { user },
 
+      error: erroUsuario,
 
+    } = await supabaseAdmin.auth.getUser(accessToken);
 
-    }
 
 
+    if (erroUsuario || !user) {
 
+      return res.status(401).json({
 
+        erro: "Sessão do usuário inválida.",
 
+      });
 
+    }
 
-    const authHeader = req.headers.authorization || "";
 
 
+    const preference = await preferenceClient.create({
 
+      body: {
 
+        items: [
 
+          {
 
+            title: pacoteSelecionado.titulo,
 
-    if (!authHeader.startsWith("Bearer ")) {
+            quantity: 1,
 
+            currency_id: "BRL",
 
+            unit_price: pacoteSelecionado.valor,
 
-      return res.status(401).json({
+          },
 
+        ],
 
 
-        erro: "Usuário não autenticado.",
 
+        external_reference: `${user.id}|${pacote}`,
 
 
-      });
 
+        metadata: {
 
+          user_id: user.id,
 
-    }
+          pacote: pacote,
 
+          creditos: pacoteSelecionado.creditos,
 
+        },
 
+      },
 
+    });
 
 
 
-    const accessToken = authHeader.replace("Bearer ", "");
+    return res.json({
 
+      id: preference.id,
 
+      init_point: preference.init_point,
 
+    });
 
+  } catch (erro) {
 
+    console.error("Erro ao criar pagamento:", erro);
 
 
-    const {
 
+    return res.status(500).json({
 
+      erro: "Não foi possível criar o pagamento.",
 
-      data: { user },
+    });
 
-
-
-      error: erroUsuario,
-
-
-
-    } = await supabaseAdmin.auth.getUser(accessToken);
-
-
-
-
-
-
-
-    if (erroUsuario || !user) {
-
-
-
-      return res.status(401).json({
-
-
-
-        erro: "Sessão do usuário inválida.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    const preference = await preferenceClient.create({
-
-
-
-      body: {
-
-
-
-        items: [
-
-
-
-          {
-
-
-
-            title: pacoteSelecionado.titulo,
-
-
-
-            quantity: 1,
-
-
-
-            currency_id: "BRL",
-
-
-
-            unit_price: pacoteSelecionado.valor,
-
-
-
-          },
-
-
-
-        ],
-
-
-
-
-
-
-
-        external_reference: \`${user.id}|${pacote}\`,
-
-
-
-
-
-
-
-        metadata: {
-
-
-
-          user_id: user.id,
-
-
-
-          pacote: pacote,
-
-
-
-          creditos: pacoteSelecionado.creditos,
-
-
-
-        },
-
-
-
-      },
-
-
-
-    });
-
-
-
-
-
-
-
-    return res.json({
-
-
-
-      id: preference.id,
-
-
-
-      init_point: preference.init_point,
-
-
-
-    });
-
-
-
-  } catch (erro) {
-
-
-
-    console.error("Erro ao criar pagamento:", erro);
-
-
-
-
-
-
-
-    return res.status(500).json({
-
-
-
-      erro: "Não foi possível criar o pagamento.",
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // WEBHOOK MERCADO PAGO - PAYMENT + ORDER
 
-
-
 // =====================================================
-
-
 
 // Esta aplicação usa Checkout Pro pela API de Preferências
 
-
-
 // (/checkout/preferences). Para esse fluxo, o evento correto
-
-
 
 // é "Pagamentos" (tópico payment). Mantemos suporte a "order"
 
-
-
 // também para compatibilidade futura.
 
-
-
 // O mesmo pagamento não pode gerar créditos duas vezes porque
-
-
 
 // o Supabase controla mercado_pago_id como UNIQUE.
 
 
 
-
-
-
-
 function extrairAssinaturaMercadoPago(xSignature) {
 
-
-
-  const resultado = { ts: null, v1: null };
-
+  const resultado = { ts: null, v1: null };
 
 
 
+  if (!xSignature || typeof xSignature !== "string") {
+
+    return resultado;
+
+  }
 
 
 
-  if (!xSignature || typeof xSignature !== "string") {
+  for (const parte of xSignature.split(",")) {
+
+    const [chave, ...resto] = parte.split("=");
+
+    if (!chave || !resto.length) continue;
 
 
 
-    return resultado;
+    const valor = resto.join("=").trim();
+
+    const chaveLimpa = chave.trim();
 
 
 
-  }
+    if (chaveLimpa === "ts") resultado.ts = valor;
+
+    if (chaveLimpa === "v1") resultado.v1 = valor;
+
+  }
 
 
 
-
-
-
-
-  for (const parte of xSignature.split(",")) {
-
-
-
-    const [chave, ...resto] = parte.split("=");
-
-
-
-    if (!chave || !resto.length) continue;
-
-
-
-
-
-
-
-    const valor = resto.join("=").trim();
-
-
-
-    const chaveLimpa = chave.trim();
-
-
-
-
-
-
-
-    if (chaveLimpa === "ts") resultado.ts = valor;
-
-
-
-    if (chaveLimpa === "v1") resultado.v1 = valor;
-
-
-
-  }
-
-
-
-
-
-
-
-  return resultado;
-
-
+  return resultado;
 
 }
-
-
-
-
 
 
 
 function validarAssinaturaMercadoPago(req, dataId) {
 
+  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
 
 
-  const secret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
 
+  if (!secret) {
 
+    throw new Error(
 
+      "MERCADOPAGO_WEBHOOK_SECRET não configurada no servidor."
 
+    );
 
+  }
 
 
-  if (!secret) {
 
+  const xSignature = req.headers["x-signature"];
 
+  const xRequestId = req.headers["x-request-id"];
 
-    throw new Error(
 
 
+  if (!xSignature || !xRequestId || !dataId) {
 
-      "MERCADOPAGO_WEBHOOK_SECRET não configurada no servidor."
+    return false;
 
+  }
 
 
-    );
 
+  const { ts, v1 } = extrairAssinaturaMercadoPago(xSignature);
 
 
-  }
 
+  if (!ts || !v1) {
 
+    return false;
 
+  }
 
 
 
+  // Manifesto oficial do Mercado Pago.
 
-  const xSignature = req.headers["x-signature"];
+  // O data.id é usado em minúsculas no cálculo da assinatura.
 
+  const manifest =
 
+    `id:${String(dataId).toLowerCase()};request-id:${xRequestId};ts:${ts};`;
 
-  const xRequestId = req.headers["x-request-id"];
 
 
+  const assinaturaCalculada = crypto
 
+    .createHmac("sha256", secret)
 
+    .update(manifest)
 
+    .digest("hex");
 
 
-  if (!xSignature || !xRequestId || !dataId) {
 
+  const esperado = Buffer.from(assinaturaCalculada, "utf8");
 
+  const recebido = Buffer.from(String(v1), "utf8");
 
-    return false;
 
 
+  if (esperado.length !== recebido.length) {
 
-  }
+    return false;
 
+  }
 
 
 
-
-
-
-  const { ts, v1 } = extrairAssinaturaMercadoPago(xSignature);
-
-
-
-
-
-
-
-  if (!ts || !v1) {
-
-
-
-    return false;
-
-
-
-  }
-
-
-
-
-
-
-
-  // Manifesto oficial do Mercado Pago.
-
-
-
-  // O data.id é usado em minúsculas no cálculo da assinatura.
-
-
-
-  const manifest =
-
-
-
-    \`id:${String(dataId).toLowerCase()};request-id:${xRequestId};ts:${ts};\`;
-
-
-
-
-
-
-
-  const assinaturaCalculada = crypto
-
-
-
-    .createHmac("sha256", secret)
-
-
-
-    .update(manifest)
-
-
-
-    .digest("hex");
-
-
-
-
-
-
-
-  const esperado = Buffer.from(assinaturaCalculada, "utf8");
-
-
-
-  const recebido = Buffer.from(String(v1), "utf8");
-
-
-
-
-
-
-
-  if (esperado.length !== recebido.length) {
-
-
-
-    return false;
-
-
-
-  }
-
-
-
-
-
-
-
-  return crypto.timingSafeEqual(esperado, recebido);
-
-
+  return crypto.timingSafeEqual(esperado, recebido);
 
 }
-
-
-
-
 
 
 
 app.post("/api/mercadopago/webhook", async (req, res) => {
 
+  try {
 
+    console.log("");
 
-  try {
+    console.log("=================================");
 
+    console.log("WEBHOOK MERCADO PAGO RECEBIDO");
 
+    console.log("=================================");
 
-    console.log("");
 
 
+    const dataId = String(
 
-    console.log("=================================");
+      req.query["data.id"] ||
 
+      req.body?.data?.id ||
 
+      ""
 
-    console.log("WEBHOOK MERCADO PAGO RECEBIDO");
+    ).trim();
 
 
 
-    console.log("=================================");
+    const tipo = String(
 
+      req.query.type ||
 
+      req.body?.type ||
 
+      ""
 
+    ).trim().toLowerCase();
 
 
 
-    const dataId = String(
+    console.log("Tipo:", tipo);
 
+    console.log("ID do recurso:", dataId);
 
 
-      req.query["data.id"] ||
 
+    if (!dataId) {
 
+      console.error("Webhook recebido sem data.id.");
 
-      req.body?.data?.id ||
+      return res.status(400).json({
 
+        erro: "ID do recurso não informado.",
 
+      });
 
-      ""
+    }
 
 
 
-    ).trim();
+    if (!validarAssinaturaMercadoPago(req, dataId)) {
 
+      console.error("Webhook Mercado Pago rejeitado: assinatura inválida.");
 
+      return res.status(401).json({
 
+        erro: "Assinatura do webhook inválida.",
 
+      });
 
+    }
 
 
-    const tipo = String(
 
+    if (tipo !== "payment" && tipo !== "order") {
 
+      console.log("Webhook ignorado: tipo não suportado:", tipo);
 
-      req.query.type ||
+      return res.status(200).json({
 
+        recebido: true,
 
+        processado: false,
 
-      req.body?.type ||
+      });
 
+    }
 
 
-      ""
 
+    if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
 
+      throw new Error(
 
-    ).trim().toLowerCase();
+        "MERCADOPAGO_ACCESS_TOKEN não configurado."
 
+      );
 
+    }
 
 
 
+    let recurso;
 
+    let statusAprovado = false;
 
-    console.log("Tipo:", tipo);
+    let externalReference = "";
 
+    let metadata = null;
 
+    let valorPago = NaN;
 
-    console.log("ID do recurso:", dataId);
+    let recursoId = dataId;
 
 
 
+    if (tipo === "payment") {
 
+      // Checkout Pro via Preferences API: consultar pagamento.
 
+      const respostaPagamento = await fetch(
 
+        `https://api.mercadopago.com/v1/payments/${encodeURIComponent(dataId)}`,
 
-    if (!dataId) {
+        {
 
+          method: "GET",
 
+          headers: {
 
-      console.error("Webhook recebido sem data.id.");
+            Authorization:
 
+              `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
 
+            Accept: "application/json",
 
-      return res.status(400).json({
+          },
 
+        }
 
+      );
 
-        erro: "ID do recurso não informado.",
 
 
+      if (!respostaPagamento.ok) {
 
-      });
+        const detalhes = await respostaPagamento.text();
 
+        console.error(
 
+          "Erro ao consultar pagamento no Mercado Pago:",
 
-    }
+          detalhes
 
+        );
 
+        return res.status(502).json({
 
+          erro: "Não foi possível consultar o pagamento no Mercado Pago.",
 
+        });
 
+      }
 
 
-    if (!validarAssinaturaMercadoPago(req, dataId)) {
 
+      recurso = await respostaPagamento.json();
 
+      recursoId = String(recurso.id || dataId);
 
-      console.error("Webhook Mercado Pago rejeitado: assinatura inválida.");
+      statusAprovado =
 
+        recurso.status === "approved" &&
 
+        (recurso.status_detail === "accredited" ||
 
-      return res.status(401).json({
+          !recurso.status_detail);
 
+      externalReference = String(
 
+        recurso.external_reference || ""
 
-        erro: "Assinatura do webhook inválida.",
+      ).trim();
 
+      metadata = recurso.metadata || null;
 
+      valorPago = Number(recurso.transaction_amount);
 
-      });
 
 
+      console.log("Status do pagamento:", recurso.status);
 
-    }
+      console.log("Status detail:", recurso.status_detail);
 
+      console.log("External reference:", externalReference);
 
+      console.log("Valor do pagamento:", valorPago);
 
+    } else {
 
+      // Compatibilidade com Checkout Pro via Orders API.
 
+      const respostaOrder = await fetch(
 
+        `https://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}`,
 
-    if (tipo !== "payment" && tipo !== "order") {
+        {
 
+          method: "GET",
 
+          headers: {
 
-      console.log("Webhook ignorado: tipo não suportado:", tipo);
+            Authorization:
 
+              `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
 
+            Accept: "application/json",
 
-      return res.status(200).json({
+          },
 
+        }
 
+      );
 
-        recebido: true,
 
 
+      if (!respostaOrder.ok) {
 
-        processado: false,
+        const detalhes = await respostaOrder.text();
 
+        console.error(
 
+          "Erro ao consultar order no Mercado Pago:",
 
-      });
+          detalhes
 
+        );
 
+        return res.status(502).json({
 
-    }
+          erro: "Não foi possível consultar a order no Mercado Pago.",
 
+        });
 
+      }
 
 
 
+      recurso = await respostaOrder.json();
 
+      recursoId = String(recurso.id || dataId);
 
-    if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
+      statusAprovado =
 
+        recurso.status === "processed" &&
 
+        recurso.status_detail === "accredited";
 
-      throw new Error(
+      externalReference = String(
 
+        recurso.external_reference || ""
 
+      ).trim();
 
-        "MERCADOPAGO_ACCESS_TOKEN não configurado."
+      metadata = recurso.metadata || null;
 
+      valorPago = Number(
 
+        recurso.total_paid_amount ?? recurso.total_amount
 
-      );
+      );
 
 
 
-    }
+      console.log("Status da order:", recurso.status);
 
+      console.log("Status detail:", recurso.status_detail);
 
+      console.log("External reference:", externalReference);
 
+      console.log("Valor da order:", valorPago);
 
+    }
 
 
 
-    let recurso;
+    if (!statusAprovado) {
 
+      console.log(
 
+        "Pagamento ainda não está aprovado/acreditado. Nenhum crédito será adicionado."
 
-    let statusAprovado = false;
+      );
 
 
 
-    let externalReference = "";
+      return res.status(200).json({
 
+        recebido: true,
 
+        processado: false,
 
-    let metadata = null;
+        status: recurso.status,
 
+        status_detail: recurso.status_detail,
 
+      });
 
-    let valorPago = NaN;
+    }
 
 
 
-    let recursoId = dataId;
+    let userId = "";
 
+    let pacote = "";
 
 
 
+    // O fluxo atual grava: UUID|pacote
 
+    const separador = externalReference.indexOf("|");
 
 
-    if (tipo === "payment") {
 
+    if (separador > 0) {
 
+      userId = externalReference.slice(0, separador).trim();
 
-      // Checkout Pro via Preferences API: consultar pagamento.
+      pacote = externalReference.slice(separador + 1).trim();
 
+    }
 
 
-      const respostaPagamento = await fetch(
 
+    // Fallback para metadata caso a referência externa não esteja disponível.
 
+    if ((!userId || !pacote) && metadata) {
 
-        \`https\://api.mercadopago.com/v1/payments/${encodeURIComponent(dataId)}\`,
+      userId = String(metadata.user_id || "").trim();
 
+      pacote = String(metadata.pacote || "").trim();
 
+    }
 
-        {
 
 
+    if (!userId || !pacote) {
 
-          method: "GET",
+      console.error(
 
+        "Não foi possível identificar usuário/pacote do pagamento.",
 
+        {
 
-          headers: {
+          externalReference,
 
+          metadata,
 
+        }
 
-            Authorization:
+      );
 
 
 
-              \`Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}\`,
+      return res.status(400).json({
 
+        erro: "Não foi possível identificar o usuário e o pacote do pagamento.",
 
+      });
 
-            Accept: "application/json",
+    }
 
 
 
-          },
+    const pacoteSelecionado = PACOTES_CREDITOS[pacote];
 
 
 
-        }
+    if (!pacoteSelecionado) {
 
+      console.error("Pacote não encontrado:", pacote);
 
+      return res.status(400).json({
 
-      );
+        erro: "Pacote de créditos não encontrado.",
 
+      });
 
+    }
 
 
 
+    const valorEsperado = Number(pacoteSelecionado.valor);
 
 
-      if (!respostaPagamento.ok) {
 
+    if (
 
+      !Number.isFinite(valorPago) ||
 
-        const detalhes = await respostaPagamento.text();
+      Math.abs(valorPago - valorEsperado) > 0.01
 
+    ) {
 
+      console.error(
 
-        console.error(
+        "Valor do pagamento diferente do pacote:",
 
+        {
 
+          valorPago,
 
-          "Erro ao consultar pagamento no Mercado Pago:",
+          valorEsperado,
 
+          pacote,
 
+        }
 
-          detalhes
+      );
 
 
 
-        );
+      return res.status(400).json({
 
+        erro: "Valor do pagamento não corresponde ao pacote.",
 
+      });
 
-        return res.status(502).json({
+    }
 
 
 
-          erro: "Não foi possível consultar o pagamento no Mercado Pago.",
+    const { data, error } = await supabaseAdmin.rpc(
 
+      "processar_pagamento_aprovado",
 
+      {
 
-        });
+        p_mercado_pago_id: recursoId,
 
+        p_user_id: userId,
 
+        p_pacote: pacote,
 
-      }
+        p_creditos: pacoteSelecionado.creditos,
 
+        p_valor: valorPago,
 
+      }
 
+    );
 
 
 
+    if (error) {
 
-      recurso = await respostaPagamento.json();
+      console.error(
 
+        "ERRO AO PROCESSAR PAGAMENTO NO SUPABASE:",
 
+        error
 
-      recursoId = String(recurso.id || dataId);
+      );
 
 
 
-      statusAprovado =
+      return res.status(500).json({
 
+        erro: "Não foi possível registrar o pagamento no Supabase.",
 
+      });
 
-        recurso.status === "approved" &&
+    }
 
 
 
-        (recurso.status_detail === "accredited" ||
+    console.log("Pagamento processado pelo Supabase:", data);
 
+    console.log(
 
+      "Créditos adicionados:",
 
-          !recurso.status_detail);
+      pacoteSelecionado.creditos
 
+    );
 
 
-      externalReference = String(
 
+    return res.status(200).json({
 
+      recebido: true,
 
-        recurso.external_reference || ""
+      processado: true,
 
+      paymentId: recursoId,
 
+      creditos: pacoteSelecionado.creditos,
 
-      ).trim();
+    });
 
+  } catch (erro) {
 
+    console.error("ERRO NO WEBHOOK MERCADO PAGO:", erro);
 
-      metadata = recurso.metadata || null;
 
 
+    return res.status(500).json({
 
-      valorPago = Number(recurso.transaction_amount);
+      erro: erro?.message || "Erro interno no webhook.",
 
+    });
 
-
-
-
-
-
-      console.log("Status do pagamento:", recurso.status);
-
-
-
-      console.log("Status detail:", recurso.status_detail);
-
-
-
-      console.log("External reference:", externalReference);
-
-
-
-      console.log("Valor do pagamento:", valorPago);
-
-
-
-    } else {
-
-
-
-      // Compatibilidade com Checkout Pro via Orders API.
-
-
-
-      const respostaOrder = await fetch(
-
-
-
-        \`https\://api.mercadopago.com/v1/orders/${encodeURIComponent(dataId)}\`,
-
-
-
-        {
-
-
-
-          method: "GET",
-
-
-
-          headers: {
-
-
-
-            Authorization:
-
-
-
-              \`Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}\`,
-
-
-
-            Accept: "application/json",
-
-
-
-          },
-
-
-
-        }
-
-
-
-      );
-
-
-
-
-
-
-
-      if (!respostaOrder.ok) {
-
-
-
-        const detalhes = await respostaOrder.text();
-
-
-
-        console.error(
-
-
-
-          "Erro ao consultar order no Mercado Pago:",
-
-
-
-          detalhes
-
-
-
-        );
-
-
-
-        return res.status(502).json({
-
-
-
-          erro: "Não foi possível consultar a order no Mercado Pago.",
-
-
-
-        });
-
-
-
-      }
-
-
-
-
-
-
-
-      recurso = await respostaOrder.json();
-
-
-
-      recursoId = String(recurso.id || dataId);
-
-
-
-      statusAprovado =
-
-
-
-        recurso.status === "processed" &&
-
-
-
-        recurso.status_detail === "accredited";
-
-
-
-      externalReference = String(
-
-
-
-        recurso.external_reference || ""
-
-
-
-      ).trim();
-
-
-
-      metadata = recurso.metadata || null;
-
-
-
-      valorPago = Number(
-
-
-
-        recurso.total_paid_amount ?? recurso.total_amount
-
-
-
-      );
-
-
-
-
-
-
-
-      console.log("Status da order:", recurso.status);
-
-
-
-      console.log("Status detail:", recurso.status_detail);
-
-
-
-      console.log("External reference:", externalReference);
-
-
-
-      console.log("Valor da order:", valorPago);
-
-
-
-    }
-
-
-
-
-
-
-
-    if (!statusAprovado) {
-
-
-
-      console.log(
-
-
-
-        "Pagamento ainda não está aprovado/acreditado. Nenhum crédito será adicionado."
-
-
-
-      );
-
-
-
-
-
-
-
-      return res.status(200).json({
-
-
-
-        recebido: true,
-
-
-
-        processado: false,
-
-
-
-        status: recurso.status,
-
-
-
-        status_detail: recurso.status_detail,
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    let userId = "";
-
-
-
-    let pacote = "";
-
-
-
-
-
-
-
-    // O fluxo atual grava: UUID|pacote
-
-
-
-    const separador = externalReference.indexOf("|");
-
-
-
-
-
-
-
-    if (separador > 0) {
-
-
-
-      userId = externalReference.slice(0, separador).trim();
-
-
-
-      pacote = externalReference.slice(separador + 1).trim();
-
-
-
-    }
-
-
-
-
-
-
-
-    // Fallback para metadata caso a referência externa não esteja disponível.
-
-
-
-    if ((!userId || !pacote) && metadata) {
-
-
-
-      userId = String(metadata.user_id || "").trim();
-
-
-
-      pacote = String(metadata.pacote || "").trim();
-
-
-
-    }
-
-
-
-
-
-
-
-    if (!userId || !pacote) {
-
-
-
-      console.error(
-
-
-
-        "Não foi possível identificar usuário/pacote do pagamento.",
-
-
-
-        {
-
-
-
-          externalReference,
-
-
-
-          metadata,
-
-
-
-        }
-
-
-
-      );
-
-
-
-
-
-
-
-      return res.status(400).json({
-
-
-
-        erro: "Não foi possível identificar o usuário e o pacote do pagamento.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    const pacoteSelecionado = PACOTES_CREDITOS[pacote];
-
-
-
-
-
-
-
-    if (!pacoteSelecionado) {
-
-
-
-      console.error("Pacote não encontrado:", pacote);
-
-
-
-      return res.status(400).json({
-
-
-
-        erro: "Pacote de créditos não encontrado.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    const valorEsperado = Number(pacoteSelecionado.valor);
-
-
-
-
-
-
-
-    if (
-
-
-
-      !Number.isFinite(valorPago) ||
-
-
-
-      Math.abs(valorPago - valorEsperado) > 0.01
-
-
-
-    ) {
-
-
-
-      console.error(
-
-
-
-        "Valor do pagamento diferente do pacote:",
-
-
-
-        {
-
-
-
-          valorPago,
-
-
-
-          valorEsperado,
-
-
-
-          pacote,
-
-
-
-        }
-
-
-
-      );
-
-
-
-
-
-
-
-      return res.status(400).json({
-
-
-
-        erro: "Valor do pagamento não corresponde ao pacote.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    const { data, error } = await supabaseAdmin.rpc(
-
-
-
-      "processar_pagamento_aprovado",
-
-
-
-      {
-
-
-
-        p_mercado_pago_id: recursoId,
-
-
-
-        p_user_id: userId,
-
-
-
-        p_pacote: pacote,
-
-
-
-        p_creditos: pacoteSelecionado.creditos,
-
-
-
-        p_valor: valorPago,
-
-
-
-      }
-
-
-
-    );
-
-
-
-
-
-
-
-    if (error) {
-
-
-
-      console.error(
-
-
-
-        "ERRO AO PROCESSAR PAGAMENTO NO SUPABASE:",
-
-
-
-        error
-
-
-
-      );
-
-
-
-
-
-
-
-      return res.status(500).json({
-
-
-
-        erro: "Não foi possível registrar o pagamento no Supabase.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    console.log("Pagamento processado pelo Supabase:", data);
-
-
-
-    console.log(
-
-
-
-      "Créditos adicionados:",
-
-
-
-      pacoteSelecionado.creditos
-
-
-
-    );
-
-
-
-
-
-
-
-    return res.status(200).json({
-
-
-
-      recebido: true,
-
-
-
-      processado: true,
-
-
-
-      paymentId: recursoId,
-
-
-
-      creditos: pacoteSelecionado.creditos,
-
-
-
-    });
-
-
-
-  } catch (erro) {
-
-
-
-    console.error("ERRO NO WEBHOOK MERCADO PAGO:", erro);
-
-
-
-
-
-
-
-    return res.status(500).json({
-
-
-
-      erro: erro?.message || "Erro interno no webhook.",
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // CONFIGURAÇÃO
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 const allowedOrigins = [
 
+  "https://www.fabricadavozstudio.com.br",
 
+  "https://fabricadavozstudio.com.br",
 
-  "https\://www\.fabricadavozstudio.com.br",
+  "http://localhost:5173",
 
+  "http://localhost:4173",
 
-
-  "https\://fabricadavozstudio.com.br",
-
-
-
-  "http\://localhost:5173",
-
-
-
-  "http\://localhost:4173",
-
-
-
-  "http\://localhost:3010",
-
-
+  "http://localhost:3010",
 
 ];
 
 
 
-
-
-
-
 app.use(
 
+  cors({
 
+    origin(origin, callback) {
 
-  cors({
+      // Permite chamadas sem Origin (ex.: curl, health-checks)
 
+      // e os domínios oficiais da Fábrica da Voz.
 
+      if (!origin || allowedOrigins.includes(origin)) {
 
-    origin(origin, callback) {
+        callback(null, true);
 
+        return;
 
-
-      // Permite chamadas sem Origin (ex.: curl, health-checks)
-
-
-
-      // e os domínios oficiais da Fábrica da Voz.
-
-
-
-      if (!origin || allowedOrigins.includes(origin)) {
+      }
 
 
 
-        callback(null, true);
+      // Não bloqueia o navegador por CORS; a aplicação continua
 
+      // protegida pelo próprio domínio/rota.
 
+      callback(null, true);
 
-        return;
+    },
 
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
+    allowedHeaders: ["Content-Type", "Authorization"],
 
-      }
+    credentials: false,
 
-
-
-
-
-
-
-      // Não bloqueia o navegador por CORS; a aplicação continua
-
-
-
-      // protegida pelo próprio domínio/rota.
-
-
-
-      callback(null, true);
-
-
-
-    },
-
-
-
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-
-
-
-    allowedHeaders: ["Content-Type", "Authorization"],
-
-
-
-    credentials: false,
-
-
-
-  })
-
-
+  })
 
 );
 
 
 
-
-
-
-
-app.options(/.\*/, cors());
-
-
-
-
+app.options(/.*/, cors());
 
 
 
 app.use(
 
+  express.json({
 
+    limit: "100mb",
 
-  express.json({
-
-
-
-    limit: "100mb",
-
-
-
-  })
-
-
+  })
 
 );
-
-
-
-
 
 
 
 // A geração também aceita JSON enviado como text/plain.
 
-
-
 // Isso evita o preflight OPTIONS que o proxy do domínio estava redirecionando.
-
-
 
 app.use(
 
+  express.text({
 
+    type: ["text/plain", "text/plain;charset=UTF-8"],
 
-  express.text({
+    limit: "100mb",
 
-
-
-    type: ["text/plain", "text/plain;charset=UTF-8"],
-
-
-
-    limit: "100mb",
-
-
-
-  })
-
-
+  })
 
 );
-
-
-
-
 
 
 
 // Normaliza o corpo para JSON quando o navegador enviar text/plain.
 
-
-
 app.use((req, res, next) => {
 
+  if (typeof req.body === "string") {
 
+    try {
 
-  if (typeof req.body === "string") {
+      req.body = JSON.parse(req.body);
 
+    } catch {}
 
+  }
 
-    try {
-
-
-
-      req.body = JSON.parse(req.body);
-
-
-
-    } catch {}
-
-
-
-  }
-
-
-
-  next();
-
-
+  next();
 
 });
 
 
 
-
-
-
-
 app.use(
 
+  express.urlencoded({
 
+    extended: true,
 
-  express.urlencoded({
+    limit: "100mb",
 
-
-
-    extended: true,
-
-
-
-    limit: "100mb",
-
-
-
-  })
-
-
+  })
 
 );
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // FFMPEG
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 if (!ffmpegPath) {
 
+  console.error("");
 
+  console.error("ERRO: FFmpeg não encontrado.");
 
-  console.error("");
+  console.error("");
 
-
-
-  console.error("ERRO: FFmpeg não encontrado.");
-
-
-
-  console.error("");
-
-
-
-  process.exit(1);
-
-
+  process.exit(1);
 
 }
-
-
-
-
 
 
 
 console.log("");
 
-
-
 console.log("FFmpeg encontrado:");
-
-
 
 console.log(ffmpegPath);
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // UTILITÁRIOS
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 function limparBase64(valor) {
 
+  if (!valor || typeof valor !== "string") {
 
+    return null;
 
-  if (!valor || typeof valor !== "string") {
-
-
-
-    return null;
-
-
-
-  }
+  }
 
 
 
+  return valor.replace(
 
+    /^data:audio\/[^;]+;base64,/i,
 
+    ""
 
-
-  return valor.replace(
-
-
-
-    /^data:audi&#x6F;**\\/**[^;]+;base64,/i,
-
-
-
-    ""
-
-
-
-  );
-
-
+  );
 
 }
-
-
-
-
 
 
 
 function base64ParaBuffer(valor) {
 
-
-
-  const limpo = limparBase64(valor);
-
+  const limpo = limparBase64(valor);
 
 
 
+  if (!limpo) {
+
+    return null;
+
+  }
 
 
 
-  if (!limpo) {
+  const buffer = Buffer.from(limpo, "base64");
 
 
 
-    return null;
-
-
-
-  }
-
-
-
-
-
-
-
-  const buffer = Buffer.from(limpo, "base64");
-
-
-
-
-
-
-
-  return buffer.length ? buffer : null;
-
-
+  return buffer.length ? buffer : null;
 
 }
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // PEGAR DURAÇÃO DO ÁUDIO
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 function obterDuracao(audioPath) {
 
+  return new Promise((resolve, reject) => {
 
+    const ffprobe = spawn(ffmpegPath, [
 
-  return new Promise((resolve, reject) => {
+      "-hide_banner",
 
+      "-i",
 
+      audioPath,
 
-    const ffprobe = spawn(ffmpegPath, [
+    ]);
 
 
 
-      "-hide_banner",
+    let erro = "";
 
 
 
-      "-i",
+    ffprobe.stderr.on("data", (data) => {
 
+      erro += data.toString();
 
+    });
 
-      audioPath,
 
 
+    ffprobe.on("error", (err) => {
 
-    ]);
+      reject(err);
 
+    });
 
 
 
+    ffprobe.on("close", () => {
 
+      const resultado = erro.match(
 
+        /Duration:\s*(\d+):(\d+):([\d.]+)/
 
-    let erro = "";
+      );
 
 
 
+      if (!resultado) {
 
+        reject(
 
+          new Error(
 
+            "Não foi possível descobrir a duração do áudio."
 
-    ffprobe.stderr.on("data", (data) => {
+          )
 
+        );
 
+        return;
 
-      erro += data.toString();
+      }
 
 
 
-    });
+      const horas = Number(resultado[1]);
 
+      const minutos = Number(resultado[2]);
 
+      const segundos = Number(resultado[3]);
 
 
 
+      resolve(
 
+        horas * 3600 +
 
-    ffprobe.on("error", (err) => {
+        minutos * 60 +
 
+        segundos
 
+      );
 
-      reject(err);
+    });
 
-
-
-    });
-
-
-
-
-
-
-
-    ffprobe.on("close", () => {
-
-
-
-      const resultado = erro.match(
-
-
-
-        /Duration:\s\*(\d+):(\d+):([\d.]+)/
-
-
-
-      );
-
-
-
-
-
-
-
-      if (!resultado) {
-
-
-
-        reject(
-
-
-
-          new Error(
-
-
-
-            "Não foi possível descobrir a duração do áudio."
-
-
-
-          )
-
-
-
-        );
-
-
-
-        return;
-
-
-
-      }
-
-
-
-
-
-
-
-      const horas = Number(resultado[1]);
-
-
-
-      const minutos = Number(resultado[2]);
-
-
-
-      const segundos = Number(resultado[3]);
-
-
-
-
-
-
-
-      resolve(
-
-
-
-        horas \* 3600 +
-
-
-
-        minutos \* 60 +
-
-
-
-        segundos
-
-
-
-      );
-
-
-
-    });
-
-
-
-  });
-
-
+  });
 
 }
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // ALTERAR VELOCIDADE
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 function alterarVelocidade(audioBuffer, speed) {
 
+  return new Promise((resolve, reject) => {
 
+    let velocidade = Number(speed);
 
-  return new Promise((resolve, reject) => {
 
 
+    if (!Number.isFinite(velocidade)) {
 
-    let velocidade = Number(speed);
+      velocidade = 1;
 
+    }
 
 
 
+    velocidade = Math.max(
 
+      0.5,
 
+      Math.min(2, velocidade)
 
-    if (!Number.isFinite(velocidade)) {
+    );
 
 
 
-      velocidade = 1;
+    const ffmpeg = spawn(ffmpegPath, [
 
+      "-hide_banner",
 
+      "-loglevel",
 
-    }
+      "error",
 
 
 
+      "-i",
 
+      "pipe:0",
 
 
 
-    velocidade = Math.max(
+      "-filter:a",
 
+      `atempo=${velocidade}`,
 
 
-      0.5,
 
+      "-c:a",
 
+      "libmp3lame",
 
-      Math.min(2, velocidade)
 
 
+      "-b:a",
 
-    );
+      "128k",
 
 
 
+      "-f",
 
+      "mp3",
 
 
 
-    const ffmpeg = spawn(ffmpegPath, [
+      "pipe:1",
 
+    ]);
 
 
-      "-hide_banner",
 
+    const partes = [];
 
+    let erro = "";
 
-      "-loglevel",
 
 
+    ffmpeg.stdout.on("data", (parte) => {
 
-      "error",
+      partes.push(parte);
 
+    });
 
 
 
+    ffmpeg.stderr.on("data", (parte) => {
 
+      erro += parte.toString();
 
+    });
 
-      "-i",
 
 
+    ffmpeg.on("error", (err) => {
 
-      "pipe:0",
+      reject(err);
 
+    });
 
 
 
+    ffmpeg.on("close", (codigo) => {
 
+      if (codigo === 0) {
 
+        resolve(Buffer.concat(partes));
 
-      "-filter:a",
+        return;
 
+      }
 
 
-      \`atempo=${velocidade}\`,
 
+      reject(
 
+        new Error(
 
+          erro ||
 
+          "Erro ao alterar a velocidade da voz."
 
+        )
 
+      );
 
-      "-c:a",
+    });
 
 
 
-      "libmp3lame",
+    ffmpeg.stdin.end(audioBuffer);
 
-
-
-
-
-
-
-      "-b:a",
-
-
-
-      "128k",
-
-
-
-
-
-
-
-      "-f",
-
-
-
-      "mp3",
-
-
-
-
-
-
-
-      "pipe:1",
-
-
-
-    ]);
-
-
-
-
-
-
-
-    const partes = [];
-
-
-
-    let erro = "";
-
-
-
-
-
-
-
-    ffmpeg.stdout.on("data", (parte) => {
-
-
-
-      partes.push(parte);
-
-
-
-    });
-
-
-
-
-
-
-
-    ffmpeg.stderr.on("data", (parte) => {
-
-
-
-      erro += parte.toString();
-
-
-
-    });
-
-
-
-
-
-
-
-    ffmpeg.on("error", (err) => {
-
-
-
-      reject(err);
-
-
-
-    });
-
-
-
-
-
-
-
-    ffmpeg.on("close", (codigo) => {
-
-
-
-      if (codigo === 0) {
-
-
-
-        resolve(Buffer.concat(partes));
-
-
-
-        return;
-
-
-
-      }
-
-
-
-
-
-
-
-      reject(
-
-
-
-        new Error(
-
-
-
-          erro ||
-
-
-
-          "Erro ao alterar a velocidade da voz."
-
-
-
-        )
-
-
-
-      );
-
-
-
-    });
-
-
-
-
-
-
-
-    ffmpeg.stdin.end(audioBuffer);
-
-
-
-  });
-
-
+  });
 
 }
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // MIXAGEM PROFISSIONAL
 
-
-
 //
-
-
 
 // SEGUNDOS ANTES
 
-
-
 // + VOZ
-
-
 
 // + SEGUNDOS DEPOIS
 
-
-
 // + FADE FINAL DE 2 SEGUNDOS
-
-
 
 //
 
-
-
 // A TRILHA FICA EM 20% DE VOLUME.
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 async function mixarAudio(
 
+  vozBuffer,
 
+  trilhaBuffer,
 
-  vozBuffer,
+  segundosInicio,
 
+  segundosFinal,
 
-
-  trilhaBuffer,
-
-
-
-  segundosInicio,
-
-
-
-  segundosFinal,
-
-
-
-  reverbAtivo = false
-
-
+  reverbAtivo = false
 
 ) {
 
+  let inicio = Number(segundosInicio);
 
+  let final = Number(segundosFinal);
 
-  let inicio = Number(segundosInicio);
 
 
+  if (!Number.isFinite(inicio)) {
 
-  let final = Number(segundosFinal);
+    inicio = 5;
 
+  }
 
 
 
+  if (!Number.isFinite(final)) {
 
+    final = 5;
 
+  }
 
-  if (!Number.isFinite(inicio)) {
 
 
+  inicio = Math.max(
 
-    inicio = 5;
+    0,
 
+    Math.min(60, inicio)
 
+  );
 
-  }
 
 
+  final = Math.max(
 
+    0,
 
+    Math.min(60, final)
 
+  );
 
 
-  if (!Number.isFinite(final)) {
 
+  const pastaTemp = fs.mkdtempSync(
 
+    path.join(
 
-    final = 5;
+      os.tmpdir(),
 
+      "fabrica-da-voz-"
 
+    )
 
-  }
+  );
 
 
 
+  const vozPath = path.join(
 
+    pastaTemp,
 
+    "voz.mp3"
 
+  );
 
-  inicio = Math.max(
 
 
+  const trilhaPath = path.join(
 
-    0,
+    pastaTemp,
 
+    "trilha.mp3"
 
+  );
 
-    Math.min(60, inicio)
 
 
+  const saidaPath = path.join(
 
-  );
+    pastaTemp,
 
+    "final.mp3"
 
+  );
 
 
 
+  try {
 
+    fs.writeFileSync(
 
-  final = Math.max(
+      vozPath,
 
+      vozBuffer
 
+    );
 
-    0,
 
 
+    fs.writeFileSync(
 
-    Math.min(60, final)
+      trilhaPath,
 
+      trilhaBuffer
 
+    );
 
-  );
 
 
+    const duracaoVoz =
 
+      await obterDuracao(vozPath);
 
 
 
+    const duracaoTotal =
 
-  const pastaTemp = fs.mkdtempSync(
+      inicio +
 
+      duracaoVoz +
 
+      final;
 
-    path.join(
 
 
+    const inicioFade = Math.max(
 
-      os.tmpdir(),
+      0,
 
+      duracaoTotal - 2
 
+    );
 
-      "fabrica-da-voz-"
 
 
+    console.log("");
 
-    )
+    console.log(
 
+      "================================="
 
+    );
 
-  );
+    console.log("INICIANDO MIXAGEM");
 
+    console.log(
 
+      "Segundos antes:",
 
+      inicio
 
+    );
 
+    console.log(
 
+      "Duração da voz:",
 
-  const vozPath = path.join(
+      duracaoVoz
 
+    );
 
+    console.log(
 
-    pastaTemp,
+      "Segundos depois:",
 
+      final
 
+    );
 
-    "voz.mp3"
+    console.log(
 
+      "Duração final:",
 
+      duracaoTotal
 
-  );
+    );
 
+    console.log(
 
+      "Fade final:",
 
+      inicioFade,
 
+      "até",
 
+      duracaoTotal
 
+    );
 
-  const trilhaPath = path.join(
+    console.log(
 
+      "================================="
 
+    );
 
-    pastaTemp,
 
 
+    const delayMs = Math.round(
 
-    "trilha.mp3"
+      inicio * 1000
 
+    );
 
 
-  );
 
+    const duracaoVozComInicio =
 
+      inicio + duracaoVoz;
 
 
 
+    const argumentos = [
 
+      "-hide_banner",
 
-  const saidaPath = path.join(
+      "-loglevel",
 
+      "error",
 
 
-    pastaTemp,
 
+      // VOZ
 
+      "-i",
 
-    "final.mp3"
+      vozPath,
 
 
 
-  );
+      // TRILHA em loop para nunca acabar antes da voz
 
+      "-stream_loop",
 
+      "-1",
 
+      "-i",
 
+      trilhaPath,
 
 
 
-  try {
+      "-filter_complex",
 
 
 
-    fs.writeFileSync(
+      // Voz:
 
+      // começa após os segundos iniciais
 
+      // e recebe silêncio depois.
 
-      vozPath,
+      `[0:a]adelay=${delayMs}|${delayMs},` +
+      (reverbAtivo ? "aecho=0.8:0.9:70:0.25," : "") +
+      `apad=pad_dur=${final}[voz];` +
 
 
 
-      vozBuffer
+      // Trilha:
 
+      // 20% de volume, duração final exata
 
+      // e fade out nos últimos 2 segundos.
 
-    );
+      `[1:a]volume=0.20,` +
 
+      `atrim=duration=${duracaoTotal},` +
 
+      `afade=t=out:st=${inicioFade}:d=2[trilha];` +
 
 
 
+      // Mistura voz + trilha.
 
+      `[voz][trilha]` +
 
-    fs.writeFileSync(
+      `amix=inputs=2:` +
 
+      `duration=first:` +
 
+      `dropout_transition=0:` +
 
-      trilhaPath,
+      `normalize=0,` +
 
+      `atrim=duration=${duracaoTotal},` +
 
+      `asetpts=N/SR/TB[out]`,
 
-      trilhaBuffer
 
 
+      "-map",
 
-    );
+      "[out]",
 
 
 
+      "-c:a",
 
+      "libmp3lame",
 
 
 
-    const duracaoVoz =
+      "-b:a",
 
+      "192k",
 
 
-      await obterDuracao(vozPath);
 
+      "-ar",
 
+      "44100",
 
 
 
+      "-ac",
 
+      "2",
 
-    const duracaoTotal =
 
 
+      "-y",
 
-      inicio +
+      saidaPath,
 
+    ];
 
 
-      duracaoVoz +
 
+    const resultado = await executarFfmpeg(
 
+      argumentos,
 
-      final;
+      saidaPath
 
+    );
 
 
 
+    console.log("");
 
+    console.log(
 
+      "================================="
 
-    const inicioFade = Math.max(
+    );
 
+    console.log("MIXAGEM CONCLUÍDA");
 
+    console.log(
 
-      0,
+      "Tamanho:",
 
+      resultado.length,
 
+      "bytes"
 
-      duracaoTotal - 2
+    );
 
+    console.log(
 
+      "================================="
 
-    );
+    );
 
+    console.log("");
 
 
 
+    return resultado;
 
+  } finally {
 
+    try {
 
-    console.log("");
+      fs.rmSync(
 
+        pastaTemp,
 
+        {
 
-    console.log(
+          recursive: true,
 
+          force: true,
 
+        }
 
-      "================================="
+      );
 
+    } catch {}
 
-
-    );
-
-
-
-    console.log("INICIANDO MIXAGEM");
-
-
-
-    console.log(
-
-
-
-      "Segundos antes:",
-
-
-
-      inicio
-
-
-
-    );
-
-
-
-    console.log(
-
-
-
-      "Duração da voz:",
-
-
-
-      duracaoVoz
-
-
-
-    );
-
-
-
-    console.log(
-
-
-
-      "Segundos depois:",
-
-
-
-      final
-
-
-
-    );
-
-
-
-    console.log(
-
-
-
-      "Duração final:",
-
-
-
-      duracaoTotal
-
-
-
-    );
-
-
-
-    console.log(
-
-
-
-      "Fade final:",
-
-
-
-      inicioFade,
-
-
-
-      "até",
-
-
-
-      duracaoTotal
-
-
-
-    );
-
-
-
-    console.log(
-
-
-
-      "================================="
-
-
-
-    );
-
-
-
-
-
-
-
-    const delayMs = Math.round(
-
-
-
-      inicio \* 1000
-
-
-
-    );
-
-
-
-
-
-
-
-    const duracaoVozComInicio =
-
-
-
-      inicio + duracaoVoz;
-
-
-
-
-
-
-
-    const argumentos = [
-
-
-
-      "-hide_banner",
-
-
-
-      "-loglevel",
-
-
-
-      "error",
-
-
-
-
-
-
-
-      // VOZ
-
-
-
-      "-i",
-
-
-
-      vozPath,
-
-
-
-
-
-
-
-      // TRILHA em loop para nunca acabar antes da voz
-
-
-
-      "-stream_loop",
-
-
-
-      "-1",
-
-
-
-      "-i",
-
-
-
-      trilhaPath,
-
-
-
-
-
-
-
-      "-filter_complex",
-
-
-
-
-
-
-
-      // Voz:
-
-
-
-      // começa após os segundos iniciais
-
-
-
-      // e recebe silêncio depois.
-
-
-
-      \`[0:a]adelay=${delayMs}|${delayMs},\` +
-
-      (reverbAtivo ? "aecho=0.8:0.9:70:0.25," : "") +
-
-      \`apad=pad_dur=${final}[voz];\` +
-
-
-
-
-
-
-
-      // Trilha:
-
-
-
-      // 20% de volume, duração final exata
-
-
-
-      // e fade out nos últimos 2 segundos.
-
-
-
-      \`[1:a]volume=0.20,\` +
-
-
-
-      \`atrim=duration=${duracaoTotal},\` +
-
-
-
-      \`afade=t=out:st=${inicioFade}:d=2[trilha];\` +
-
-
-
-
-
-
-
-      // Mistura voz + trilha.
-
-
-
-      \`[voz][trilha]\` +
-
-
-
-      \`amix=inputs=2:\` +
-
-
-
-      \`duration=first:\` +
-
-
-
-      \`dropout_transition=0:\` +
-
-
-
-      \`normalize=0,\` +
-
-
-
-      \`atrim=duration=${duracaoTotal},\` +
-
-
-
-      \`asetpts=N/SR/TB[out]\`,
-
-
-
-
-
-
-
-      "-map",
-
-
-
-      "[out]",
-
-
-
-
-
-
-
-      "-c:a",
-
-
-
-      "libmp3lame",
-
-
-
-
-
-
-
-      "-b:a",
-
-
-
-      "192k",
-
-
-
-
-
-
-
-      "-ar",
-
-
-
-      "44100",
-
-
-
-
-
-
-
-      "-ac",
-
-
-
-      "2",
-
-
-
-
-
-
-
-      "-y",
-
-
-
-      saidaPath,
-
-
-
-    ];
-
-
-
-
-
-
-
-    const resultado = await executarFfmpeg(
-
-
-
-      argumentos,
-
-
-
-      saidaPath
-
-
-
-    );
-
-
-
-
-
-
-
-    console.log("");
-
-
-
-    console.log(
-
-
-
-      "================================="
-
-
-
-    );
-
-
-
-    console.log("MIXAGEM CONCLUÍDA");
-
-
-
-    console.log(
-
-
-
-      "Tamanho:",
-
-
-
-      resultado.length,
-
-
-
-      "bytes"
-
-
-
-    );
-
-
-
-    console.log(
-
-
-
-      "================================="
-
-
-
-    );
-
-
-
-    console.log("");
-
-
-
-
-
-
-
-    return resultado;
-
-
-
-  } finally {
-
-
-
-    try {
-
-
-
-      fs.rmSync(
-
-
-
-        pastaTemp,
-
-
-
-        {
-
-
-
-          recursive: true,
-
-
-
-          force: true,
-
-
-
-        }
-
-
-
-      );
-
-
-
-    } catch {}
-
-
-
-  }
-
-
+  }
 
 }
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // EXECUTAR FFMPEG
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 function executarFfmpeg(
 
+  argumentos,
 
-
-  argumentos,
-
-
-
-  saidaPath
-
-
+  saidaPath
 
 ) {
 
+  return new Promise(
 
+    (resolve, reject) => {
 
-  return new Promise(
+      const ffmpeg = spawn(
 
+        ffmpegPath,
 
+        argumentos
 
-    (resolve, reject) => {
+      );
 
 
 
-      const ffmpeg = spawn(
+      let erro = "";
 
 
 
-        ffmpegPath,
+      ffmpeg.stderr.on(
 
+        "data",
 
+        (data) => {
 
-        argumentos
+          erro += data.toString();
 
+        }
 
+      );
 
-      );
 
 
+      ffmpeg.on(
 
+        "error",
 
+        (err) => {
 
+          reject(err);
 
+        }
 
-      let erro = "";
+      );
 
 
 
+      ffmpeg.on(
 
+        "close",
 
+        (codigo) => {
 
+          if (codigo !== 0) {
 
-      ffmpeg.stderr.on(
+            reject(
 
+              new Error(
 
+                erro ||
 
-        "data",
+                "FFmpeg retornou um erro."
 
+              )
 
+            );
 
-        (data) => {
+            return;
 
+          }
 
 
-          erro += data.toString();
 
+          try {
 
+            const resultado =
 
-        }
+              fs.readFileSync(
 
+                saidaPath
 
+              );
 
-      );
 
 
+            resolve(resultado);
 
+          } catch (err) {
 
+            reject(err);
 
+          }
 
+        }
 
-      ffmpeg.on(
+      );
 
+    }
 
-
-        "error",
-
-
-
-        (err) => {
-
-
-
-          reject(err);
-
-
-
-        }
-
-
-
-      );
-
-
-
-
-
-
-
-      ffmpeg.on(
-
-
-
-        "close",
-
-
-
-        (codigo) => {
-
-
-
-          if (codigo !== 0) {
-
-
-
-            reject(
-
-
-
-              new Error(
-
-
-
-                erro ||
-
-
-
-                "FFmpeg retornou um erro."
-
-
-
-              )
-
-
-
-            );
-
-
-
-            return;
-
-
-
-          }
-
-
-
-
-
-
-
-          try {
-
-
-
-            const resultado =
-
-
-
-              fs.readFileSync(
-
-
-
-                saidaPath
-
-
-
-              );
-
-
-
-
-
-
-
-            resolve(resultado);
-
-
-
-          } catch (err) {
-
-
-
-            reject(err);
-
-
-
-          }
-
-
-
-        }
-
-
-
-      );
-
-
-
-    }
-
-
-
-  );
-
-
+  );
 
 }
 
-
-
 // =========================================================
-
-
 
 // CORRIGIR TEXTO COM IA
 
-
-
 // =========================================================
-
-
-
-
 
 
 
 app.post("/api/corrigir-texto", async (req, res) => {
 
+  try {
 
-
-  try {
-
-
-
-    const { texto } = req.body;
+    const { texto } = req.body;
 
 
 
+    if (!texto || !texto.trim()) {
+
+      return res.status(400).json({
+
+        erro: "Digite um texto para corrigir.",
+
+      });
+
+    }
 
 
 
+    const resposta = await openai.responses.create({
 
-    if (!texto || !texto.trim()) {
+      model: "gpt-5.6-luna",
 
-
-
-      return res.status(400).json({
-
-
-
-        erro: "Digite um texto para corrigir.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    const resposta = await openai.responses.create({
-
-
-
-      model: "gpt-5.6-luna",
-
-
-
-      instructions: \`
-
-
+      instructions: `
 
 Você é um revisor especializado em textos para locução de rádio em português do Brasil.
 
 
 
-
-
-
-
 Corrija:
 
+- erros de ortografia;
 
+- acentuação;
 
-\- erros de ortografia;
+- pontuação;
 
+- concordância;
 
+- palavras digitadas incorretamente;
 
-\- acentuação;
-
-
-
-\- pontuação;
-
-
-
-\- concordância;
-
-
-
-\- palavras digitadas incorretamente;
-
-
-
-\- frases que estejam pouco naturais para serem faladas.
-
-
-
-
+- frases que estejam pouco naturais para serem faladas.
 
 
 
@@ -3934,3148 +1968,1580 @@ Deixe o texto natural, claro e agradável para uma locução.
 
 
 
-
-
-
-
 MUITO IMPORTANTE:
 
+- Não invente informações.
 
+- Não altere nomes de pessoas, empresas ou lugares.
 
-\- Não invente informações.
+- Não altere números de telefone.
 
+- Não altere preços.
 
+- Não altere datas ou horários.
 
-\- Não altere nomes de pessoas, empresas ou lugares.
+- Não altere endereços.
 
+- Preserve as informações e o sentido original.
 
+- Retorne SOMENTE o texto corrigido, sem explicações, sem aspas e sem comentários.
 
-\- Não altere números de telefone.
+      `,
 
+      input: texto.trim(),
 
+    });
 
-\- Não altere preços.
 
 
+    const textoCorrigido = resposta.output_text?.trim();
 
-\- Não altere datas ou horários.
 
 
+    if (!textoCorrigido) {
 
-\- Não altere endereços.
+      return res.status(500).json({
 
+        erro: "A IA não retornou um texto corrigido.",
 
+      });
 
-\- Preserve as informações e o sentido original.
+    }
 
 
 
-\- Retorne SOMENTE o texto corrigido, sem explicações, sem aspas e sem comentários.
+    res.json({
 
+      texto: textoCorrigido,
 
+    });
 
-      \`,
+  } catch (erro) {
 
+    console.error("ERRO AO CORRIGIR TEXTO:", erro);
 
 
-      input: texto.trim(),
 
+    res.status(500).json({
 
+      erro: "Não foi possível corrigir o texto.",
 
-    });
+      detalhes: erro?.message || "Erro desconhecido",
 
+    });
 
-
-
-
-
-
-    const textoCorrigido = resposta.output_text?.trim();
-
-
-
-
-
-
-
-    if (!textoCorrigido) {
-
-
-
-      return res.status(500).json({
-
-
-
-        erro: "A IA não retornou um texto corrigido.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-
-
-
-
-    res.json({
-
-
-
-      texto: textoCorrigido,
-
-
-
-    });
-
-
-
-  } catch (erro) {
-
-
-
-    console.error("ERRO AO CORRIGIR TEXTO:", erro);
-
-
-
-
-
-
-
-    res.status(500).json({
-
-
-
-      erro: "Não foi possível corrigir o texto.",
-
-
-
-      detalhes: erro?.message || "Erro desconhecido",
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 });
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // AUTENTICAÇÃO E CRÉDITOS
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 async function autenticarUsuario(req) {
 
+  const authHeader = req.headers.authorization || "";
 
 
-  const authHeader = req.headers.authorization || "";
 
+  if (!authHeader.startsWith("Bearer ")) {
 
+    throw new Error("Usuário não autenticado.");
 
+  }
 
 
 
+  const accessToken = authHeader.replace("Bearer ", "").trim();
 
-  if (!authHeader.startsWith("Bearer ")) {
 
 
+  if (!accessToken) {
 
-    throw new Error("Usuário não autenticado.");
+    throw new Error("Token de autenticação não informado.");
 
+  }
 
 
-  }
 
+  const {
 
+    data: { user },
 
+    error,
 
+  } = await supabaseAdmin.auth.getUser(accessToken);
 
 
 
-  const accessToken = authHeader.replace("Bearer ", "").trim();
+  if (error || !user) {
 
+    throw new Error("Sessão do usuário inválida.");
 
+  }
 
 
 
-
-
-  if (!accessToken) {
-
-
-
-    throw new Error("Token de autenticação não informado.");
-
-
-
-  }
-
-
-
-
-
-
-
-  const {
-
-
-
-    data: { user },
-
-
-
-    error,
-
-
-
-  } = await supabaseAdmin.auth.getUser(accessToken);
-
-
-
-
-
-
-
-  if (error || !user) {
-
-
-
-    throw new Error("Sessão do usuário inválida.");
-
-
-
-  }
-
-
-
-
-
-
-
-  return user;
-
-
+  return user;
 
 }
-
-
-
-
 
 
 
 async function consumirCreditos(userId, quantidade) {
 
+  const { data, error } = await supabaseAdmin.rpc(
 
+    "consumir_creditos",
 
-  const { data, error } = await supabaseAdmin.rpc(
+    {
 
+      p_user_id: userId,
 
+      p_quantidade: quantidade,
 
-    "consumir_creditos",
+    }
 
-
-
-    {
-
-
-
-      p_user_id: userId,
-
-
-
-      p_quantidade: quantidade,
+  );
 
 
 
-    }
+  if (error) {
+
+    console.error("ERRO AO CONSUMIR CRÉDITOS:", error);
+
+    throw new Error(
+
+      error.message || "Não foi possível consumir os créditos."
+
+    );
+
+  }
 
 
 
-  );
-
-
-
-
-
-
-
-  if (error) {
-
-
-
-    console.error("ERRO AO CONSUMIR CRÉDITOS:", error);
-
-
-
-    throw new Error(
-
-
-
-      error.message || "Não foi possível consumir os créditos."
-
-
-
-    );
-
-
-
-  }
-
-
-
-
-
-
-
-  return data;
-
-
+  return data;
 
 }
-
-
-
-
 
 
 
 async function devolverCreditos(userId, quantidade) {
 
+  const { data, error } = await supabaseAdmin.rpc(
 
+    "devolver_creditos",
 
-  const { data, error } = await supabaseAdmin.rpc(
+    {
 
+      p_user_id: userId,
 
+      p_quantidade: quantidade,
 
-    "devolver_creditos",
+    }
 
-
-
-    {
-
-
-
-      p_user_id: userId,
-
-
-
-      p_quantidade: quantidade,
+  );
 
 
 
-    }
+  if (error) {
+
+    console.error("ERRO AO DEVOLVER CRÉDITOS:", error);
+
+    return null;
+
+  }
 
 
 
-  );
-
-
-
-
-
-
-
-  if (error) {
-
-
-
-    console.error("ERRO AO DEVOLVER CRÉDITOS:", error);
-
-
-
-    return null;
-
-
-
-  }
-
-
-
-
-
-
-
-  return data;
-
-
+  return data;
 
 }
-
-
-
-
 
 
 
 function calcularCreditosNecessarios(texto) {
 
-
-
-  const quantidadeCaracteres = texto.trim().length;
-
+  const quantidadeCaracteres = texto.trim().length;
 
 
 
+  if (quantidadeCaracteres <= 0) {
+
+    return 0;
+
+  }
 
 
 
-  if (quantidadeCaracteres <= 0) {
-
-
-
-    return 0;
-
-
-
-  }
-
-
-
-
-
-
-
-  return Math.ceil(quantidadeCaracteres / 800);
-
-
+  return Math.ceil(quantidadeCaracteres / 800);
 
 }
 
 
 
-
-
-
-
 // =====================================================
-
 // GERAR VOZ - CARTESIA
-
 // =====================================================
-
-
 
 // Pode receber o UUID da voz diretamente do frontend ou um apelido.
-
 // Se usar apelidos, configure os IDs abaixo no Render como variáveis de ambiente.
-
 const VOZES_CARTESIA = {
-
-  paulinho: 'db6b0ed5-d5d3-463d-ae85-518a07d3c2b4',
-
-  aninha: 'bd914056-a671-4cc2-8a1d-a27986fd1ad8',
-
-  flavinha: '52ace6a9-86f9-4bd3-9e5a-cc3f99d9a551',
-
-  gaby: '9d85cbd2-a5b8-4c0b-b8b6-6d1a7d133039',
-
-  luiza: '7aade9d3-456d-482e-b8ab-4ffb37e23783',
-
-  nina: '8207ca11-20cc-4061-bfc9-86711d52a66e',
-
-  gustavo: '9baa38f2-0797-4f48-884e-8132dfc0cbda',
-
-  loureno: 'fd12fc80-d3e9-4762-aaec-54fb6e3f7a56',
-
-  vitor: '0955a4b0-5a6a-4f2d-8b96-79c647fef708',
-
-  vincius: '5001b299-6aeb-48d0-b4b4-bf6196a16946',
-
-  rafael: '2fa1edae-7d1e-40d9-ac10-1f0f6ed57a52',
-
-  henrique: '162e47b4-376d-4d8d-84cc-879f978c42fb',
-
-  pedro: '72253ed9-990b-45d2-b1af-80e7f0b27cf4',
-
-  noah: 'e16c6afe-5f8d-498c-b358-10a5bdefdfd1',
-
-  celso: '16efe60e-8740-4bb4-9743-6efbf75784ba',
-
+  paulinho: 'db6b0ed5-d5d3-463d-ae85-518a07d3c2b4',
+  aninha: 'bd914056-a671-4cc2-8a1d-a27986fd1ad8',
+  flavinha: '52ace6a9-86f9-4bd3-9e5a-cc3f99d9a551',
+  gaby: '9d85cbd2-a5b8-4c0b-b8b6-6d1a7d133039',
+  luiza: '7aade9d3-456d-482e-b8ab-4ffb37e23783',
+  nina: '8207ca11-20cc-4061-bfc9-86711d52a66e',
+  gustavo: '9baa38f2-0797-4f48-884e-8132dfc0cbda',
+  loureno: 'fd12fc80-d3e9-4762-aaec-54fb6e3f7a56',
+  vitor: '0955a4b0-5a6a-4f2d-8b96-79c647fef708',
+  vincius: '5001b299-6aeb-48d0-b4b4-bf6196a16946',
+  rafael: '2fa1edae-7d1e-40d9-ac10-1f0f6ed57a52',
+  henrique: '162e47b4-376d-4d8d-84cc-879f978c42fb',
+  pedro: '72253ed9-990b-45d2-b1af-80e7f0b27cf4',
+  noah: 'e16c6afe-5f8d-498c-b358-10a5bdefdfd1',
+  celso: '16efe60e-8740-4bb4-9743-6efbf75784ba',
 };
-
-
 
 function resolverVoiceIdCartesia(voiceId) {
+  const informado = String(voiceId || '').trim();
+  if (!informado) return '';
 
-  const informado = String(voiceId || '').trim();
+  const apelido = informado
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
 
-  if (!informado) return '';
+  // UUID de voz da Cartesia enviado pelo frontend.
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(informado)) {
+    return informado;
+  }
 
-
-
-  const apelido = informado
-
-    .normalize('NFD')
-
-    .replace(/[\u0300-\u036f]/g, '')
-
-    .toLowerCase()
-
-    .replace(/[^a-z0-9]/g, '');
-
-
-
-  // UUID de voz da Cartesia enviado pelo frontend.
-
-  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(informado)) {
-
-    return informado;
-
-  }
-
-
-
-  // Apelido/nome do locutor configurado no Render.
-
-  return VOZES_CARTESIA[apelido] || '';
-
+  // Apelido/nome do locutor configurado no Render.
+  return VOZES_CARTESIA[apelido] || '';
 }
 
-
-
 app.post('/api/gerar-voz', async (req, res) => {
+  let usuarioId = null;
+  let creditosConsumidos = 0;
 
-  let usuarioId = null;
+  try {
+    const { texto, voiceId, speed, categoria, estilo, reverb } = req.body;
+    console.log('ESTILO RECEBIDO:', estilo);
+    console.log('=================================');
+    console.log('GERANDO VOZ - CARTESIA');
+    console.log('=================================');
 
-  let creditosConsumidos = 0;
+    if (typeof texto !== 'string' || !texto.trim()) {
+      return res.status(400).json({ erro: 'Digite um texto.' });
+    }
+    if (!voiceId) {
+      return res.status(400).json({ erro: 'Nenhuma voz foi selecionada.' });
+    }
+    if (!process.env.CARTESIA_API_KEY) {
+      return res.status(500).json({
+        erro: 'CARTESIA_API_KEY não está configurada nas variáveis de ambiente do Render.',
+      });
+    }
 
+    const cartesiaVoiceId = resolverVoiceIdCartesia(voiceId);
+    if (!cartesiaVoiceId) {
+      return res.status(400).json({
+        erro: `A voz "${String(voiceId)}" não foi reconhecida. Confira o ID da voz da Cartesia enviado pelo frontend.`,
+      });
+    }
 
+    const textoLimpo = texto.trim();
+    const quantidadeCaracteres = textoLimpo.length;
+    const creditosNecessarios = calcularCreditosNecessarios(textoLimpo);
 
-  try {
+    console.log('Quantidade de caracteres:', quantidadeCaracteres);
+    console.log('Créditos necessários:', creditosNecessarios);
 
-    const { texto, voiceId, speed, categoria, estilo, reverb } = req.body;
+    // AUTENTICAR USUÁRIO
+    const usuario = await autenticarUsuario(req);
+    usuarioId = usuario.id;
 
-    console.log('ESTILO RECEBIDO:', estilo);
+    // CONSUMIR CRÉDITOS: cada bloco de até 800 caracteres consome 1 crédito.
+    await consumirCreditos(usuarioId, creditosNecessarios);
+    creditosConsumidos = creditosNecessarios;
 
-    console.log('=================================');
+    console.log('Créditos consumidos:', creditosConsumidos);
+    console.log('Cartesia Voice ID:', cartesiaVoiceId);
+    console.log('Texto:', textoLimpo);
 
-    console.log('GERANDO VOZ - CARTESIA');
-
-    console.log('=================================');
-
-
-
-    if (typeof texto !== 'string' || !texto.trim()) {
-
-      return res.status(400).json({ erro: 'Digite um texto.' });
-
-    }
-
-    if (!voiceId) {
-
-      return res.status(400).json({ erro: 'Nenhuma voz foi selecionada.' });
-
-    }
-
-    if (!process.env.CARTESIA_API_KEY) {
-
-      return res.status(500).json({
-
-        erro: 'CARTESIA_API_KEY não está configurada nas variáveis de ambiente do Render.',
-
-      });
-
-    }
-
-
-
-    const cartesiaVoiceId = resolverVoiceIdCartesia(voiceId);
-
-    if (!cartesiaVoiceId) {
-
-      return res.status(400).json({
-
-        erro: \`A voz "${String(voiceId)}" não foi reconhecida. Confira o ID da voz da Cartesia enviado pelo frontend.\`,
-
-      });
-
-    }
-
-
-
-    const textoLimpo = texto.trim();
-
-    const quantidadeCaracteres = textoLimpo.length;
-
-    const creditosNecessarios = calcularCreditosNecessarios(textoLimpo);
-
-
-
-    console.log('Quantidade de caracteres:', quantidadeCaracteres);
-
-    console.log('Créditos necessários:', creditosNecessarios);
-
-
-
-    // AUTENTICAR USUÁRIO
-
-    const usuario = await autenticarUsuario(req);
-
-    usuarioId = usuario.id;
-
-
-
-    // CONSUMIR CRÉDITOS: cada bloco de até 800 caracteres consome 1 crédito.
-
-    await consumirCreditos(usuarioId, creditosNecessarios);
-
-    creditosConsumidos = creditosNecessarios;
-
-
-
-    console.log('Créditos consumidos:', creditosConsumidos);
-
-    console.log('Cartesia Voice ID:', cartesiaVoiceId);
-
-    console.log('Texto:', textoLimpo);
-
-
-
-    // O Sonic entende o contexto do texto. Não enviamos as tags [excited],
-
-    // [happily] etc. da ElevenLabs porque não são instruções equivalentes na Cartesia.
-
-    // Os presets abaixo ajustam levemente velocidade e volume para cada estilo.
-
-        const presetsEstilo = {
-  normal:        { speed: 1.00, volume: 1.00, emotion: 'neutral' },
-  animado:       { speed: 1.06, volume: 1.08, emotion: 'excited' },
-  muitoAnimado:  { speed: 1.12, volume: 1.16, emotion: 'excited' },
-  superImpacto:  { speed: 1.08, volume: 1.22, emotion: 'excited' },
-  serio:         { speed: 0.96, volume: 0.96, emotion: 'neutral' },
-  urgente:       { speed: 1.10, volume: 1.12, emotion: 'angry' },
-  comercial:     { speed: 1.03, volume: 1.05, emotion: 'content' },
-  festa:         { speed: 1.10, volume: 1.14, emotion: 'excited' },
-  solene:        { speed: 0.94, volume: 0.96, emotion: 'neutral' },
+    // O Sonic entende o contexto do texto. Não enviamos as tags [excited],
+    // [happily] etc. da ElevenLabs porque não são instruções equivalentes na Cartesia.
+    // Os presets abaixo ajustam levemente velocidade e volume para cada estilo.
+        const presetsEstilo = {
+  animado:       { speed: 1.06, volume: 1.08 },
+  muitoAnimado:  { speed: 1.12, volume: 1.16 },
+  superImpacto:  { speed: 1.08, volume: 1.22 },
+  serio:         { speed: 0.96, volume: 0.96 },
+  urgente:       { speed: 1.10, volume: 1.12 },
+  comercial:     { speed: 1.03, volume: 1.05 },
+  festa:         { speed: 1.10, volume: 1.14 },
+  solene:        { speed: 0.94, volume: 0.96 },
 };
 
-const preset = presetsEstilo[estilo] || presetsEstilo.normal;
+const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
 
-const resposta = await fetch('https\://api.cartesia.ai/tts/bytes', {
-
-      method: 'POST',
-
-      headers: {
-
-        Authorization: process.env.CARTESIA_API_KEY,
-
-        'Cartesia-Version': process.env.CARTESIA_API_VERSION || '2026-08-14',
-
-        'Content-Type': 'application/json',
-
-        Accept: 'audio/mpeg',
-
-      },
-
-      body: JSON.stringify({
-
-        model_id: process.env.CARTESIA_MODEL_ID || 'sonic-3.6',
-
-        transcript: textoLimpo,
-
-        voice: cartesiaVoiceId,
-
-        locale: 'pt',
-
-        output_format: {
-
-          container: 'mp3',
-
-          sample_rate: 44100,
-
-          bit_rate: 128000,
-
-        },
-
-       generation_config: {
-
-  speed: preset.speed,
-
-  volume: preset.volume,
-
+    const resposta = await fetch('https://api.cartesia.ai/tts/bytes', {
+      method: 'POST',
+      headers: {
+        Authorization: process.env.CARTESIA_API_KEY,
+        'Cartesia-Version': process.env.CARTESIA_API_VERSION || '2026-08-14',
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg',
+      },
+      body: JSON.stringify({
+        model_id: process.env.CARTESIA_MODEL_ID || 'sonic-3.6',
+        transcript: textoLimpo,
+        voice: cartesiaVoiceId,
+        locale: 'pt',
+        output_format: {
+          container: 'mp3',
+          sample_rate: 44100,
+          bit_rate: 128000,
+        },
+       generation_config: {
+  speed: preset.speed,
+  volume: preset.volume,
 },
+      }),
+    });
 
-      }),
+    if (!resposta.ok) {
+      const erroApi = await resposta.text();
+      console.error('CARTESIA ERRO:', resposta.status, erroApi);
+      throw new Error(`Cartesia (${resposta.status}): ${erroApi || 'falha ao gerar áudio.'}`);
+    }
 
-    });
+    let audio = Buffer.from(await resposta.arrayBuffer());
+    if (!audio.length) {
+      throw new Error('A Cartesia retornou um áudio vazio.');
+    }
 
+    console.log('Áudio recebido da Cartesia:', audio.length, 'bytes');
 
+    // Mantém o ajuste opcional de velocidade que já existia na aplicação.
+    if (speed !== undefined && speed !== null && Number(speed) !== 1) {
+      audio = await alterarVelocidade(audio, Number(speed));
+    }
+    if (!audio.length) {
+      throw new Error('O áudio ficou vazio após o processamento.');
+    }
 
-    if (!resposta.ok) {
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audio.length.toString(),
+      'Cache-Control': 'no-store',
+      'X-Creditos-Consumidos': creditosConsumidos.toString(),
+    });
+    return res.send(audio);
+  } catch (erro) {
+    console.error('ERRO AO GERAR VOZ COM CARTESIA:', erro);
 
-      const erroApi = await resposta.text();
+    // Devolve os créditos caso a geração falhe depois do consumo.
+    if (usuarioId && creditosConsumidos > 0) {
+      try {
+        await devolverCreditos(usuarioId, creditosConsumidos);
+        console.log('Créditos devolvidos:', creditosConsumidos);
+      } catch (erroDevolucao) {
+        console.error('ERRO AO DEVOLVER CRÉDITOS:', erroDevolucao);
+      }
+    }
 
-      console.error('CARTESIA ERRO:', resposta.status, erroApi);
-
-      throw new Error(\`Cartesia (${resposta.status}): ${erroApi || 'falha ao gerar áudio.'}\`);
-
-    }
-
-
-
-    let audio = Buffer.from(await resposta.arrayBuffer());
-
-    if (!audio.length) {
-
-      throw new Error('A Cartesia retornou um áudio vazio.');
-
-    }
-
-
-
-    console.log('Áudio recebido da Cartesia:', audio.length, 'bytes');
-
-
-
-    // Mantém o ajuste opcional de velocidade que já existia na aplicação.
-
-    if (speed !== undefined && speed !== null && Number(speed) !== 1) {
-
-      audio = await alterarVelocidade(audio, Number(speed));
-
-    }
-
-    if (!audio.length) {
-
-      throw new Error('O áudio ficou vazio após o processamento.');
-
-    }
-
-
-
-    res.set({
-
-      'Content-Type': 'audio/mpeg',
-
-      'Content-Length': audio.length.toString(),
-
-      'Cache-Control': 'no-store',
-
-      'X-Creditos-Consumidos': creditosConsumidos.toString(),
-
-    });
-
-    return res.send(audio);
-
-  } catch (erro) {
-
-    console.error('ERRO AO GERAR VOZ COM CARTESIA:', erro);
-
-
-
-    // Devolve os créditos caso a geração falhe depois do consumo.
-
-    if (usuarioId && creditosConsumidos > 0) {
-
-      try {
-
-        await devolverCreditos(usuarioId, creditosConsumidos);
-
-        console.log('Créditos devolvidos:', creditosConsumidos);
-
-      } catch (erroDevolucao) {
-
-        console.error('ERRO AO DEVOLVER CRÉDITOS:', erroDevolucao);
-
-      }
-
-    }
-
-
-
-    const mensagem = erro?.message || 'Não foi possível gerar a voz.';
-
-    const semCreditos = mensagem.toLowerCase().includes('créditos insuficientes');
-
-    return res.status(semCreditos ? 402 : 500).json({
-
-      erro: semCreditos
-
-        ? 'Você não possui créditos suficientes para gerar essa locução.'
-
-        : mensagem,
-
-    });
-
-  }
-
+    const mensagem = erro?.message || 'Não foi possível gerar a voz.';
+    const semCreditos = mensagem.toLowerCase().includes('créditos insuficientes');
+    return res.status(semCreditos ? 402 : 500).json({
+      erro: semCreditos
+        ? 'Você não possui créditos suficientes para gerar essa locução.'
+        : mensagem,
+    });
+  }
 });
 
 
-
-
-
 // =====================================================
-
-
 
 // MIXAGEM COM TRILHA DA FÁBRICA
 
-
-
 //
-
-
 
 // O frontend envia:
 
-
-
 // - audioBase64
-
-
 
 // - trilhaSelecionada
 
-
-
 // - segundosInicio
-
-
 
 // - segundosFinal
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 app.post(
 
+  "/api/mixar-voz",
 
+  async (req, res) => {
 
-  "/api/mixar-voz",
+    try {
 
+      const {
 
+        audioBase64,
 
-  async (req, res) => {
+        trilhaSelecionada,
 
+        segundosInicio,
 
+        segundosFinal,
 
-    try {
+        reverbAtivo,
 
+      } = req.body;
 
 
-      const {
 
+      console.log("");
 
+      console.log(
 
-        audioBase64,
+        "================================="
 
+      );
 
+      console.log(
 
-        trilhaSelecionada,
+        "MIXAGEM - TRILHA DA FÁBRICA"
 
+      );
 
+      console.log(
 
-        segundosInicio,
+        "================================="
 
+      );
 
 
-        segundosFinal,
 
+      if (!audioBase64) {
 
+        return res.status(400).json({
 
-        reverbAtivo,
+          erro:
 
+            "Áudio da voz não informado.",
 
+        });
 
-      } = req.body;
+      }
 
 
 
+      if (!trilhaSelecionada) {
 
+        return res.status(400).json({
 
+          erro:
 
+            "Nenhuma trilha foi selecionada.",
 
-      console.log("");
+        });
 
+      }
 
 
-      console.log(
 
+      const vozBuffer =
 
+        base64ParaBuffer(
 
-        "================================="
+          audioBase64
 
+        );
 
 
-      );
 
+      if (!vozBuffer) {
 
+        return res.status(400).json({
 
-      console.log(
+          erro:
 
+            "Áudio da voz vazio ou inválido.",
 
+        });
 
-        "MIXAGEM - TRILHA DA FÁBRICA"
+      }
 
 
 
-      );
+      // Aceita tanto:
 
+      // "TRILHA.mp3"
 
+      // quanto:
 
-      console.log(
+      // "/TRILHA.mp3"
 
+      // quanto:
 
+      // "public/TRILHA.mp3"
 
-        "================================="
+      const nomeTrilha =
 
+        path.basename(
 
+          String(trilhaSelecionada)
 
-      );
+        );
 
 
 
+      const trilhaPath =
 
+        path.join(
 
+          __dirname,
 
+          "public",
 
-      if (!audioBase64) {
+          nomeTrilha
 
+        );
 
 
-        return res.status(400).json({
 
+      if (
 
+        !fs.existsSync(
 
-          erro:
+          trilhaPath
 
+        )
 
+      ) {
 
-            "Áudio da voz não informado.",
+        console.error(
 
+          "Trilha não encontrada:",
 
+          trilhaPath
 
-        });
+        );
 
 
 
-      }
+        return res.status(404).json({
 
+          erro:
 
+            `Trilha não encontrada: ${nomeTrilha}`,
 
+        });
 
+      }
 
 
 
-      if (!trilhaSelecionada) {
+      const trilhaBuffer =
 
+        fs.readFileSync(
 
+          trilhaPath
 
-        return res.status(400).json({
+        );
 
 
 
-          erro:
+      const resultado =
 
+        await mixarAudio(
 
+          vozBuffer,
 
-            "Nenhuma trilha foi selecionada.",
+          trilhaBuffer,
 
+          segundosInicio,
 
+          segundosFinal,
 
-        });
+          Boolean(reverbAtivo)
 
+        );
 
 
-      }
 
+      res.set({
 
+        "Content-Type":
 
+          "audio/mpeg",
 
 
 
+        "Content-Length":
 
-      const vozBuffer =
+          resultado.length.toString(),
 
 
 
-        base64ParaBuffer(
+        "Content-Disposition":
 
+          'attachment; filename="fabrica-da-voz.mp3"',
 
 
-          audioBase64
 
+        "Cache-Control":
 
+          "no-store",
 
-        );
+      });
 
 
 
+      res.send(resultado);
 
+    } catch (erro) {
 
+      console.error("");
 
+      console.error(
 
-      if (!vozBuffer) {
+        "ERRO NA MIXAGEM:"
 
+      );
 
+      console.error(erro);
 
-        return res.status(400).json({
 
 
+      res.status(500).json({
 
-          erro:
+        erro:
 
+          erro.message ||
 
+          "Erro ao mixar os áudios.",
 
-            "Áudio da voz vazio ou inválido.",
+      });
 
+    }
 
-
-        });
-
-
-
-      }
-
-
-
-
-
-
-
-      // Aceita tanto:
-
-
-
-      // "TRILHA.mp3"
-
-
-
-      // quanto:
-
-
-
-      // "/TRILHA.mp3"
-
-
-
-      // quanto:
-
-
-
-      // "public/TRILHA.mp3"
-
-
-
-      const nomeTrilha =
-
-
-
-        path.basename(
-
-
-
-          String(trilhaSelecionada)
-
-
-
-        );
-
-
-
-
-
-
-
-      const trilhaPath =
-
-
-
-        path.join(
-
-
-
-          \_\_dirname,
-
-
-
-          "public",
-
-
-
-          nomeTrilha
-
-
-
-        );
-
-
-
-
-
-
-
-      if (
-
-
-
-        !fs.existsSync(
-
-
-
-          trilhaPath
-
-
-
-        )
-
-
-
-      ) {
-
-
-
-        console.error(
-
-
-
-          "Trilha não encontrada:",
-
-
-
-          trilhaPath
-
-
-
-        );
-
-
-
-
-
-
-
-        return res.status(404).json({
-
-
-
-          erro:
-
-
-
-            \`Trilha não encontrada: ${nomeTrilha}\`,
-
-
-
-        });
-
-
-
-      }
-
-
-
-
-
-
-
-      const trilhaBuffer =
-
-
-
-        fs.readFileSync(
-
-
-
-          trilhaPath
-
-
-
-        );
-
-
-
-
-
-
-
-      const resultado =
-
-
-
-        await mixarAudio(
-
-
-
-          vozBuffer,
-
-
-
-          trilhaBuffer,
-
-
-
-          segundosInicio,
-
-
-
-          segundosFinal,
-
-
-
-          Boolean(reverbAtivo)
-
-
-
-        );
-
-
-
-
-
-
-
-      res.set({
-
-
-
-        "Content-Type":
-
-
-
-          "audio/mpeg",
-
-
-
-
-
-
-
-        "Content-Length":
-
-
-
-          resultado.length.toString(),
-
-
-
-
-
-
-
-        "Content-Disposition":
-
-
-
-          'attachment; filename="fabrica-da-voz.mp3"',
-
-
-
-
-
-
-
-        "Cache-Control":
-
-
-
-          "no-store",
-
-
-
-      });
-
-
-
-
-
-
-
-      res.send(resultado);
-
-
-
-    } catch (erro) {
-
-
-
-      console.error("");
-
-
-
-      console.error(
-
-
-
-        "ERRO NA MIXAGEM:"
-
-
-
-      );
-
-
-
-      console.error(erro);
-
-
-
-
-
-
-
-      res.status(500).json({
-
-
-
-        erro:
-
-
-
-          erro.message ||
-
-
-
-          "Erro ao mixar os áudios.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // MIXAGEM COM TRILHA ENVIADA PELO CLIENTE
 
-
-
 //
-
-
 
 // O frontend envia:
 
-
-
 // - audioBase64
-
-
 
 // - trilhaBase64
 
-
-
 // - segundosInicio
-
-
 
 // - segundosFinal
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 app.post(
 
+  "/api/mixar-upload",
 
+  async (req, res) => {
 
-  "/api/mixar-upload",
+    try {
 
+      const {
 
+        audioBase64,
 
-  async (req, res) => {
+        trilhaBase64,
 
+        segundosInicio,
 
+        segundosFinal,
 
-    try {
+        reverbAtivo,
 
+      } = req.body;
 
 
-      const {
 
+      console.log("");
 
+      console.log(
 
-        audioBase64,
+        "================================="
 
+      );
 
+      console.log(
 
-        trilhaBase64,
+        "MIXAGEM - TRILHA DO CLIENTE"
 
+      );
 
+      console.log(
 
-        segundosInicio,
+        "================================="
 
+      );
 
 
-        segundosFinal,
 
+      if (!audioBase64) {
 
+        return res.status(400).json({
 
-        reverbAtivo,
+          erro:
 
+            "Áudio da voz não informado.",
 
+        });
 
-      } = req.body;
+      }
 
 
 
+      if (!trilhaBase64) {
 
+        return res.status(400).json({
 
+          erro:
 
+            "A trilha enviada pelo cliente não foi encontrada.",
 
-      console.log("");
+        });
 
+      }
 
 
-      console.log(
 
+      const vozBuffer =
 
+        base64ParaBuffer(
 
-        "================================="
+          audioBase64
 
+        );
 
 
-      );
 
+      const trilhaBuffer =
 
+        base64ParaBuffer(
 
-      console.log(
+          trilhaBase64
 
+        );
 
 
-        "MIXAGEM - TRILHA DO CLIENTE"
 
+      if (!vozBuffer) {
 
+        return res.status(400).json({
 
-      );
+          erro:
 
+            "Áudio da voz vazio ou inválido.",
 
+        });
 
-      console.log(
+      }
 
 
 
-        "================================="
+      if (!trilhaBuffer) {
 
+        return res.status(400).json({
 
+          erro:
 
-      );
+            "Áudio da trilha vazio ou inválido.",
 
+        });
 
+      }
 
 
 
+      const resultado =
 
+        await mixarAudio(
 
-      if (!audioBase64) {
+          vozBuffer,
 
+          trilhaBuffer,
 
+          segundosInicio,
 
-        return res.status(400).json({
+          segundosFinal,
 
+          Boolean(reverbAtivo)
 
+        );
 
-          erro:
 
 
+      console.log(
 
-            "Áudio da voz não informado.",
+        "Mixagem da trilha do cliente concluída."
 
+      );
 
 
-        });
 
+      res.set({
 
+        "Content-Type":
 
-      }
+          "audio/mpeg",
 
 
 
+        "Content-Length":
 
+          resultado.length.toString(),
 
 
 
-      if (!trilhaBase64) {
+        "Content-Disposition":
 
+          'attachment; filename="fabrica-da-voz.mp3"',
 
 
-        return res.status(400).json({
 
+        "Cache-Control":
 
+          "no-store",
 
-          erro:
+      });
 
 
 
-            "A trilha enviada pelo cliente não foi encontrada.",
+      res.send(resultado);
 
+    } catch (erro) {
 
+      console.error("");
 
-        });
+      console.error(
 
+        "ERRO NA MIXAGEM DO CLIENTE:"
 
+      );
 
-      }
+      console.error(erro);
 
 
 
+      res.status(500).json({
 
+        erro:
 
+          erro.message ||
 
+          "Não foi possível mixar a trilha enviada.",
 
-      const vozBuffer =
+      });
 
+    }
 
-
-        base64ParaBuffer(
-
-
-
-          audioBase64
-
-
-
-        );
-
-
-
-
-
-
-
-      const trilhaBuffer =
-
-
-
-        base64ParaBuffer(
-
-
-
-          trilhaBase64
-
-
-
-        );
-
-
-
-
-
-
-
-      if (!vozBuffer) {
-
-
-
-        return res.status(400).json({
-
-
-
-          erro:
-
-
-
-            "Áudio da voz vazio ou inválido.",
-
-
-
-        });
-
-
-
-      }
-
-
-
-
-
-
-
-      if (!trilhaBuffer) {
-
-
-
-        return res.status(400).json({
-
-
-
-          erro:
-
-
-
-            "Áudio da trilha vazio ou inválido.",
-
-
-
-        });
-
-
-
-      }
-
-
-
-
-
-
-
-      const resultado =
-
-
-
-        await mixarAudio(
-
-
-
-          vozBuffer,
-
-
-
-          trilhaBuffer,
-
-
-
-          segundosInicio,
-
-
-
-          segundosFinal,
-
-
-
-          Boolean(reverbAtivo)
-
-
-
-        );
-
-
-
-
-
-
-
-      console.log(
-
-
-
-        "Mixagem da trilha do cliente concluída."
-
-
-
-      );
-
-
-
-
-
-
-
-      res.set({
-
-
-
-        "Content-Type":
-
-
-
-          "audio/mpeg",
-
-
-
-
-
-
-
-        "Content-Length":
-
-
-
-          resultado.length.toString(),
-
-
-
-
-
-
-
-        "Content-Disposition":
-
-
-
-          'attachment; filename="fabrica-da-voz.mp3"',
-
-
-
-
-
-
-
-        "Cache-Control":
-
-
-
-          "no-store",
-
-
-
-      });
-
-
-
-
-
-
-
-      res.send(resultado);
-
-
-
-    } catch (erro) {
-
-
-
-      console.error("");
-
-
-
-      console.error(
-
-
-
-        "ERRO NA MIXAGEM DO CLIENTE:"
-
-
-
-      );
-
-
-
-      console.error(erro);
-
-
-
-
-
-
-
-      res.status(500).json({
-
-
-
-        erro:
-
-
-
-          erro.message ||
-
-
-
-          "Não foi possível mixar a trilha enviada.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
 
-
-
 // =====================================================
-
-
 
 // CONVERTER WAV PARA MP3
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 app.post(
 
+  "/api/converter-mp3",
 
+  async (req, res) => {
 
-  "/api/converter-mp3",
+    try {
 
+      const partes = [];
 
 
-  async (req, res) => {
 
+      req.on("data", (parte) => {
 
+        partes.push(parte);
 
-    try {
+      });
 
 
 
-      const partes = [];
+      req.on("end", () => {
 
+        const wavBuffer =
 
+          Buffer.concat(partes);
 
 
 
+        if (!wavBuffer.length) {
 
+          return res.status(400).json({
 
-      req.on("data", (parte) => {
+            erro:
 
+              "Áudio WAV não informado.",
 
+          });
 
-        partes.push(parte);
+        }
 
 
 
-      });
+        const ffmpeg = spawn(
 
+          ffmpegPath,
 
+          [
 
+            "-hide_banner",
 
+            "-loglevel",
 
+            "error",
 
 
-      req.on("end", () => {
 
+            "-i",
 
+            "pipe:0",
 
-        const wavBuffer =
 
 
+            "-c:a",
 
-          Buffer.concat(partes);
+            "libmp3lame",
 
 
 
+            "-b:a",
 
+            "192k",
 
 
 
-        if (!wavBuffer.length) {
+            "-ar",
 
+            "44100",
 
 
-          return res.status(400).json({
 
+            "-ac",
 
+            "2",
 
-            erro:
 
 
+            "-f",
 
-              "Áudio WAV não informado.",
+            "mp3",
 
 
 
-          });
+            "pipe:1",
 
+          ]
 
+        );
 
-        }
 
 
+        const partesMp3 = [];
 
+        let erro = "";
 
 
 
+        ffmpeg.stdout.on(
 
-        const ffmpeg = spawn(
+          "data",
 
+          (parte) => {
 
+            partesMp3.push(parte);
 
-          ffmpegPath,
+          }
 
+        );
 
 
-          [
 
+        ffmpeg.stderr.on(
 
+          "data",
 
-            "-hide_banner",
+          (parte) => {
 
+            erro += parte.toString();
 
+          }
 
-            "-loglevel",
+        );
 
 
 
-            "error",
+        ffmpeg.on(
 
+          "error",
 
+          (err) => {
 
+            console.error(
 
+              "ERRO AO CONVERTER MP3:",
 
+              err
 
+            );
 
-            "-i",
 
 
+            if (!res.headersSent) {
 
-            "pipe:0",
+              res.status(500).json({
 
+                erro:
 
+                  "Erro ao converter para MP3.",
 
+              });
 
+            }
 
+          }
 
+        );
 
-            "-c:a",
 
 
+        ffmpeg.on(
 
-            "libmp3lame",
+          "close",
 
+          (codigo) => {
 
+            if (codigo !== 0) {
 
+              console.error(
 
+                "FFmpeg conversão:",
 
+                erro
 
+              );
 
-            "-b:a",
 
 
+              if (!res.headersSent) {
 
-            "192k",
+                res.status(500).json({
 
+                  erro:
 
+                    erro ||
 
+                    "Não foi possível converter o áudio para MP3.",
 
+                });
 
+              }
 
 
-            "-ar",
 
+              return;
 
+            }
 
-            "44100",
 
 
+            const mp3Buffer =
 
+              Buffer.concat(partesMp3);
 
 
 
+            res.set({
 
-            "-ac",
+              "Content-Type":
 
+                "audio/mpeg",
 
 
-            "2",
 
+              "Content-Length":
 
+                mp3Buffer.length.toString(),
 
 
 
+              "Content-Disposition":
 
+                'attachment; filename="fabrica-da-voz-mixagem.mp3"',
 
-            "-f",
 
 
+              "Cache-Control":
 
-            "mp3",
+                "no-store",
 
+            });
 
 
 
+            res.send(mp3Buffer);
 
+          }
 
+        );
 
-            "pipe:1",
 
 
+        ffmpeg.stdin.end(
 
-          ]
+          wavBuffer
 
+        );
 
+      });
 
-        );
+    } catch (erro) {
 
+      console.error(
 
+        "ERRO NA CONVERSÃO PARA MP3:",
 
+        erro
 
+      );
 
 
 
-        const partesMp3 = [];
+      res.status(500).json({
 
+        erro:
 
+          erro.message ||
 
-        let erro = "";
+          "Erro ao converter para MP3.",
 
+      });
 
+    }
 
-
-
-
-
-        ffmpeg.stdout.on(
-
-
-
-          "data",
-
-
-
-          (parte) => {
-
-
-
-            partesMp3.push(parte);
-
-
-
-          }
-
-
-
-        );
-
-
-
-
-
-
-
-        ffmpeg.stderr.on(
-
-
-
-          "data",
-
-
-
-          (parte) => {
-
-
-
-            erro += parte.toString();
-
-
-
-          }
-
-
-
-        );
-
-
-
-
-
-
-
-        ffmpeg.on(
-
-
-
-          "error",
-
-
-
-          (err) => {
-
-
-
-            console.error(
-
-
-
-              "ERRO AO CONVERTER MP3:",
-
-
-
-              err
-
-
-
-            );
-
-
-
-
-
-
-
-            if (!res.headersSent) {
-
-
-
-              res.status(500).json({
-
-
-
-                erro:
-
-
-
-                  "Erro ao converter para MP3.",
-
-
-
-              });
-
-
-
-            }
-
-
-
-          }
-
-
-
-        );
-
-
-
-
-
-
-
-        ffmpeg.on(
-
-
-
-          "close",
-
-
-
-          (codigo) => {
-
-
-
-            if (codigo !== 0) {
-
-
-
-              console.error(
-
-
-
-                "FFmpeg conversão:",
-
-
-
-                erro
-
-
-
-              );
-
-
-
-
-
-
-
-              if (!res.headersSent) {
-
-
-
-                res.status(500).json({
-
-
-
-                  erro:
-
-
-
-                    erro ||
-
-
-
-                    "Não foi possível converter o áudio para MP3.",
-
-
-
-                });
-
-
-
-              }
-
-
-
-
-
-
-
-              return;
-
-
-
-            }
-
-
-
-
-
-
-
-            const mp3Buffer =
-
-
-
-              Buffer.concat(partesMp3);
-
-
-
-
-
-
-
-            res.set({
-
-
-
-              "Content-Type":
-
-
-
-                "audio/mpeg",
-
-
-
-
-
-
-
-              "Content-Length":
-
-
-
-                mp3Buffer.length.toString(),
-
-
-
-
-
-
-
-              "Content-Disposition":
-
-
-
-                'attachment; filename="fabrica-da-voz-mixagem.mp3"',
-
-
-
-
-
-
-
-              "Cache-Control":
-
-
-
-                "no-store",
-
-
-
-            });
-
-
-
-
-
-
-
-            res.send(mp3Buffer);
-
-
-
-          }
-
-
-
-        );
-
-
-
-
-
-
-
-        ffmpeg.stdin.end(
-
-
-
-          wavBuffer
-
-
-
-        );
-
-
-
-      });
-
-
-
-    } catch (erro) {
-
-
-
-      console.error(
-
-
-
-        "ERRO NA CONVERSÃO PARA MP3:",
-
-
-
-        erro
-
-
-
-      );
-
-
-
-
-
-
-
-      res.status(500).json({
-
-
-
-        erro:
-
-
-
-          erro.message ||
-
-
-
-          "Erro ao converter para MP3.",
-
-
-
-      });
-
-
-
-    }
-
-
-
-  }
-
-
+  }
 
 );
 
-
-
 // =====================================================
-
-
 
 // HEALTH CHECK
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 app.get("/api/health", (req, res) => {
 
+  res.json({
 
+    ok: true,
 
-  res.json({
+    servidor: "Fábrica da Voz",
 
+    porta: PORT,
 
+    ffmpeg: !!ffmpegPath,
 
-    ok: true,
+    geracaoVoz: true,
+    provedorVoz: 'Cartesia',
 
+    trilhaCliente: true,
 
+    mixagem: true,
 
-    servidor: "Fábrica da Voz",
-
-
-
-    porta: PORT,
-
-
-
-    ffmpeg: !!ffmpegPath,
-
-
-
-    geracaoVoz: true,
-
-    provedorVoz: 'Cartesia',
-
-
-
-    trilhaCliente: true,
-
-
-
-    mixagem: true,
-
-
-
-  });
-
-
+  });
 
 });
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // STATUS
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 app.get(
 
+  "/api/status",
 
+  (req, res) => {
 
-  "/api/status",
+    res.json({
 
+      funcionando: true,
 
 
-  (req, res) => {
 
+      servidor:
 
+        "Fábrica da Voz",
 
-    res.json({
 
 
+      porta:
 
-      funcionando: true,
+        PORT,
 
 
 
+      ffmpeg:
 
+        !!ffmpegPath,
 
 
 
-      servidor:
+      geracaoVoz:
 
+        true,
 
+      provedorVoz:
 
-        "Fábrica da Voz",
+        'Cartesia',
 
 
 
+      segundos:
 
+        true,
 
 
 
-      porta:
+      fadeFinal:
 
+        true,
 
 
-        PORT,
 
+      trilhaFabrica:
 
+        true,
 
 
 
+      trilhaCliente:
 
+        true,
 
-      ffmpeg:
+    });
 
-
-
-        !!ffmpegPath,
-
-
-
-
-
-
-
-      geracaoVoz:
-
-
-
-        true,
-
-
-
-      provedorVoz:
-
-
-
-        'Cartesia',
-
-
-
-
-
-
-
-      segundos:
-
-
-
-        true,
-
-
-
-
-
-
-
-      fadeFinal:
-
-
-
-        true,
-
-
-
-
-
-
-
-      trilhaFabrica:
-
-
-
-        true,
-
-
-
-
-
-
-
-      trilhaCliente:
-
-
-
-        true,
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 );
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // FRONTEND VITE / REACT
 
-
-
 //
 
-
-
-// O Render precisa executar \`npm run build\` para criar a
-
-
+// O Render precisa executar `npm run build` para criar a
 
 // pasta dist. Depois o próprio Express entrega essa pasta.
 
-
-
-// As rotas /api/\* continuam sendo atendidas acima.
-
-
+// As rotas /api/* continuam sendo atendidas acima.
 
 // =====================================================
 
 
 
-
-
-
-
-const distPath = path.join(\_\_dirname, "dist");
-
-
-
-
+const distPath = path.join(__dirname, "dist");
 
 
 
 if (fs.existsSync(distPath)) {
 
-
-
-  app.use(express.static(distPath));
-
+  app.use(express.static(distPath));
 
 
 
+  // SPA: qualquer rota que não seja /api/* recebe o index.html.
+
+  app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
+
+    const indexPath = path.join(distPath, "index-cartesia.html");
 
 
 
-  // SPA: qualquer rota que não seja /api/\* recebe o index.html.
+    if (fs.existsSync(indexPath)) {
+
+      res.sendFile(indexPath);
+
+      return;
+
+    }
 
 
 
-  app.get(/^(?!**\\/**&#x61;pi(?:**\\/**|$)).\*/, (req, res) => {
+    res.status(500).send(
 
+      "Frontend não encontrado. Execute npm run build no deploy."
 
+    );
 
-    const indexPath = path.join(distPath, "index-cartesia.html");
-
-
-
-
-
-
-
-    if (fs.existsSync(indexPath)) {
-
-
-
-      res.sendFile(indexPath);
-
-
-
-      return;
-
-
-
-    }
-
-
-
-
-
-
-
-    res.status(500).send(
-
-
-
-      "Frontend não encontrado. Execute npm run build no deploy."
-
-
-
-    );
-
-
-
-  });
-
-
+  });
 
 } else {
 
+  console.warn(
 
+    "AVISO: pasta dist não encontrada. O frontend não será exibido até o build do Vite ser executado."
 
-  console.warn(
-
-
-
-    "AVISO: pasta dist não encontrada. O frontend não será exibido até o build do Vite ser executado."
-
-
-
-  );
+  );
 
 
 
+  app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
 
+    res.status(503).send(
 
+      "Fábrica da Voz: frontend ainda não foi compilado. Execute npm run build."
 
+    );
 
-  app.get(/^(?!**\\/**&#x61;pi(?:**\\/**|$)).\*/, (req, res) => {
-
-
-
-    res.status(503).send(
-
-
-
-      "Fábrica da Voz: frontend ainda não foi compilado. Execute npm run build."
-
-
-
-    );
-
-
-
-  });
-
-
+  });
 
 }
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // TRATAMENTO DE ERROS
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 app.use(
 
+  (err, req, res, next) => {
 
+    console.error(
 
-  (err, req, res, next) => {
+      "ERRO GERAL:",
 
+      err
 
-
-    console.error(
-
-
-
-      "ERRO GERAL:",
-
-
-
-      err
+    );
 
 
 
-    );
+    if (res.headersSent) {
+
+      return next(err);
+
+    }
 
 
 
+    res.status(500).json({
 
+      erro:
 
+        err.message ||
 
+        "Erro interno do servidor.",
 
-    if (res.headersSent) {
+    });
 
-
-
-      return next(err);
-
-
-
-    }
-
-
-
-
-
-
-
-    res.status(500).json({
-
-
-
-      erro:
-
-
-
-        err.message ||
-
-
-
-        "Erro interno do servidor.",
-
-
-
-    });
-
-
-
-  }
-
-
+  }
 
 );
 
 
 
-
-
-
-
 // =====================================================
-
-
 
 // INICIAR SERVIDOR
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 const server =
 
+  app.listen(
 
+    PORT,
 
-  app.listen(
+    "0.0.0.0",
 
+    () => {
 
+      console.log("");
 
-    PORT,
+      console.log(
 
+        "================================="
 
+      );
 
-    "0.0.0.0",
+      console.log(
 
+        "        FÁBRICA DA VOZ"
 
+      );
 
-    () => {
+      console.log(
 
+        "================================="
 
+      );
 
-      console.log("");
+      console.log(
 
+        `Servidor: http://localhost:${PORT}`
 
+      );
 
-      console.log(
+      console.log(
 
+        "Geração de voz: ATIVADA"
 
+      );
 
-        "================================="
+      console.log(
 
+        "Segundos antes/depois: ATIVADOS"
 
+      );
 
-      );
+      console.log(
 
+        "Fade final: 2 segundos"
 
+      );
 
-      console.log(
+      console.log(
 
+        "Trilha da fábrica: ATIVADA"
 
+      );
 
-        "        FÁBRICA DA VOZ"
+      console.log(
 
+        "Trilha do cliente: ATIVADA"
 
+      );
 
-      );
+      console.log(
 
+        "================================="
 
+      );
 
-      console.log(
+      console.log("");
 
+    }
 
-
-        "================================="
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        \`Servidor: http\://localhost:${PORT}\`
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        "Geração de voz: ATIVADA"
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        "Segundos antes/depois: ATIVADOS"
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        "Fade final: 2 segundos"
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        "Trilha da fábrica: ATIVADA"
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        "Trilha do cliente: ATIVADA"
-
-
-
-      );
-
-
-
-      console.log(
-
-
-
-        "================================="
-
-
-
-      );
-
-
-
-      console.log("");
-
-
-
-    }
-
-
-
-  );
-
-
-
-
+  );
 
 
 
 // =====================================================
-
-
 
 // ENCERRAMENTO SEGURO
 
-
-
 // =====================================================
-
-
-
-
 
 
 
 function encerrarServidor(sinal) {
 
+  console.log("");
 
+  console.log(
 
-  console.log("");
+    `Recebido ${sinal}. Encerrando servidor...`
 
-
-
-  console.log(
-
-
-
-    \`Recebido ${sinal}. Encerrando servidor...\`
+  );
 
 
 
-  );
+  server.close(() => {
+
+    process.exit(0);
+
+  });
 
 
 
+  setTimeout(() => {
 
+    process.exit(1);
 
-
-
-  server.close(() => {
-
-
-
-    process.exit(0);
-
-
-
-  });
-
-
-
-
-
-
-
-  setTimeout(() => {
-
-
-
-    process.exit(1);
-
-
-
-  }, 5000);
-
-
+  }, 5000);
 
 }
 
 
 
-
-
-
-
 process.on(
 
+  "SIGINT",
 
-
-  "SIGINT",
-
-
-
-  () => encerrarServidor("SIGINT")
-
-
+  () => encerrarServidor("SIGINT")
 
 );
 
 
 
-
-
-
-
 process.on(
 
+  "SIGTERM",
 
-
-  "SIGTERM",
-
-
-
-  () => encerrarServidor("SIGTERM")
-
-
+  () => encerrarServidor("SIGTERM")
 
 );
