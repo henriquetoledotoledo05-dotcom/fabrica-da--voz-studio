@@ -2260,9 +2260,21 @@ app.post('/api/gerar-voz', async (req, res) => {
     }
 
     const textoLimpo = texto.trim();
-    const textoParaCartesia = textoLimpo;
+    const instrucaoEmocao = {
+  animado: '<emotion value="excited"/>',
+  muitoAnimado: '<emotion value="enthusiastic"/>',
+  superImpacto: '<emotion value="triumphant"/>',
+  serio: '<emotion value="confident"/>',
+  urgente: '<emotion value="alarmed"/>',
+  comercial: '<emotion value="confident"/>',
+  festa: '<emotion value="euphoric"/>',
+  solene: '<emotion value="serene"/>',
+  normal: '<emotion value="neutral"/>'
+}[estilo] || '<emotion value="neutral"/>';
 
-    const quantidadeCaracteres = textoLimpo.length;
+const textoParaCartesia = instrucaoEmocao + ' ' + textoLimpo;
+
+const quantidadeCaracteres = textoLimpo.length;
     const creditosNecessarios = calcularCreditosNecessarios(textoLimpo);
 
     console.log('Quantidade de caracteres:', quantidadeCaracteres);
