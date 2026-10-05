@@ -2272,20 +2272,8 @@ app.post('/api/gerar-voz', async (req, res) => {
   normal: '<emotion value="neutral"/>'
 }[estilo] || '<emotion value="neutral"/>';
 
-const instrucoesEstilo = {
-  animado: "Fale de forma animada, energética e alegre.",
-  muitoAnimado: "Fale com muita energia, entusiasmo e alegria.",
-  superImpacto: "Fale com forte impacto, energia e presença de locutor.",
-  serio: "Fale de forma séria, firme, segura e profissional.",
-  urgente: "Fale com urgência, intensidade e atenção.",
-  comercial: "Fale de forma comercial, envolvente e persuasiva.",
-  festa: "Fale com muita animação, alegria e clima de festa.",
-  solene: "Fale de forma solene, calma, firme e respeitosa.",
-  normal: "Fale de forma natural e equilibrada."
-};
+const textoParaCartesia = instrucaoEmocao + ' ' + textoLimpo;
 
-const instrucaoEstilo = instrucoesEstilo[estilo] || instrucoesEstilo.normal;
-const textoParaCartesia = "<voice_style>" + instrucaoEstilo + "</voice_style> " + textoLimpo;
 const quantidadeCaracteres = textoLimpo.length;
     const creditosNecessarios = calcularCreditosNecessarios(textoLimpo);
 
@@ -3576,7 +3564,5 @@ process.on(
   () => encerrarServidor("SIGTERM")
 
 );
-
-
 
 
