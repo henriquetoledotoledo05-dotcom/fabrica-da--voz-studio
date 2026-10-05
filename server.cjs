@@ -2260,7 +2260,21 @@ app.post('/api/gerar-voz', async (req, res) => {
     }
 
     const textoLimpo = texto.trim();
-    const quantidadeCaracteres = textoLimpo.length;
+    const instrucaoEmocao = {
+  animado: '<emotion value="excited"/>',
+  muitoAnimado: '<emotion value="enthusiastic"/>',
+  superImpacto: '<emotion value="triumphant"/>',
+  serio: '<emotion value="confident"/>',
+  urgente: '<emotion value="alarmed"/>',
+  comercial: '<emotion value="confident"/>',
+  festa: '<emotion value="euphoric"/>',
+  solene: '<emotion value="serene"/>',
+  normal: '<emotion value="neutral"/>'
+}[estilo] || '<emotion value="neutral"/>';
+
+const textoParaCartesia = instrucaoEmocao + ' ' + textoLimpo;
+
+const quantidadeCaracteres = textoLimpo.length;
     const creditosNecessarios = calcularCreditosNecessarios(textoLimpo);
 
     console.log('Quantidade de caracteres:', quantidadeCaracteres);
@@ -2308,7 +2322,7 @@ const preset = presetsEstilo[estilo] || {
       },
       body: JSON.stringify({
         model_id: process.env.CARTESIA_MODEL_ID || 'sonic-3.6',
-        transcript: textoLimpo,
+        transcript: textoParaCartesia,
         voice: cartesiaVoiceId,
         locale: 'pt',
         output_format: {
@@ -3550,4 +3564,5 @@ process.on(
   () => encerrarServidor("SIGTERM")
 
 );
+
 
