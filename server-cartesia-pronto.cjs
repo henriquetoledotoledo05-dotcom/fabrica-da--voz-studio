@@ -3309,7 +3309,7 @@ if (fs.existsSync(distPath)) {
 
   app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
 
-    const indexPath = path.join(distPath, "index.html");
+    const indexPath = path.join(distPath, "index-cartesia.html");
 
 
 
