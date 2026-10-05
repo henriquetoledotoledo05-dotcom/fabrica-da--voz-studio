@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+﻿const crypto = require("crypto");
 
 const express = require("express");
 
@@ -66,7 +66,7 @@ const PACOTES_CREDITOS = {
 
   credito1: {
 
-    titulo: "1 crédito",
+    titulo: "1 crÃ©dito",
 
     creditos: 1,
 
@@ -76,7 +76,7 @@ const PACOTES_CREDITOS = {
 
   credito10: {
 
-    titulo: "10 créditos",
+    titulo: "10 crÃ©ditos",
 
     creditos: 10,
 
@@ -86,7 +86,7 @@ const PACOTES_CREDITOS = {
 
   credito50: {
 
-    titulo: "50 créditos",
+    titulo: "50 crÃ©ditos",
 
     creditos: 50,
 
@@ -96,7 +96,7 @@ const PACOTES_CREDITOS = {
 
   credito100: {
 
-    titulo: "100 créditos",
+    titulo: "100 crÃ©ditos",
 
     creditos: 100,
 
@@ -122,7 +122,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
       return res.status(400).json({
 
-        erro: "Pacote de créditos inválido.",
+        erro: "Pacote de crÃ©ditos invÃ¡lido.",
 
       });
 
@@ -138,7 +138,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
       return res.status(401).json({
 
-        erro: "Usuário não autenticado.",
+        erro: "UsuÃ¡rio nÃ£o autenticado.",
 
       });
 
@@ -164,7 +164,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
       return res.status(401).json({
 
-        erro: "Sessão do usuário inválida.",
+        erro: "SessÃ£o do usuÃ¡rio invÃ¡lida.",
 
       });
 
@@ -230,7 +230,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
     return res.status(500).json({
 
-      erro: "Não foi possível criar o pagamento.",
+      erro: "NÃ£o foi possÃ­vel criar o pagamento.",
 
     });
 
@@ -246,15 +246,15 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
 // =====================================================
 
-// Esta aplicação usa Checkout Pro pela API de Preferências
+// Esta aplicaÃ§Ã£o usa Checkout Pro pela API de PreferÃªncias
 
 // (/checkout/preferences). Para esse fluxo, o evento correto
 
-// é "Pagamentos" (tópico payment). Mantemos suporte a "order"
+// Ã© "Pagamentos" (tÃ³pico payment). Mantemos suporte a "order"
 
-// também para compatibilidade futura.
+// tambÃ©m para compatibilidade futura.
 
-// O mesmo pagamento não pode gerar créditos duas vezes porque
+// O mesmo pagamento nÃ£o pode gerar crÃ©ditos duas vezes porque
 
 // o Supabase controla mercado_pago_id como UNIQUE.
 
@@ -312,7 +312,7 @@ function validarAssinaturaMercadoPago(req, dataId) {
 
     throw new Error(
 
-      "MERCADOPAGO_WEBHOOK_SECRET não configurada no servidor."
+      "MERCADOPAGO_WEBHOOK_SECRET nÃ£o configurada no servidor."
 
     );
 
@@ -348,7 +348,7 @@ function validarAssinaturaMercadoPago(req, dataId) {
 
   // Manifesto oficial do Mercado Pago.
 
-  // O data.id é usado em minúsculas no cálculo da assinatura.
+  // O data.id Ã© usado em minÃºsculas no cÃ¡lculo da assinatura.
 
   const manifest =
 
@@ -436,7 +436,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       return res.status(400).json({
 
-        erro: "ID do recurso não informado.",
+        erro: "ID do recurso nÃ£o informado.",
 
       });
 
@@ -446,11 +446,11 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (!validarAssinaturaMercadoPago(req, dataId)) {
 
-      console.error("Webhook Mercado Pago rejeitado: assinatura inválida.");
+      console.error("Webhook Mercado Pago rejeitado: assinatura invÃ¡lida.");
 
       return res.status(401).json({
 
-        erro: "Assinatura do webhook inválida.",
+        erro: "Assinatura do webhook invÃ¡lida.",
 
       });
 
@@ -460,7 +460,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (tipo !== "payment" && tipo !== "order") {
 
-      console.log("Webhook ignorado: tipo não suportado:", tipo);
+      console.log("Webhook ignorado: tipo nÃ£o suportado:", tipo);
 
       return res.status(200).json({
 
@@ -478,7 +478,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       throw new Error(
 
-        "MERCADOPAGO_ACCESS_TOKEN não configurado."
+        "MERCADOPAGO_ACCESS_TOKEN nÃ£o configurado."
 
       );
 
@@ -542,7 +542,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
         return res.status(502).json({
 
-          erro: "Não foi possível consultar o pagamento no Mercado Pago.",
+          erro: "NÃ£o foi possÃ­vel consultar o pagamento no Mercado Pago.",
 
         });
 
@@ -624,7 +624,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
         return res.status(502).json({
 
-          erro: "Não foi possível consultar a order no Mercado Pago.",
+          erro: "NÃ£o foi possÃ­vel consultar a order no Mercado Pago.",
 
         });
 
@@ -674,7 +674,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       console.log(
 
-        "Pagamento ainda não está aprovado/acreditado. Nenhum crédito será adicionado."
+        "Pagamento ainda nÃ£o estÃ¡ aprovado/acreditado. Nenhum crÃ©dito serÃ¡ adicionado."
 
       );
 
@@ -718,7 +718,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
 
 
-    // Fallback para metadata caso a referência externa não esteja disponível.
+    // Fallback para metadata caso a referÃªncia externa nÃ£o esteja disponÃ­vel.
 
     if ((!userId || !pacote) && metadata) {
 
@@ -734,7 +734,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       console.error(
 
-        "Não foi possível identificar usuário/pacote do pagamento.",
+        "NÃ£o foi possÃ­vel identificar usuÃ¡rio/pacote do pagamento.",
 
         {
 
@@ -750,7 +750,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       return res.status(400).json({
 
-        erro: "Não foi possível identificar o usuário e o pacote do pagamento.",
+        erro: "NÃ£o foi possÃ­vel identificar o usuÃ¡rio e o pacote do pagamento.",
 
       });
 
@@ -764,11 +764,11 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (!pacoteSelecionado) {
 
-      console.error("Pacote não encontrado:", pacote);
+      console.error("Pacote nÃ£o encontrado:", pacote);
 
       return res.status(400).json({
 
-        erro: "Pacote de créditos não encontrado.",
+        erro: "Pacote de crÃ©ditos nÃ£o encontrado.",
 
       });
 
@@ -808,7 +808,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       return res.status(400).json({
 
-        erro: "Valor do pagamento não corresponde ao pacote.",
+        erro: "Valor do pagamento nÃ£o corresponde ao pacote.",
 
       });
 
@@ -852,7 +852,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
       return res.status(500).json({
 
-        erro: "Não foi possível registrar o pagamento no Supabase.",
+        erro: "NÃ£o foi possÃ­vel registrar o pagamento no Supabase.",
 
       });
 
@@ -864,7 +864,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     console.log(
 
-      "Créditos adicionados:",
+      "CrÃ©ditos adicionados:",
 
       pacoteSelecionado.creditos
 
@@ -904,7 +904,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
 // =====================================================
 
-// CONFIGURAÇÃO
+// CONFIGURAÃ‡ÃƒO
 
 // =====================================================
 
@@ -934,7 +934,7 @@ app.use(
 
       // Permite chamadas sem Origin (ex.: curl, health-checks)
 
-      // e os domínios oficiais da Fábrica da Voz.
+      // e os domÃ­nios oficiais da FÃ¡brica da Voz.
 
       if (!origin || allowedOrigins.includes(origin)) {
 
@@ -946,9 +946,9 @@ app.use(
 
 
 
-      // Não bloqueia o navegador por CORS; a aplicação continua
+      // NÃ£o bloqueia o navegador por CORS; a aplicaÃ§Ã£o continua
 
-      // protegida pelo próprio domínio/rota.
+      // protegida pelo prÃ³prio domÃ­nio/rota.
 
       callback(null, true);
 
@@ -982,9 +982,9 @@ app.use(
 
 
 
-// A geração também aceita JSON enviado como text/plain.
+// A geraÃ§Ã£o tambÃ©m aceita JSON enviado como text/plain.
 
-// Isso evita o preflight OPTIONS que o proxy do domínio estava redirecionando.
+// Isso evita o preflight OPTIONS que o proxy do domÃ­nio estava redirecionando.
 
 app.use(
 
@@ -1046,7 +1046,7 @@ if (!ffmpegPath) {
 
   console.error("");
 
-  console.error("ERRO: FFmpeg não encontrado.");
+  console.error("ERRO: FFmpeg nÃ£o encontrado.");
 
   console.error("");
 
@@ -1066,7 +1066,7 @@ console.log(ffmpegPath);
 
 // =====================================================
 
-// UTILITÁRIOS
+// UTILITÃRIOS
 
 // =====================================================
 
@@ -1120,7 +1120,7 @@ function base64ParaBuffer(valor) {
 
 // =====================================================
 
-// PEGAR DURAÇÃO DO ÁUDIO
+// PEGAR DURAÃ‡ÃƒO DO ÃUDIO
 
 // =====================================================
 
@@ -1178,7 +1178,7 @@ function obterDuracao(audioPath) {
 
           new Error(
 
-            "Não foi possível descobrir a duração do áudio."
+            "NÃ£o foi possÃ­vel descobrir a duraÃ§Ã£o do Ã¡udio."
 
           )
 
@@ -1552,7 +1552,7 @@ async function mixarAudio(
 
     console.log(
 
-      "Duração da voz:",
+      "DuraÃ§Ã£o da voz:",
 
       duracaoVoz
 
@@ -1568,7 +1568,7 @@ async function mixarAudio(
 
     console.log(
 
-      "Duração final:",
+      "DuraÃ§Ã£o final:",
 
       duracaoTotal
 
@@ -1580,7 +1580,7 @@ async function mixarAudio(
 
       inicioFade,
 
-      "até",
+      "atÃ©",
 
       duracaoTotal
 
@@ -1644,9 +1644,9 @@ async function mixarAudio(
 
       // Voz:
 
-      // começa após os segundos iniciais
+      // comeÃ§a apÃ³s os segundos iniciais
 
-      // e recebe silêncio depois.
+      // e recebe silÃªncio depois.
 
       `[0:a]adelay=${delayMs}|${delayMs},` +
       (reverbAtivo ? "aecho=0.8:0.9:70:0.25," : "") +
@@ -1656,9 +1656,9 @@ async function mixarAudio(
 
       // Trilha:
 
-      // 20% de volume, duração final exata
+      // 20% de volume, duraÃ§Ã£o final exata
 
-      // e fade out nos últimos 2 segundos.
+      // e fade out nos Ãºltimos 2 segundos.
 
       `[1:a]volume=0.20,` +
 
@@ -1742,7 +1742,7 @@ async function mixarAudio(
 
     );
 
-    console.log("MIXAGEM CONCLUÍDA");
+    console.log("MIXAGEM CONCLUÃDA");
 
     console.log(
 
@@ -1944,7 +1944,7 @@ app.post("/api/corrigir-texto", async (req, res) => {
 
       instructions: `
 
-Você é um revisor especializado em textos para locução de rádio em português do Brasil.
+VocÃª Ã© um revisor especializado em textos para locuÃ§Ã£o de rÃ¡dio em portuguÃªs do Brasil.
 
 
 
@@ -1952,11 +1952,11 @@ Corrija:
 
 - erros de ortografia;
 
-- acentuação;
+- acentuaÃ§Ã£o;
 
-- pontuação;
+- pontuaÃ§Ã£o;
 
-- concordância;
+- concordÃ¢ncia;
 
 - palavras digitadas incorretamente;
 
@@ -1964,27 +1964,27 @@ Corrija:
 
 
 
-Deixe o texto natural, claro e agradável para uma locução.
+Deixe o texto natural, claro e agradÃ¡vel para uma locuÃ§Ã£o.
 
 
 
 MUITO IMPORTANTE:
 
-- Não invente informações.
+- NÃ£o invente informaÃ§Ãµes.
 
-- Não altere nomes de pessoas, empresas ou lugares.
+- NÃ£o altere nomes de pessoas, empresas ou lugares.
 
-- Não altere números de telefone.
+- NÃ£o altere nÃºmeros de telefone.
 
-- Não altere preços.
+- NÃ£o altere preÃ§os.
 
-- Não altere datas ou horários.
+- NÃ£o altere datas ou horÃ¡rios.
 
-- Não altere endereços.
+- NÃ£o altere endereÃ§os.
 
-- Preserve as informações e o sentido original.
+- Preserve as informaÃ§Ãµes e o sentido original.
 
-- Retorne SOMENTE o texto corrigido, sem explicações, sem aspas e sem comentários.
+- Retorne SOMENTE o texto corrigido, sem explicaÃ§Ãµes, sem aspas e sem comentÃ¡rios.
 
       `,
 
@@ -2002,7 +2002,7 @@ MUITO IMPORTANTE:
 
       return res.status(500).json({
 
-        erro: "A IA não retornou um texto corrigido.",
+        erro: "A IA nÃ£o retornou um texto corrigido.",
 
       });
 
@@ -2024,7 +2024,7 @@ MUITO IMPORTANTE:
 
     res.status(500).json({
 
-      erro: "Não foi possível corrigir o texto.",
+      erro: "NÃ£o foi possÃ­vel corrigir o texto.",
 
       detalhes: erro?.message || "Erro desconhecido",
 
@@ -2038,7 +2038,7 @@ MUITO IMPORTANTE:
 
 // =====================================================
 
-// AUTENTICAÇÃO E CRÉDITOS
+// AUTENTICAÃ‡ÃƒO E CRÃ‰DITOS
 
 // =====================================================
 
@@ -2052,7 +2052,7 @@ async function autenticarUsuario(req) {
 
   if (!authHeader.startsWith("Bearer ")) {
 
-    throw new Error("Usuário não autenticado.");
+    throw new Error("UsuÃ¡rio nÃ£o autenticado.");
 
   }
 
@@ -2064,7 +2064,7 @@ async function autenticarUsuario(req) {
 
   if (!accessToken) {
 
-    throw new Error("Token de autenticação não informado.");
+    throw new Error("Token de autenticaÃ§Ã£o nÃ£o informado.");
 
   }
 
@@ -2082,7 +2082,7 @@ async function autenticarUsuario(req) {
 
   if (error || !user) {
 
-    throw new Error("Sessão do usuário inválida.");
+    throw new Error("SessÃ£o do usuÃ¡rio invÃ¡lida.");
 
   }
 
@@ -2114,11 +2114,11 @@ async function consumirCreditos(userId, quantidade) {
 
   if (error) {
 
-    console.error("ERRO AO CONSUMIR CRÉDITOS:", error);
+    console.error("ERRO AO CONSUMIR CRÃ‰DITOS:", error);
 
     throw new Error(
 
-      error.message || "Não foi possível consumir os créditos."
+      error.message || "NÃ£o foi possÃ­vel consumir os crÃ©ditos."
 
     );
 
@@ -2152,7 +2152,7 @@ async function devolverCreditos(userId, quantidade) {
 
   if (error) {
 
-    console.error("ERRO AO DEVOLVER CRÉDITOS:", error);
+    console.error("ERRO AO DEVOLVER CRÃ‰DITOS:", error);
 
     return null;
 
@@ -2191,7 +2191,7 @@ function calcularCreditosNecessarios(texto) {
 // =====================================================
 
 // Pode receber o UUID da voz diretamente do frontend ou um apelido.
-// Se usar apelidos, configure os IDs abaixo no Render como variáveis de ambiente.
+// Se usar apelidos, configure os IDs abaixo no Render como variÃ¡veis de ambiente.
 const VOZES_CARTESIA = {
   paulinho: 'db6b0ed5-d5d3-463d-ae85-518a07d3c2b4',
   aninha: 'bd914056-a671-4cc2-8a1d-a27986fd1ad8',
@@ -2248,14 +2248,14 @@ app.post('/api/gerar-voz', async (req, res) => {
     }
     if (!process.env.CARTESIA_API_KEY) {
       return res.status(500).json({
-        erro: 'CARTESIA_API_KEY não está configurada nas variáveis de ambiente do Render.',
+        erro: 'CARTESIA_API_KEY nÃ£o estÃ¡ configurada nas variÃ¡veis de ambiente do Render.',
       });
     }
 
     const cartesiaVoiceId = resolverVoiceIdCartesia(voiceId);
     if (!cartesiaVoiceId) {
       return res.status(400).json({
-        erro: `A voz "${String(voiceId)}" não foi reconhecida. Confira o ID da voz da Cartesia enviado pelo frontend.`,
+        erro: `A voz "${String(voiceId)}" nÃ£o foi reconhecida. Confira o ID da voz da Cartesia enviado pelo frontend.`,
       });
     }
 
@@ -2264,35 +2264,39 @@ app.post('/api/gerar-voz', async (req, res) => {
     const creditosNecessarios = calcularCreditosNecessarios(textoLimpo);
 
     console.log('Quantidade de caracteres:', quantidadeCaracteres);
-    console.log('Créditos necessários:', creditosNecessarios);
+    console.log('CrÃ©ditos necessÃ¡rios:', creditosNecessarios);
 
-    // AUTENTICAR USUÁRIO
+    // AUTENTICAR USUÃRIO
     const usuario = await autenticarUsuario(req);
     usuarioId = usuario.id;
 
-    // CONSUMIR CRÉDITOS: cada bloco de até 800 caracteres consome 1 crédito.
+    // CONSUMIR CRÃ‰DITOS: cada bloco de atÃ© 800 caracteres consome 1 crÃ©dito.
     await consumirCreditos(usuarioId, creditosNecessarios);
     creditosConsumidos = creditosNecessarios;
 
-    console.log('Créditos consumidos:', creditosConsumidos);
+    console.log('CrÃ©ditos consumidos:', creditosConsumidos);
     console.log('Cartesia Voice ID:', cartesiaVoiceId);
     console.log('Texto:', textoLimpo);
 
-    // O Sonic entende o contexto do texto. Não enviamos as tags [excited],
-    // [happily] etc. da ElevenLabs porque não são instruções equivalentes na Cartesia.
+    // O Sonic entende o contexto do texto. NÃ£o enviamos as tags [excited],
+    // [happily] etc. da ElevenLabs porque nÃ£o sÃ£o instruÃ§Ãµes equivalentes na Cartesia.
     // Os presets abaixo ajustam levemente velocidade e volume para cada estilo.
         const presetsEstilo = {
   animado:       { speed: 1.10, volume: 1.08, emotion: 'excited' },
-  muitoAnimado:  { speed: 1.20, volume: 1.16, emotion: 'excited' },
-  superImpacto:  { speed: 1.25, volume: 1.22, emotion: 'excited' },
-  serio:         { speed: 0.88, volume: 0.96, emotion: 'neutral' },
-  urgente:       { speed: 1.22, volume: 1.12, emotion: 'angry' },
-  comercial:     { speed: 1.06, volume: 1.05, emotion: 'content' },
-  festa:         { speed: 1.16, volume: 1.14, emotion: 'excited' },
-  solene:        { speed: 0.85, volume: 0.96, emotion: 'neutral' },
+  muitoAnimado:  { speed: 1.18, volume: 1.14, emotion: 'enthusiastic' },
+  superImpacto:  { speed: 1.22, volume: 1.20, emotion: 'triumphant' },
+  serio:         { speed: 0.88, volume: 0.96, emotion: 'confident' },
+  urgente:       { speed: 1.20, volume: 1.10, emotion: 'alarmed' },
+  comercial:     { speed: 1.05, volume: 1.04, emotion: 'confident' },
+  festa:         { speed: 1.16, volume: 1.12, emotion: 'euphoric' },
+  solene:        { speed: 0.85, volume: 0.94, emotion: 'serene' },
 };
 
-const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
+const preset = presetsEstilo[estilo] || {
+  speed: 1,
+  volume: 1,
+  emotion: 'neutral'
+};
 
     const resposta = await fetch('https://api.cartesia.ai/tts/bytes', {
       method: 'POST',
@@ -2323,22 +2327,22 @@ const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
     if (!resposta.ok) {
       const erroApi = await resposta.text();
       console.error('CARTESIA ERRO:', resposta.status, erroApi);
-      throw new Error(`Cartesia (${resposta.status}): ${erroApi || 'falha ao gerar áudio.'}`);
+      throw new Error(`Cartesia (${resposta.status}): ${erroApi || 'falha ao gerar Ã¡udio.'}`);
     }
 
     let audio = Buffer.from(await resposta.arrayBuffer());
     if (!audio.length) {
-      throw new Error('A Cartesia retornou um áudio vazio.');
+      throw new Error('A Cartesia retornou um Ã¡udio vazio.');
     }
 
-    console.log('Áudio recebido da Cartesia:', audio.length, 'bytes');
+    console.log('Ãudio recebido da Cartesia:', audio.length, 'bytes');
 
-    // Mantém o ajuste opcional de velocidade que já existia na aplicação.
+    // MantÃ©m o ajuste opcional de velocidade que jÃ¡ existia na aplicaÃ§Ã£o.
     if (speed !== undefined && speed !== null && Number(speed) !== 1) {
       audio = await alterarVelocidade(audio, Number(speed));
     }
     if (!audio.length) {
-      throw new Error('O áudio ficou vazio após o processamento.');
+      throw new Error('O Ã¡udio ficou vazio apÃ³s o processamento.');
     }
 
     res.set({
@@ -2351,21 +2355,21 @@ const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
   } catch (erro) {
     console.error('ERRO AO GERAR VOZ COM CARTESIA:', erro);
 
-    // Devolve os créditos caso a geração falhe depois do consumo.
+    // Devolve os crÃ©ditos caso a geraÃ§Ã£o falhe depois do consumo.
     if (usuarioId && creditosConsumidos > 0) {
       try {
         await devolverCreditos(usuarioId, creditosConsumidos);
-        console.log('Créditos devolvidos:', creditosConsumidos);
+        console.log('CrÃ©ditos devolvidos:', creditosConsumidos);
       } catch (erroDevolucao) {
-        console.error('ERRO AO DEVOLVER CRÉDITOS:', erroDevolucao);
+        console.error('ERRO AO DEVOLVER CRÃ‰DITOS:', erroDevolucao);
       }
     }
 
-    const mensagem = erro?.message || 'Não foi possível gerar a voz.';
-    const semCreditos = mensagem.toLowerCase().includes('créditos insuficientes');
+    const mensagem = erro?.message || 'NÃ£o foi possÃ­vel gerar a voz.';
+    const semCreditos = mensagem.toLowerCase().includes('crÃ©ditos insuficientes');
     return res.status(semCreditos ? 402 : 500).json({
       erro: semCreditos
-        ? 'Você não possui créditos suficientes para gerar essa locução.'
+        ? 'VocÃª nÃ£o possui crÃ©ditos suficientes para gerar essa locuÃ§Ã£o.'
         : mensagem,
     });
   }
@@ -2374,7 +2378,7 @@ const preset = presetsEstilo[estilo] || { speed: 1, volume: 1 };
 
 // =====================================================
 
-// MIXAGEM COM TRILHA DA FÁBRICA
+// MIXAGEM COM TRILHA DA FÃBRICA
 
 //
 
@@ -2426,7 +2430,7 @@ app.post(
 
       console.log(
 
-        "MIXAGEM - TRILHA DA FÁBRICA"
+        "MIXAGEM - TRILHA DA FÃBRICA"
 
       );
 
@@ -2444,7 +2448,7 @@ app.post(
 
           erro:
 
-            "Áudio da voz não informado.",
+            "Ãudio da voz nÃ£o informado.",
 
         });
 
@@ -2482,7 +2486,7 @@ app.post(
 
           erro:
 
-            "Áudio da voz vazio ou inválido.",
+            "Ãudio da voz vazio ou invÃ¡lido.",
 
         });
 
@@ -2538,7 +2542,7 @@ app.post(
 
         console.error(
 
-          "Trilha não encontrada:",
+          "Trilha nÃ£o encontrada:",
 
           trilhaPath
 
@@ -2550,7 +2554,7 @@ app.post(
 
           erro:
 
-            `Trilha não encontrada: ${nomeTrilha}`,
+            `Trilha nÃ£o encontrada: ${nomeTrilha}`,
 
         });
 
@@ -2636,7 +2640,7 @@ app.post(
 
           erro.message ||
 
-          "Erro ao mixar os áudios.",
+          "Erro ao mixar os Ã¡udios.",
 
       });
 
@@ -2720,7 +2724,7 @@ app.post(
 
           erro:
 
-            "Áudio da voz não informado.",
+            "Ãudio da voz nÃ£o informado.",
 
         });
 
@@ -2734,7 +2738,7 @@ app.post(
 
           erro:
 
-            "A trilha enviada pelo cliente não foi encontrada.",
+            "A trilha enviada pelo cliente nÃ£o foi encontrada.",
 
         });
 
@@ -2768,7 +2772,7 @@ app.post(
 
           erro:
 
-            "Áudio da voz vazio ou inválido.",
+            "Ãudio da voz vazio ou invÃ¡lido.",
 
         });
 
@@ -2782,7 +2786,7 @@ app.post(
 
           erro:
 
-            "Áudio da trilha vazio ou inválido.",
+            "Ãudio da trilha vazio ou invÃ¡lido.",
 
         });
 
@@ -2810,7 +2814,7 @@ app.post(
 
       console.log(
 
-        "Mixagem da trilha do cliente concluída."
+        "Mixagem da trilha do cliente concluÃ­da."
 
       );
 
@@ -2866,7 +2870,7 @@ app.post(
 
           erro.message ||
 
-          "Não foi possível mixar a trilha enviada.",
+          "NÃ£o foi possÃ­vel mixar a trilha enviada.",
 
       });
 
@@ -2918,7 +2922,7 @@ app.post(
 
             erro:
 
-              "Áudio WAV não informado.",
+              "Ãudio WAV nÃ£o informado.",
 
           });
 
@@ -3062,7 +3066,7 @@ app.post(
 
               console.error(
 
-                "FFmpeg conversão:",
+                "FFmpeg conversÃ£o:",
 
                 erro
 
@@ -3078,7 +3082,7 @@ app.post(
 
                     erro ||
 
-                    "Não foi possível converter o áudio para MP3.",
+                    "NÃ£o foi possÃ­vel converter o Ã¡udio para MP3.",
 
                 });
 
@@ -3146,7 +3150,7 @@ app.post(
 
       console.error(
 
-        "ERRO NA CONVERSÃO PARA MP3:",
+        "ERRO NA CONVERSÃƒO PARA MP3:",
 
         erro
 
@@ -3184,7 +3188,7 @@ app.get("/api/health", (req, res) => {
 
     ok: true,
 
-    servidor: "Fábrica da Voz",
+    servidor: "FÃ¡brica da Voz",
 
     porta: PORT,
 
@@ -3225,7 +3229,7 @@ app.get(
 
       servidor:
 
-        "Fábrica da Voz",
+        "FÃ¡brica da Voz",
 
 
 
@@ -3289,7 +3293,7 @@ app.get(
 
 // O Render precisa executar `npm run build` para criar a
 
-// pasta dist. Depois o próprio Express entrega essa pasta.
+// pasta dist. Depois o prÃ³prio Express entrega essa pasta.
 
 // As rotas /api/* continuam sendo atendidas acima.
 
@@ -3307,7 +3311,7 @@ if (fs.existsSync(distPath)) {
 
 
 
-  // SPA: qualquer rota que não seja /api/* recebe o index.html.
+  // SPA: qualquer rota que nÃ£o seja /api/* recebe o index.html.
 
   app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
 
@@ -3327,7 +3331,7 @@ if (fs.existsSync(distPath)) {
 
     res.status(500).send(
 
-      "Frontend não encontrado. Execute npm run build no deploy."
+      "Frontend nÃ£o encontrado. Execute npm run build no deploy."
 
     );
 
@@ -3337,7 +3341,7 @@ if (fs.existsSync(distPath)) {
 
   console.warn(
 
-    "AVISO: pasta dist não encontrada. O frontend não será exibido até o build do Vite ser executado."
+    "AVISO: pasta dist nÃ£o encontrada. O frontend nÃ£o serÃ¡ exibido atÃ© o build do Vite ser executado."
 
   );
 
@@ -3347,7 +3351,7 @@ if (fs.existsSync(distPath)) {
 
     res.status(503).send(
 
-      "Fábrica da Voz: frontend ainda não foi compilado. Execute npm run build."
+      "FÃ¡brica da Voz: frontend ainda nÃ£o foi compilado. Execute npm run build."
 
     );
 
@@ -3431,7 +3435,7 @@ const server =
 
       console.log(
 
-        "        FÁBRICA DA VOZ"
+        "        FÃBRICA DA VOZ"
 
       );
 
@@ -3449,7 +3453,7 @@ const server =
 
       console.log(
 
-        "Geração de voz: ATIVADA"
+        "GeraÃ§Ã£o de voz: ATIVADA"
 
       );
 
@@ -3467,7 +3471,7 @@ const server =
 
       console.log(
 
-        "Trilha da fábrica: ATIVADA"
+        "Trilha da fÃ¡brica: ATIVADA"
 
       );
 
@@ -3546,3 +3550,4 @@ process.on(
   () => encerrarServidor("SIGTERM")
 
 );
+
