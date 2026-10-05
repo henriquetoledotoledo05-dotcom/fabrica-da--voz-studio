@@ -631,17 +631,19 @@ function App() {
 
   const vozes: Voz[] = [
     {
-      id: 'e16c6afe-5f8d-498c-b358-10a5bdefdfd1',
-      nome: 'Noah',
-      foto: noahLocutor,
-      demonstrativo: '/noah-amostra-novo.mp3'
-    },    {
       id: '37b3068c-a470-409a-9c83-c284cf58dd34',
       nome: 'Ricardo',
       foto: '/ricardo-foto.png',
       demonstrativo: '/vozes/ricardo-voz.wav'
     },
 
+
+    {
+      id: 'e16c6afe-5f8d-498c-b358-10a5bdefdfd1',
+      nome: 'Noah',
+      foto: noahLocutor,
+      demonstrativo: '/noah-amostra-novo.mp3'
+    },
 
     {
       id: '8207ca11-20cc-4061-bfc9-86711d52a66e',
@@ -740,7 +742,7 @@ function App() {
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'VinÃ­cius', 'Vitor', 'LourenÃ§o', 'Gustavo'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'VinÃ­cius', 'Vitor', 'LourenÃ§o', 'Gustavo', 'Ricardo'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
@@ -3307,6 +3309,7 @@ const gerarVoz = async () => {
 }
 
 export default App
+
 
 
 
