@@ -2557,6 +2557,28 @@ const gerarVoz = async () => {
   {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
 </button>
 
+              <div style={{
+                marginTop: '14px',
+                marginBottom: '18px',
+                padding: '16px 18px',
+                borderRadius: '14px',
+                border: '2px solid #ff1a1a',
+                background: '#ef0010',
+                color: '#ffffff',
+                boxShadow: '0 0 10px rgba(255, 0, 0, 0.35)',
+                lineHeight: 1.35,
+                fontSize: '14px',
+                fontWeight: 700
+              }}>
+                <div style={{ fontSize: '16px', marginBottom: '6px' }}>
+                  ⚠️ ATENÇÃO
+                </div>
+                <div>
+                  NÃO NOS RESPONSABILIZAMOS POR ERROS DE ESCRITA DO USUÁRIO,
+                  CORRIGIREMOS APENAS ERROS DE PRONÚNCIA OU DEVANEIOS DA IA.
+                </div>
+              </div>
+
               {/* =================================================
                   GERAR
               ================================================= */}
@@ -3329,6 +3351,7 @@ const gerarVoz = async () => {
 }
 
 export default App
+
 
 
 
