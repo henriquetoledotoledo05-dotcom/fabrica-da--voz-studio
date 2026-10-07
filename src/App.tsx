@@ -244,8 +244,9 @@ function App() {
   const [vozSelecionada, setVozSelecionada] =
     useState('rz25pon9uanPpUGOW98Y')
 
-  const [estiloSelecionado, setEstiloSelecionado] =
-    useState('normal')
+  const [estiloSelecionado, setEstiloSelecionado] = useState('normal')
+
+  const [instrucaoPersonalizada, setInstrucaoPersonalizada] = useState('')
 
   const [reverbAtivo, setReverbAtivo] = useState(false)
 
@@ -948,8 +949,8 @@ const gerarVoz = async () => {
           body: JSON.stringify({
             texto: textoFinal,
             voiceId: vozAtual.id,
-            speed: velocidadeSelecionada,
             estilo: estiloSelecionado,
+            instrucaoPersonalizada: instrucaoPersonalizada.trim(),
             reverb: reverbAtivo
           })
         }
@@ -2457,6 +2458,46 @@ const gerarVoz = async () => {
                   </option>
                 </select>
 
+                <div style={{
+                  marginTop: '14px'
+                }}>
+                  <label>
+                    🎙️ Como você quer que o locutor fale?
+                  </label>
+
+                  <textarea
+                    value={instrucaoPersonalizada}
+                    onChange={(e) =>
+                      setInstrucaoPersonalizada(e.target.value.slice(0, 300))
+                    }
+                    maxLength={300}
+                    placeholder="Ex.: fale como locutor de rádio, com bastante energia e entusiasmo..."
+                    rows={3}
+                    style={{
+                      width: '100%',
+                      marginTop: '8px',
+                      padding: '12px 14px',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(139, 92, 246, 0.55)',
+                      background: '#171020',
+                      color: '#ffffff',
+                      fontSize: '14px',
+                      resize: 'vertical',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+
+                  <div style={{
+                    marginTop: '5px',
+                    textAlign: 'right',
+                    color: '#aaa',
+                    fontSize: '12px'
+                  }}>
+                    {instrucaoPersonalizada.length}/300 caracteres
+                  </div>
+                </div>
+
               </div>
               {/* =================================================
                   VELOCIDADE
@@ -3351,6 +3392,8 @@ const gerarVoz = async () => {
 }
 
 export default App
+
+
 
 
 

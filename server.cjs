@@ -1108,6 +1108,7 @@ app.post(
         categoria,
         estilo,
         reverb,
+        instrucaoPersonalizada,
       } = req.body;
 
       console.log("ESTILO RECEBIDO:", estilo);
@@ -1220,6 +1221,49 @@ app.post(
       }
 
       // =====================================================
+      // INSTRUÇÃO PERSONALIZADA DO CLIENTE
+      // =====================================================
+
+      if (instrucaoPersonalizada && instrucaoPersonalizada.trim()) {
+        const instrucao = instrucaoPersonalizada.trim().toLowerCase();
+
+        let tagsPersonalizadas = [];
+
+        if (instrucao.includes('rádio') || instrucao.includes('radio') || instrucao.includes('locutor')) {
+          tagsPersonalizadas.push('[excited]');
+        }
+
+        if (instrucao.includes('futebol') || instrucao.includes('narrador') || instrucao.includes('narração')) {
+          tagsPersonalizadas.push('[excited]');
+          tagsPersonalizadas.push('[shouts]');
+        }
+
+        if (instrucao.includes('animado') || instrucao.includes('energia') || instrucao.includes('entusiasmo') || instrucao.includes('empolgação')) {
+          tagsPersonalizadas.push('[excited]');
+        }
+
+        if (instrucao.includes('festa') || instrucao.includes('alegre') || instrucao.includes('divertido')) {
+          tagsPersonalizadas.push('[happily]');
+        }
+
+        if (instrucao.includes('sério') || instrucao.includes('serio') || instrucao.includes('grave') || instrucao.includes('profissional')) {
+          tagsPersonalizadas.push('[serious]');
+        }
+
+        if (instrucao.includes('urgente') || instrucao.includes('atenção') || instrucao.includes('atencao')) {
+          tagsPersonalizadas.push('[shouts]');
+        }
+
+        tagsPersonalizadas = [...new Set(tagsPersonalizadas)];
+
+        if (tagsPersonalizadas.length > 0) {
+          textoParaVoz = `${tagsPersonalizadas.join(' ')} ${textoLimpo}`;
+        }
+
+        console.log('INSTRUÇÃO PERSONALIZADA:', instrucaoPersonalizada);
+        console.log('TAGS PERSONALIZADAS:', tagsPersonalizadas);
+      }
+
       // ELEVENLABS
       // =====================================================
 
@@ -1957,6 +2001,8 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
+
 
 
 
