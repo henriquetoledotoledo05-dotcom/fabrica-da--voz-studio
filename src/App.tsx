@@ -1,4 +1,4 @@
-import logoFabrica from './assets/logo-fabrica.png'
+﻿import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -730,16 +730,44 @@ function App() {
       foto: gabyLocutora,
       demonstrativo: '/vozes/gaby.mp3'
     }
+  ,
+    {
+      id: 'u1vCfFgLgJ3YbJEqXmbf',
+      nome: 'Angelo',
+      foto: '/angelo-foto.png',
+      demonstrativo: '/vozes/angelo-voz.mp3'
+    },
+
+    {
+      id: 'exVv2CbwvTu1WNVuSWXs',
+      nome: 'Bruno',
+      foto: '/bruno-foto.png',
+      demonstrativo: '/vozes/bruno-voz.mp3'
+    },
+
+    {
+      id: 'gyiJ08WU9Wi2LNY7nTcB',
+      nome: 'Letícia',
+      foto: '/leticia-foto.png',
+      demonstrativo: '/vozes/leticia-voz.mp3'
+    },
+
+    {
+      id: 'qPAKBzRQkQs6EIhLSbMi',
+      nome: 'Ricardo',
+      foto: '/ricardo-foto.png',
+      demonstrativo: '/vozes/ricardo-voz.wav'
+    }
   ]
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
   (voz) =>
-    ['Nina', 'Luiza', 'Gaby'].includes(voz.nome)
+    ['Nina', 'Luiza', 'Gaby', 'Letícia'].includes(voz.nome)
 )
 
 const vozesInfantis = vozes.filter(
@@ -3301,5 +3329,8 @@ const gerarVoz = async () => {
 }
 
 export default App
+
+
+
 
 
