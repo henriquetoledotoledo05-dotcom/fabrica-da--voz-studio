@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+﻿const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -1184,49 +1184,40 @@ app.post(
       // =====================================================
 
       let textoParaVoz = textoLimpo;
-let estabilidadeEstilo = 0.50;
+      let estabilidadeEstilo = 0.50;
 
-if (estilo === "animado") {
-  textoParaVoz = `[excited] ${textoLimpo} [happily]`;
-  estabilidadeEstilo = 0.18;
+      if (estilo === "animado") {
+        textoParaVoz = `[excited] ${textoLimpo}`;
+        estabilidadeEstilo = 0.30;
 
-} else if (estilo === "muitoAnimado") {
-  textoParaVoz = `[excited] [happily] ${textoLimpo} [excited] [happily]`;
-  estabilidadeEstilo = 0.08;
+      } else if (estilo === "muitoAnimado") {
+        textoParaVoz = `[excited] [happily] ${textoLimpo}`;
+        estabilidadeEstilo = 0.22;
 
-} else if (estilo === "superImpacto") {
-  textoParaVoz = `[shouts] ${textoLimpo} [shouts] [excited]`;
-  estabilidadeEstilo = 0.05;
+      } else if (estilo === "superImpacto") {
+        textoParaVoz = `[shouts] ${textoLimpo}`;
+        estabilidadeEstilo = 0.20;
 
-} else if (estilo === "serio") {
-  textoParaVoz = `[calm] [serious] ${textoLimpo}`;
-  estabilidadeEstilo = 0.72;
+      } else if (estilo === "serio") {
+        textoParaVoz = `[serious] ${textoLimpo}`;
+        estabilidadeEstilo = 0.68;
 
-} else if (estilo === "urgente") {
-  textoParaVoz = `[excited] [shouts] ${textoLimpo} [shouts]`;
-  estabilidadeEstilo = 0.06;
+      } else if (estilo === "urgente") {
+        textoParaVoz = `[shouts] [excited] ${textoLimpo}`;
+        estabilidadeEstilo = 0.18;
 
-} else if (estilo === "comercial") {
-  textoParaVoz = `[excited] ${textoLimpo} [happily] [excited]`;
-  estabilidadeEstilo = 0.15;
+      } else if (estilo === "comercial") {
+        textoParaVoz = `[excited] ${textoLimpo}`;
+        estabilidadeEstilo = 0.25;
 
-} else if (estilo === "festa") {
-  textoParaVoz = `[excited] [happily] ${textoLimpo} [laughs] [happily]`;
-  estabilidadeEstilo = 0.08;
+      } else if (estilo === "festa") {
+        textoParaVoz = `[excited] [happily] ${textoLimpo}`;
+        estabilidadeEstilo = 0.22;
 
-} else if (estilo === "solene") {
-  textoParaVoz = `[calm] [serious] ${textoLimpo}`;
-  estabilidadeEstilo = 0.82;
-}
-
-      console.log(
-        "Texto enviado para ElevenLabs:",
-        textoParaVoz
-      );
-      console.log(
-        "Estabilidade do estilo:",
-        estabilidadeEstilo
-      );
+      } else if (estilo === "solene") {
+        textoParaVoz = `[calm] [serious] ${textoLimpo}`;
+        estabilidadeEstilo = 0.78;
+      }
 
       // =====================================================
       // ELEVENLABS
@@ -1966,5 +1957,11 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
+
+
+
+
+
 
 
