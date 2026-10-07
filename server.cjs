@@ -1221,49 +1221,78 @@ app.post(
       }
 
       // =====================================================
-      // INSTRUÇÃO PERSONALIZADA DO CLIENTE
+      // =====================================================
+      // INSTRUÇÃO PERSONALIZADA - INTERPRETAÇÃO COM IA
       // =====================================================
 
       if (instrucaoPersonalizada && instrucaoPersonalizada.trim()) {
-        const instrucao = instrucaoPersonalizada.trim().toLowerCase();
+        try {
+          console.log("INSTRUÇÃO PERSONALIZADA:", instrucaoPersonalizada);
 
-        let tagsPersonalizadas = [];
+          const interpretacao = await openai.responses.create({
+            model: "gpt-5.6-luna",
+            instructions: `
+Você é um diretor de voz para locuções profissionais em português do Brasil.
 
-        if (instrucao.includes('rádio') || instrucao.includes('radio') || instrucao.includes('locutor')) {
-          tagsPersonalizadas.push('[excited]');
+Receba a instrução do cliente e transforme-a SOMENTE em uma combinação de tags de interpretação compatíveis com o ElevenLabs V3.
+
+Tags permitidas:
+[excited]
+[happily]
+[shouts]
+[serious]
+[calm]
+
+Regras:
+- Entenda o sentido completo da instrução.
+- "locutor de rádio", "rádio", "chamada de rádio" normalmente indica [excited].
+- "futebol", "narração de gol", "narrador esportivo" pode usar [excited] [shouts].
+- "muito animado", "empolgado", "muita energia" pode usar [excited] [happily].
+- "forte", "impactante", "chamando atenção" pode usar [shouts].
+- "sério", "institucional", "autoridade", "profissional" pode usar [serious].
+- "calmo", "tranquilo", "emocional" pode usar [calm].
+- Combine tags quando fizer sentido.
+- Nunca invente tags.
+- Nunca escreva explicações.
+- Retorne SOMENTE as tags, separadas por espaço.
+- Se nenhuma tag for adequada, retorne [calm].
+            `,
+            input: instrucaoPersonalizada.trim(),
+          });
+
+          const tagsInterpretadas =
+            interpretacao.output_text?.trim() || "[calm]";
+
+          const tagsValidas = tagsInterpretadas
+            .match(/\[(excited|happily|shouts|serious|calm)\]/g);
+
+          if (tagsValidas && tagsValidas.length > 0) {
+            const tagsUnicas = [...new Set(tagsValidas)];
+
+            textoParaVoz =
+              `${tagsUnicas.join(" ")} ${textoLimpo}`;
+
+            console.log(
+              "TAGS INTERPRETADAS PELA IA:",
+              tagsUnicas
+            );
+          } else {
+            console.log(
+              "IA não retornou tags válidas. Mantendo estilo selecionado."
+            );
+          }
+
+        } catch (erroInstrucao) {
+          console.error(
+            "ERRO AO INTERPRETAR INSTRUÇÃO PERSONALIZADA:",
+            erroInstrucao.message
+          );
+
+          console.log(
+            "Continuando geração com o estilo selecionado."
+          );
         }
-
-        if (instrucao.includes('futebol') || instrucao.includes('narrador') || instrucao.includes('narração')) {
-          tagsPersonalizadas.push('[excited]');
-          tagsPersonalizadas.push('[shouts]');
-        }
-
-        if (instrucao.includes('animado') || instrucao.includes('energia') || instrucao.includes('entusiasmo') || instrucao.includes('empolgação')) {
-          tagsPersonalizadas.push('[excited]');
-        }
-
-        if (instrucao.includes('festa') || instrucao.includes('alegre') || instrucao.includes('divertido')) {
-          tagsPersonalizadas.push('[happily]');
-        }
-
-        if (instrucao.includes('sério') || instrucao.includes('serio') || instrucao.includes('grave') || instrucao.includes('profissional')) {
-          tagsPersonalizadas.push('[serious]');
-        }
-
-        if (instrucao.includes('urgente') || instrucao.includes('atenção') || instrucao.includes('atencao')) {
-          tagsPersonalizadas.push('[shouts]');
-        }
-
-        tagsPersonalizadas = [...new Set(tagsPersonalizadas)];
-
-        if (tagsPersonalizadas.length > 0) {
-          textoParaVoz = `${tagsPersonalizadas.join(' ')} ${textoLimpo}`;
-        }
-
-        console.log('INSTRUÇÃO PERSONALIZADA:', instrucaoPersonalizada);
-        console.log('TAGS PERSONALIZADAS:', tagsPersonalizadas);
       }
-
       // ELEVENLABS
       // =====================================================
 
@@ -2001,6 +2030,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 
