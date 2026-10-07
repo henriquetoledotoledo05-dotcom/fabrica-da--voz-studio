@@ -2586,7 +2586,17 @@ const gerarVoz = async () => {
   placeholder="Digite aqui o texto que você quer transformar..."
 />
 
-<div className="contador-caracteres">
+<div
+  className="contador-caracteres"
+  style={{
+    marginTop: '7px',
+    textAlign: 'right',
+    color: '#aaa',
+    fontSize: '12px',
+    fontWeight: 400,
+    opacity: 0.85
+  }}
+>
   {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
 </div>
 <button
@@ -2603,20 +2613,20 @@ const gerarVoz = async () => {
                 marginBottom: '18px',
                 padding: '16px 18px',
                 borderRadius: '14px',
-                border: '2px solid #ff1a1a',
-                background: '#ef0010',
-                color: '#ffffff',
-                boxShadow: '0 0 10px rgba(255, 0, 0, 0.35)',
-                lineHeight: 1.35,
-                fontSize: '14px',
-                fontWeight: 700
+                border: '1px solid rgba(192, 132, 252, 0.28)',
+background: 'rgba(124, 58, 237, 0.08)',
+color: '#d8c7ef',
+boxShadow: 'none',
+lineHeight: 1.45,
+fontSize: '12px',
+fontWeight: 400
               }}>
-                <div style={{ fontSize: '16px', marginBottom: '6px' }}>
+                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#c084fc', fontWeight: 600 }}>
                   ⚠️ ATENÇÃO
                 </div>
                 <div>
-                  NÃO NOS RESPONSABILIZAMOS POR ERROS DE ESCRITA DO USUÁRIO,
-                  CORRIGIREMOS APENAS ERROS DE PRONÚNCIA OU DEVANEIOS DA IA.
+                  Não nos responsabilizamos por erros de escrita do usuário,
+                  corrigiremos apenas erros de pronúncia ou devaneios da IA.
                 </div>
               </div>
 
@@ -3392,6 +3402,7 @@ const gerarVoz = async () => {
 }
 
 export default App
+
 
 
 
