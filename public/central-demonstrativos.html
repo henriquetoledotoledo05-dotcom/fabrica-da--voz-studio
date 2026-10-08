@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10091b">
+<title>Central de Demonstrativos</title>
+<style>
+:root{color-scheme:dark;--bg:#10091b;--card:#1d142b;--purple:#a855f7;--gold:#ffd166;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(145deg,#10091b,#211033 60%,#10091b);color:var(--white);font-family:Arial,sans-serif;min-height:100vh}
+header{text-align:center;padding:36px 16px 25px;border-bottom:1px solid #ffffff18}
+.logo{font-size:clamp(27px,5vw,42px);font-weight:900;letter-spacing:-1px}
+.logo span{color:var(--gold)}
+header p{color:#d4c8df;line-height:1.5}
+.wrap{max-width:1120px;margin:auto;padding:22px 16px 45px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:22px}
+button,.sharelink{border:0;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;text-decoration:none}
+.primary{background:var(--purple);color:white}
+.gold{background:var(--gold);color:#24132f}
+.search{width:100%;max-width:520px;display:block;margin:0 auto 24px;padding:14px;border:1px solid #59436f;border-radius:10px;background:#170e23;color:white;font-size:16px}
+.category-title{font-size:24px;margin:30px 0 16px;padding-bottom:10px;border-bottom:2px solid #a855f7;color:#ffd166}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.card{background:linear-gradient(155deg,#261835,#191020);border:1px solid #ffffff18;border-radius:16px;padding:18px;text-align:center;box-shadow:0 8px 22px #0002}
+.photo{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#382448;border:3px solid var(--purple);margin:0 auto 12px;display:block}
+.card h2{font-size:20px;margin:8px 0 14px}
+audio{width:100%;height:42px;margin:0 0 12px}
+.card button{width:100%}
+footer{text-align:center;color:#bcaecb;padding:24px;font-size:13px}
+.empty{text-align:center;color:#d4c8df;display:none;padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">CENTRAL <span>DE VOZES</span></div>
+  <p>Central de Demonstrativos<br>Ouça as vozes e escolha a ideal para sua locução!</p>
+  <div class="actions">
+    <button class="gold" id="share">Compartilhar central</button>
+    <button class="primary" id="copy">Copiar link</button>
+  </div>
+</header>
+<main class="wrap">
+  <input class="search" id="search" type="search" placeholder="🔎 Buscar locutor pelo nome...">
+  <section id="masculinos-section">
+  <h2 class="category-title">🎙️ Locutores masculinos</h2>
+  <div class="grid" id="masculinos"></div>
+</section>
+<section id="femininos-section">
+  <h2 class="category-title">🎤 Locutoras femininas</h2>
+  <div class="grid" id="femininos"></div>
+</section>
+<section id="infantis-section">
+  <h2 class="category-title">🧒 Vozes infantis</h2>
+  <div class="grid" id="infantis"></div>
+</section>
+  <div class="empty" id="empty">Nenhum locutor encontrado.</div>
+</main>
+<footer>Escolha sua voz favorita!</footer>
+<script>
+const locutores = [
+  ["Noah","noah.png","NOAH.mp3"],
+  ["Nina","nina.png","NINA.mp3"],
+  ["Celso","celso.png","CELSO.mp3"],
+  ["Pedro","pedro.png","PEDRO.mp3"],
+  ["Henrique","/henrique-foto.png","HENRIQUE.mp3"],
+  ["Rafael","/rafael-foto.png","RAFAEL.mp3"],
+  ["Vinícius","/vinicius-foto.png","VINÍCIUS.mp3"],
+  ["Vitor","/vitor-foto.png","VITOR.mp3"],
+  ["Lourenço","lourenco.png","LOURENÇO.mp3"],
+  ["Gustavo","gustavo.png","GUSTAVO.mp3"],
+  ["Flavinha","/flavinha-foto.png","FLAVINHA.mp3"],
+  ["Aninha","/aninha-foto.png","ANINHA.mp3"],
+  ["Paulinho","/paulinho-foto.png","PAULINHO.mp3"],
+  ["Luiza","luiza.png","LUÍZA.mp3"],
+  ["Gaby","gaby.png","GABY.mp3"],
+  ["Angelo","/angelo-foto.png","ANGELO.mp3"],
+  ["Bruno","/bruno-foto.png","BRUNO.mp3"],
+  ["Letícia","/leticia-foto.png","LETÍCIA.mp3"],
+  ["Regiane","/regiane-foto.png","REGIANE.mp3"],
+  ["Ricardo","/ricardo-foto.png","RICARDO.mp3"],
+  ["Belkis","/belkis-foto.png","BELKIS.mp3"]
+];
+const baseFotos = "/central-demonstrativos/fotos/";
+const baseAudios = "/central%20de%20demonstrativo/";
+const grid = document.getElementById("voices");
+
+function renderizar(filtro="") {
+  const grupos = [
+    {
+      id: "masculinos",
+      nomes: ["Noah","Celso","Pedro","Henrique","Rafael","Vinícius","Vitor","Lourenço","Gustavo","Angelo","Bruno","Ricardo"]
+    },
+    {
+      id: "femininos",
+      nomes: ["Nina","Luiza","Gaby","Letícia","Regiane","Belkis"]
+    },
+    {
+      id: "infantis",
+      nomes: ["Flavinha","Aninha","Paulinho"]
+    }
+  ];
+
+  const termo = filtro.toLocaleLowerCase("pt-BR");
+  const encontrados = locutores.filter(v =>
+    v[0].toLocaleLowerCase("pt-BR").includes(termo)
+  );
+
+  document.getElementById("empty").style.display =
+    encontrados.length ? "none" : "block";
+
+  grupos.forEach(grupo => {
+    const secao = document.getElementById(grupo.id + "-section");
+    const gridGrupo = document.getElementById(grupo.id);
+    const lista = encontrados.filter(v => grupo.nomes.includes(v[0]));
+
+    gridGrupo.innerHTML = "";
+    secao.style.display = lista.length ? "block" : "none";
+
+    lista.forEach(([nome,foto,audio]) => {
+      const card = document.createElement("article");
+      card.className = "card";
+
+      const img = document.createElement("img");
+      img.className = "photo";
+      img.alt = "Foto de " + nome;
+      img.src = foto.startsWith("/") ? foto : baseFotos + foto;
+      img.onerror = () => { img.style.display = "none"; };
+
+      const titulo = document.createElement("h2");
+      titulo.textContent = nome;
+
+      const player = document.createElement("audio");
+      player.controls = true;
+      player.preload = "none";
+      player.src = baseAudios + encodeURIComponent(audio);
+      player.setAttribute("aria-label", "Ouvir demonstrativo de " + nome);
+
+      player.addEventListener("play", () => {
+        document.querySelectorAll("audio").forEach(a => {
+          if (a !== player) a.pause();
+        });
+      });
+
+      const btn = document.createElement("button");
+      btn.className = "primary";
+      btn.textContent = "Compartilhar esta central";
+      btn.onclick = compartilhar;
+
+      card.append(img, titulo, player, btn);
+      gridGrupo.appendChild(card);
+    });
+  });
+}
+async function compartilhar() {
+  const dados = {title:"Central de Demonstrativos",text:"Ouça os demonstrativos e escolha sua voz favorita:",url:location.href};
+  try {
+    if (navigator.share) await navigator.share(dados);
+    else {
+      await navigator.clipboard.writeText(location.href);
+      alert("Link copiado! Agora é só enviar para seu cliente.");
+    }
+  } catch(e) {
+    if(e.name !== "AbortError") alert("Copie o endereço da página e envie para seu cliente.");
+  }
+}
+document.getElementById("share").onclick = compartilhar;
+document.getElementById("copy").onclick = async () => {
+  try { await navigator.clipboard.writeText(location.href); alert("Link copiado!"); }
+  catch(e) { prompt("Copie o link abaixo:",location.href); }
+};
+document.getElementById("search").addEventListener("input",e => renderizar(e.target.value.trim()));
+renderizar();
+</script>
+</body>
+</html>
