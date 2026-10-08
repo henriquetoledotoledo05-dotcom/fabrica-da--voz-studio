@@ -699,10 +699,10 @@ function App() {
     },
 
     {
-      id: 'hble8femyJQR9HY7qel0',
+      id: '8Rw0UhFNLhw1t75pidLJ',
       nome: 'Flavinha',
       foto: flavinhaLocutora,
-      demonstrativo: '/vozes infantis/flavinha.mp3'
+      demonstrativo: '/vozes/flavinha-voz-nova.mp3'
     },
 
     {
@@ -713,10 +713,10 @@ function App() {
     },
 
     {
-      id: 'aBkeeo9J75PinaG66dNQ',
+      id: 'Tkf2paIF3z04RS9egsf2',
       nome: 'Paulinho',
       foto: paulinhoLocutor,
-      demonstrativo: '/vozes infantis/paulinho.mp3'
+      demonstrativo: '/vozes/paulinho-voz-nova.mp3'
     },
 
     {
