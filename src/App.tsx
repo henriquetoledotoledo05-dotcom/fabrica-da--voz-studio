@@ -2466,6 +2466,7 @@ const gerarVoz = async () => {
                   </label>
 
                   <textarea
+                    className="instrucao-personalizada"
                     value={instrucaoPersonalizada}
                     onChange={(e) =>
                       setInstrucaoPersonalizada(e.target.value.slice(0, 300))
@@ -3405,6 +3406,8 @@ fontWeight: 400
 }
 
 export default App
+
+
 
 
 
