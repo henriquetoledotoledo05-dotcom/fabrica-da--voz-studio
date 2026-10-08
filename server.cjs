@@ -822,7 +822,7 @@ async function mixarAudio(
       // Voz:
       // começa após os segundos iniciais
       // e recebe silêncio depois.
-      `[0:a]adelay=${delayMs}|${delayMs},` + (reverb ? `aecho=0.8:0.9:70:${Math.max(0, Math.min(0.40, (Number(volumeReverb ?? 30) / 100) * 0.40))},` : "") + `apad=pad_dur=${final}[voz];` +
+      `[0:a]adelay=${delayMs}|${delayMs},` + (reverb && Number(volumeReverb ?? 0) > 0 ? `asplit=2[vozOriginal][reverbEntrada];[reverbEntrada]aecho=0.0:1.0:70:0.65,volume=${Math.max(0, Math.min(1, Number(volumeReverb ?? 0) / 100))}[reverbSom];[vozOriginal][reverbSom]amix=inputs=2:duration=longest:dropout_transition=0:weights=1 1,` : "") + `apad=pad_dur=${final}[voz];` +
 
       // Trilha:
       // 20% de volume, duração final exata
@@ -2031,6 +2031,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 

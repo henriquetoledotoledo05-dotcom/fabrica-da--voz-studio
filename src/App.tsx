@@ -1558,7 +1558,7 @@ const gerarVoz = async () => {
         const reverbGain = offline.createGain()
 
         reverbDelay.delayTime.value = 0.18
-        reverbGain.gain.value = 0.15
+        reverbGain.gain.value = Math.max(0, Math.min(1, volumeReverb / 100))
 
         vozGain.connect(reverbDelay)
         reverbDelay.connect(reverbGain)
@@ -3446,6 +3446,7 @@ fontWeight: 400
 }
 
 export default App
+
 
 
 
