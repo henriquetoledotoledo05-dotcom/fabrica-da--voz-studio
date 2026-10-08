@@ -1,4 +1,4 @@
-Ôªøimport logoFabrica from './assets/logo-fabrica.png'
+import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -76,7 +76,7 @@ function App() {
         .maybeSingle()
 
       if (error || !data) {
-        console.error('Erro ao carregar cr√©ditos:', error)
+        console.error('Erro ao carregar crÈditos:', error)
 
         if (tentativa < 2) {
           await new Promise((resolve) => setTimeout(resolve, 500))
@@ -191,7 +191,7 @@ function App() {
   }
 
   if (!email.includes('@') || !email.includes('.')) {
-    setErroCadastro('Digite um e-mail v√°lido.')
+    setErroCadastro('Digite um e-mail v·lido.')
     return
   }
 
@@ -201,7 +201,7 @@ function App() {
   }
 
   if (senhaCadastro !== confirmarSenhaCadastro) {
-    setErroCadastro('As senhas n√£o coincidem.')
+    setErroCadastro('As senhas n„o coincidem.')
     return
   }
 
@@ -234,7 +234,7 @@ function App() {
       await carregarCreditos()
     } else {
       setErroCadastro(
-        '‚úÖ Cadastro realizado! Enviamos um link de confirma√ß√£o para o seu e-mail. Abra seu e-mail e clique no link para confirmar sua conta. Depois, volte aqui e fa√ßa login.'
+        '? Cadastro realizado! Enviamos um link de confirmaÁ„o para o seu e-mail. Abra seu e-mail e clique no link para confirmar sua conta. Depois, volte aqui e faÁa login.'
       )
     }
   }
@@ -332,7 +332,7 @@ function App() {
 
 
   // =====================================================
-  // HIST√ìRICO DE VINHETAS ‚Äî 3 DIAS
+  // HIST”RICO DE VINHETAS ó 3 DIAS
   // =====================================================
 
   const carregarHistorico = async () => {
@@ -383,7 +383,7 @@ function App() {
         .order('criado_em', { ascending: false })
 
       if (error) {
-        console.error('Erro ao carregar hist√≥rico:', error)
+        console.error('Erro ao carregar histÛrico:', error)
         setHistorico([])
         return
       }
@@ -404,7 +404,7 @@ function App() {
 
       setHistorico(itens)
     } catch (erro) {
-      console.error('Erro ao carregar hist√≥rico:', erro)
+      console.error('Erro ao carregar histÛrico:', erro)
       setHistorico([])
     } finally {
       setCarregandoHistorico(false)
@@ -422,7 +422,7 @@ function App() {
       const usuario = sessionData.session?.user
 
       if (sessionError || !usuario) {
-        console.error('N√£o foi poss√≠vel identificar o usu√°rio para salvar o hist√≥rico.')
+        console.error('N„o foi possÌvel identificar o usu·rio para salvar o histÛrico.')
         return
       }
 
@@ -437,7 +437,7 @@ function App() {
         })
 
       if (uploadError) {
-        console.error('Erro ao salvar √°udio no Storage:', uploadError)
+        console.error('Erro ao salvar ·udio no Storage:', uploadError)
         return
       }
 
@@ -446,7 +446,7 @@ function App() {
         .insert({
           id,
           user_id: usuario.id,
-          texto: texto.trim() || '√Åudio gerado',
+          texto: texto.trim() || '¡udio gerado',
           nome_voz: vozAtual.nome,
           estilo: estiloSelecionado,
           arquivo_path: caminho,
@@ -458,7 +458,7 @@ function App() {
         })
 
       if (insertError) {
-        console.error('Erro ao registrar hist√≥rico:', insertError)
+        console.error('Erro ao registrar histÛrico:', insertError)
         await supabase.storage
           .from('historico-vinhetas')
           .remove([caminho])
@@ -467,7 +467,7 @@ function App() {
 
       await carregarHistorico()
     } catch (erro) {
-      console.error('Erro ao salvar hist√≥rico:', erro)
+      console.error('Erro ao salvar histÛrico:', erro)
     }
   }
 
@@ -477,7 +477,7 @@ function App() {
       .remove([item.arquivo_path])
 
     if (storageError) {
-      console.error('Erro ao excluir √°udio:', storageError)
+      console.error('Erro ao excluir ·udio:', storageError)
       return
     }
 
@@ -513,9 +513,9 @@ function App() {
       return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'radial-gradient(circle at top, #24103d 0%, #090909 55%)', color: '#fff' }}>
           <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(21,16,32,0.96)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
-            <img src={logoFabrica} alt="F√°brica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
+            <img src={logoFabrica} alt="F·brica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
             <h2 style={{ margin: '0 0 8px' }}>Criar sua conta</h2>
-            <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a F√°brica da Voz.</p>
+            <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a F·brica da Voz.</p>
             <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
               <label style={{ fontWeight: 700 }}>Nome</label>
               <input type="text" value={nomeCadastro} onChange={(e) => { setNomeCadastro(e.target.value); setErroCadastro('') }} placeholder="Seu nome" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
@@ -528,7 +528,7 @@ function App() {
               <button type="button" onClick={validarCadastro} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Criar minha conta</button>
             </div>
             {erroCadastro && <p style={{ color: '#c084fc', marginTop: '14px', fontWeight: 600 }}>{erroCadastro}</p>}
-            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>‚Üê Voltar para entrar</button>
+            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>? Voltar para entrar</button>
           </div>
         </div>
       )
@@ -537,9 +537,9 @@ function App() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'radial-gradient(circle at top, #24103d 0%, #090909 55%)', color: '#fff' }}>
         <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(21,16,32,0.96)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
-          <img src={logoFabrica} alt="F√°brica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
-          <h2 style={{ margin: '0 0 8px' }}>Entre na F√°brica da Voz</h2>
-          <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Crie sua conta ou entre para usar seu saldo de cr√©ditos.</p>
+          <img src={logoFabrica} alt="F·brica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
+          <h2 style={{ margin: '0 0 8px' }}>Entre na F·brica da Voz</h2>
+          <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Crie sua conta ou entre para usar seu saldo de crÈditos.</p>
           <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
             <label style={{ fontWeight: 700 }}>E-mail</label>
             <input
@@ -587,7 +587,7 @@ function App() {
               fontSize: '15px',
             }}
           >
-            üí¨ Falar no WhatsApp
+            ?? Falar no WhatsApp
           </a>
 
           <div
@@ -602,9 +602,9 @@ function App() {
           </div>
 
           <div style={{ margin: '26px 0', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-          <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda n√£o tem uma conta?</p>
+          <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda n„o tem uma conta?</p>
           <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: '#171020' }}>Criar minha conta</button>
-          <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>üí≥ Depois do cadastro, voc√™ poder√° comprar cr√©ditos para gerar suas locu√ß√µes.</p>
+          <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>?? Depois do cadastro, vocÍ poder· comprar crÈditos para gerar suas locuÁıes.</p>
         </div>
       </div>
     )
@@ -673,7 +673,7 @@ function App() {
     },
         {
       id: 'B7HqRIxroDpybJI9vXMj',
-      nome: 'Vin√≠cius',
+      nome: 'VinÌcius',
       foto: viniciusLocutor,
       demonstrativo: '/vozes/vinicius-voz.mp3'
     },
@@ -686,7 +686,7 @@ function App() {
 
     {
       id: 'DQRaZFBAlsnenMlFVe0R',
-      nome: 'Louren√ßo',
+      nome: 'LourenÁo',
       foto: lourencoLocutor,
       demonstrativo: '/vozes/lourenco.mp3'
     },
@@ -749,7 +749,7 @@ function App() {
 
     {
       id: 'gyiJ08WU9Wi2LNY7nTcB',
-      nome: 'Let√≠cia',
+      nome: 'LetÌcia',
       foto: '/leticia-foto.png',
       demonstrativo: '/vozes/leticia-voz.mp3'
     },
@@ -764,12 +764,12 @@ function App() {
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vin√≠cius', 'Vitor', 'Louren√ßo', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'VinÌcius', 'Vitor', 'LourenÁo', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
   (voz) =>
-    ['Nina', 'Luiza', 'Gaby', 'Let√≠cia'].includes(voz.nome)
+    ['Nina', 'Luiza', 'Gaby', 'LetÌcia'].includes(voz.nome)
 )
 
 const vozesInfantis = vozes.filter(
@@ -810,7 +810,7 @@ const vozesInfantis = vozes.filter(
     const dados = await resposta.json()
 
     if (!resposta.ok) {
-      throw new Error(dados?.erro || 'N√£o foi poss√≠vel corrigir o texto.')
+      throw new Error(dados?.erro || 'N„o foi possÌvel corrigir o texto.')
     }
 
     setTexto(dados.texto || '')
@@ -820,7 +820,7 @@ const vozesInfantis = vozes.filter(
     alert(
       erro instanceof Error
         ? erro.message
-        : 'N√£o foi poss√≠vel corrigir o texto.'
+        : 'N„o foi possÌvel corrigir o texto.'
     )
   } finally {
     setCorrigindoTexto(false)
@@ -836,7 +836,7 @@ const iniciarPagamento = async (pacote: {
       await supabase.auth.getSession()
 
     if (sessionError || !sessionData.session) {
-      alert('Fa√ßa login para comprar cr√©ditos.')
+      alert('FaÁa login para comprar crÈditos.')
       return
     }
 
@@ -850,7 +850,7 @@ const iniciarPagamento = async (pacote: {
     const pacoteId = mapaPacotes[pacote.creditos]
 
     if (!pacoteId) {
-      alert('Pacote de cr√©ditos inv√°lido.')
+      alert('Pacote de crÈditos inv·lido.')
       return
     }
 
@@ -869,12 +869,12 @@ const iniciarPagamento = async (pacote: {
 
     if (!resposta.ok) {
       throw new Error(
-        dados.erro || 'N√£o foi poss√≠vel iniciar o pagamento.'
+        dados.erro || 'N„o foi possÌvel iniciar o pagamento.'
       )
     }
 
     if (!dados.init_point) {
-      throw new Error('O Mercado Pago n√£o retornou o link de pagamento.')
+      throw new Error('O Mercado Pago n„o retornou o link de pagamento.')
     }
 
     window.location.href = dados.init_point
@@ -884,7 +884,7 @@ const iniciarPagamento = async (pacote: {
     alert(
       erro instanceof Error
         ? erro.message
-        : 'N√£o foi poss√≠vel iniciar o pagamento.'
+        : 'N„o foi possÌvel iniciar o pagamento.'
     )
   }
 }  
@@ -902,21 +902,21 @@ const gerarVoz = async () => {
     )
 
     if (carregandoCreditos) {
-      alert('Aguarde o carregamento do seu saldo de cr√©ditos.')
+      alert('Aguarde o carregamento do seu saldo de crÈditos.')
       return
     }
 
     if (creditos === null) {
       await carregarCreditos()
-      alert('N√£o foi poss√≠vel confirmar seu saldo. Tente novamente.')
+      alert('N„o foi possÌvel confirmar seu saldo. Tente novamente.')
       return
     }
 
     if (creditos < creditosNecessarios) {
       alert(
-        `Voc√™ precisa de ${creditosNecessarios} cr√©dito${
+        `VocÍ precisa de ${creditosNecessarios} crÈdito${
           creditosNecessarios === 1 ? '' : 's'
-        } para gerar essa locu√ß√£o. Seu saldo atual √© de ${creditos} cr√©dito${
+        } para gerar essa locuÁ„o. Seu saldo atual È de ${creditos} crÈdito${
           creditos === 1 ? '' : 's'
         }.`
       )
@@ -930,7 +930,7 @@ const gerarVoz = async () => {
       sessionError ||
       !sessionData.session
     ) {
-      alert('Sua sess√£o expirou. Fa√ßa login novamente.')
+      alert('Sua sess„o expirou. FaÁa login novamente.')
       return
     }
 
@@ -983,7 +983,7 @@ const gerarVoz = async () => {
       const audioBlob = await resposta.blob()
 
       if (!audioBlob.size) {
-        throw new Error('O servidor retornou um √°udio vazio.')
+        throw new Error('O servidor retornou um ·udio vazio.')
       }
 
       const urlAudio =
@@ -995,7 +995,7 @@ const gerarVoz = async () => {
 
       await salvarNoHistorico(audioBlob, 'locucao')
 
-      // O servidor j√° descontou os cr√©ditos com seguran√ßa.
+      // O servidor j· descontou os crÈditos com seguranÁa.
       // Apenas atualizamos o saldo exibido na tela.
       await carregarCreditos()
     } catch (erro) {
@@ -1004,7 +1004,7 @@ const gerarVoz = async () => {
       alert(
         erro instanceof Error
           ? erro.message
-          : 'N√£o foi poss√≠vel gerar a voz.'
+          : 'N„o foi possÌvel gerar a voz.'
       )
     } finally {
       setGerando(false)
@@ -1022,9 +1022,9 @@ const gerarVoz = async () => {
       { nome: 'Comercial 03', arquivo: '/trilhas/comercial/03-comercial.mp3' },
     ],
     forro: [
-      { nome: 'Forr√≥ 01', arquivo: '/trilhas/forro/01- Forr√≥.mp3' },
-      { nome: 'Forr√≥ 02', arquivo: '/trilhas/forro/02- Forr√≥.mp3' },
-      { nome: 'Forr√≥ 03', arquivo: '/trilhas/forro/03- Forr√≥.mp3' },
+      { nome: 'ForrÛ 01', arquivo: '/trilhas/forro/01- ForrÛ.mp3' },
+      { nome: 'ForrÛ 02', arquivo: '/trilhas/forro/02- ForrÛ.mp3' },
+      { nome: 'ForrÛ 03', arquivo: '/trilhas/forro/03- ForrÛ.mp3' },
     ],
     institucional: [
       { nome: 'Institucional 01', arquivo: '/trilhas/institucional/01-Trilha institucional.mp3' },
@@ -1042,14 +1042,14 @@ const gerarVoz = async () => {
       { nome: 'Gospel 03', arquivo: '/trilhas/gospel/03- Gospel.mp3' },
     ],
     jornalistica: [
-      { nome: 'Jornal√≠stica 01', arquivo: '/trilhas/jornalistica/01-Trilha jornasl√≠stica.mp3' },
-      { nome: 'Jornal√≠stica 02', arquivo: '/trilhas/jornalistica/02-Trilha jornal√≠stica.mp3' },
-      { nome: 'Jornal√≠stica 03', arquivo: '/trilhas/jornalistica/03-Trilha jornal√≠stica.mp3' },
+      { nome: 'JornalÌstica 01', arquivo: '/trilhas/jornalistica/01-Trilha jornaslÌstica.mp3' },
+      { nome: 'JornalÌstica 02', arquivo: '/trilhas/jornalistica/02-Trilha jornalÌstica.mp3' },
+      { nome: 'JornalÌstica 03', arquivo: '/trilhas/jornalistica/03-Trilha jornalÌstica.mp3' },
     ],
     gaucha: [
-      { nome: 'Ga√∫cha 01', arquivo: '/trilhas/gaucha/01- Ga√∫cha.mp3' },
-      { nome: 'Ga√∫cha 02', arquivo: '/trilhas/gaucha/02- Ga√∫cha.mp3' },
-      { nome: 'Ga√∫cha 03', arquivo: '/trilhas/gaucha/03- Ga√∫cha.mp3' },
+      { nome: 'Ga˙cha 01', arquivo: '/trilhas/gaucha/01- Ga˙cha.mp3' },
+      { nome: 'Ga˙cha 02', arquivo: '/trilhas/gaucha/02- Ga˙cha.mp3' },
+      { nome: 'Ga˙cha 03', arquivo: '/trilhas/gaucha/03- Ga˙cha.mp3' },
     ],
     natal: [
       { nome: 'Natal 01', arquivo: '/trilhas/natal/01-natal.mp3' },
@@ -1062,23 +1062,23 @@ const gerarVoz = async () => {
       { nome: 'Sertanejo 03', arquivo: '/trilhas/sertanejo/03- Sertanejo.mp3' },
     ],
     eletronica: [
-      { nome: 'Eletr√¥nica 01', arquivo: '/trilhas/eletronica/01- Eletr√¥nica.mp3' },
-      { nome: 'Eletr√¥nica 02', arquivo: '/trilhas/eletronica/02- Eletr√¥nica.mp3' },
-      { nome: 'Eletr√¥nica 03', arquivo: '/trilhas/eletronica/03- Eletr√¥nica.mp3' },
+      { nome: 'EletrÙnica 01', arquivo: '/trilhas/eletronica/01- EletrÙnica.mp3' },
+      { nome: 'EletrÙnica 02', arquivo: '/trilhas/eletronica/02- EletrÙnica.mp3' },
+      { nome: 'EletrÙnica 03', arquivo: '/trilhas/eletronica/03- EletrÙnica.mp3' },
     ],
   }
 
   const estilosDeTrilha = [
-    { valor: 'comercial', nome: 'üéôÔ∏è Comercial' },
-    { valor: 'forro', nome: 'üíÉ Forr√≥' },
-    { valor: 'institucional', nome: 'üè¢ Institucional' },
-    { valor: 'impacto', nome: '‚ö° Impacto' },
-    { valor: 'gospel', nome: '‚úùÔ∏è Gospel' },
-    { valor: 'jornalistica', nome: 'üì∞ Jornal√≠stica' },
-    { valor: 'gaucha', nome: 'ü§† Ga√∫cha' },
-    { valor: 'natal', nome: 'üéÑ Natal' },
-    { valor: 'sertanejo', nome: 'ü§† Sertanejo' },
-    { valor: 'eletronica', nome: 'üéß Eletr√¥nica' },
+    { valor: 'comercial', nome: '??? Comercial' },
+    { valor: 'forro', nome: '?? ForrÛ' },
+    { valor: 'institucional', nome: '?? Institucional' },
+    { valor: 'impacto', nome: '? Impacto' },
+    { valor: 'gospel', nome: '?? Gospel' },
+    { valor: 'jornalistica', nome: '?? JornalÌstica' },
+    { valor: 'gaucha', nome: '?? Ga˙cha' },
+    { valor: 'natal', nome: '?? Natal' },
+    { valor: 'sertanejo', nome: '?? Sertanejo' },
+    { valor: 'eletronica', nome: '?? EletrÙnica' },
   ]
 
   const trilhasAtuais =
@@ -1118,7 +1118,7 @@ const gerarVoz = async () => {
       )
     ) {
       alert(
-        'Escolha um arquivo de √°udio MP3, WAV, OGG, M4A ou AAC.'
+        'Escolha um arquivo de ·udio MP3, WAV, OGG, M4A ou AAC.'
       )
 
       e.target.value = ''
@@ -1345,7 +1345,7 @@ const gerarVoz = async () => {
     }
 
     if (!trilhaSelecionada && !trilhaArquivo) {
-      alert('Escolha uma trilha ou envie sua pr√≥pria trilha.')
+      alert('Escolha uma trilha ou envie sua prÛpria trilha.')
       return
     }
 
@@ -1355,7 +1355,7 @@ const gerarVoz = async () => {
       const vozResponse = await fetch(audioOriginalUrl)
 
       if (!vozResponse.ok) {
-        throw new Error('N√£o foi poss√≠vel acessar o √°udio da voz.')
+        throw new Error('N„o foi possÌvel acessar o ·udio da voz.')
       }
 
       const vozBuffer = await vozResponse.arrayBuffer()
@@ -1368,7 +1368,7 @@ const gerarVoz = async () => {
         const trilhaResponse = await fetch(trilhaSelecionada)
 
         if (!trilhaResponse.ok) {
-          throw new Error('N√£o foi poss√≠vel carregar a trilha selecionada.')
+          throw new Error('N„o foi possÌvel carregar a trilha selecionada.')
         }
 
         trilhaBuffer = await trilhaResponse.arrayBuffer()
@@ -1383,7 +1383,7 @@ const gerarVoz = async () => {
         ).webkitAudioContext
 
       if (!AudioContextClass) {
-        throw new Error('Seu navegador n√£o suporta mixagem de √°udio.')
+        throw new Error('Seu navegador n„o suporta mixagem de ·udio.')
       }
 
       const contexto = new AudioContextClass()
@@ -1394,20 +1394,20 @@ const gerarVoz = async () => {
       // -----------------------------------------------------
       // CARREGAR EFEITOS
       // -----------------------------------------------------
-      // encodeURI evita problemas com nomes como "Transmiss√£o.mp3".
+      // encodeURI evita problemas com nomes como "Transmiss„o.mp3".
       const carregarEfeito = async (
         caminho: string
       ): Promise<AudioBuffer> => {
         const resposta = await fetch(encodeURI(caminho))
 
         if (!resposta.ok) {
-          throw new Error(`N√£o foi poss√≠vel carregar o efeito: ${caminho}`)
+          throw new Error(`N„o foi possÌvel carregar o efeito: ${caminho}`)
         }
 
         const dados = await resposta.arrayBuffer()
 
         if (!dados.byteLength) {
-          throw new Error(`O efeito est√° vazio: ${caminho}`)
+          throw new Error(`O efeito est· vazio: ${caminho}`)
         }
 
         return contexto.decodeAudioData(dados.slice(0))
@@ -1437,8 +1437,8 @@ const gerarVoz = async () => {
 
       const duracaoVoz = voz.duration
 
-      // Os efeitos s√£o posicionados em rela√ß√£o ao IN√çCIO DA TRILHA,
-      // nunca em rela√ß√£o ao in√≠cio da voz.
+      // Os efeitos s„o posicionados em relaÁ„o ao INÕCIO DA TRILHA,
+      // nunca em relaÁ„o ao inÌcio da voz.
       const posicaoEfeitoNormalizada = Math.max(
         0,
         Number(posicaoEfeito) || 0
@@ -1449,8 +1449,8 @@ const gerarVoz = async () => {
         Number(posicaoEfeito2) || 0
       )
 
-      // Remove eventual sil√™ncio do come√ßo do arquivo para que o efeito
-      // aconte√ßa no segundo escolhido pelo usu√°rio.
+      // Remove eventual silÍncio do comeÁo do arquivo para que o efeito
+      // aconteÁa no segundo escolhido pelo usu·rio.
       const encontrarOffsetComSom = (buffer: AudioBuffer) => {
         const limiteSom = 0.008
 
@@ -1499,10 +1499,10 @@ const gerarVoz = async () => {
       // -----------------------------------------------------
       // TEMPOS DO DUCKING
       // -----------------------------------------------------
-      // N√£o existe fade no in√≠cio.
-      // A trilha come√ßa imediatamente no volume escolhido.
+      // N„o existe fade no inÌcio.
+      // A trilha comeÁa imediatamente no volume escolhido.
       // Depois da voz, reservamos tempo para a trilha subir antes
-      // de come√ßar o fade final.
+      // de comeÁar o fade final.
       const duracaoEntradaVoz = Math.min(
         0.8,
         Math.max(0.25, duracaoVoz / 10)
@@ -1516,7 +1516,7 @@ const gerarVoz = async () => {
       const fimDaVoz = inicio + duracaoVoz
       const fimSubidaTrilha = fimDaVoz + duracaoSaidaVoz
 
-      // O fade final s√≥ come√ßa DEPOIS da subida da trilha.
+      // O fade final sÛ comeÁa DEPOIS da subida da trilha.
       const duracaoTotal = Math.max(
         inicio + duracaoVoz + duracaoSaidaVoz + final,
         fimEfeito1,
@@ -1569,7 +1569,7 @@ const gerarVoz = async () => {
       vozSource.start(inicio)
 
       // -----------------------------------------------------
-      // FUN√á√ÉO PARA INSERIR EFEITO
+      // FUN«√O PARA INSERIR EFEITO
       // -----------------------------------------------------
       const adicionarEfeito = (
         buffer: AudioBuffer,
@@ -1601,7 +1601,7 @@ const gerarVoz = async () => {
         gain.connect(compressor)
         compressor.connect(offline.destination)
 
-        // IMPORTANTE: posi√ß√£o absoluta desde o come√ßo da trilha.
+        // IMPORTANTE: posiÁ„o absoluta desde o comeÁo da trilha.
         source.start(posicao, offsetSom, duracaoSom)
       }
 
@@ -1632,14 +1632,14 @@ const gerarVoz = async () => {
 
       const volumeNormal = Math.max(
         0,
-        Math.min(1, volumeTrilha / 100)
+        Math.min(2, volumeTrilha / 100)
       )
 
       // 30% do volume escolhido durante a voz.
       const volumeDuranteVoz = volumeNormal * 0.30
 
-      // SEM FADE NO IN√çCIO.
-      // A trilha come√ßa imediatamente alta no volume escolhido.
+      // SEM FADE NO INÕCIO.
+      // A trilha comeÁa imediatamente alta no volume escolhido.
       trilhaGain.gain.setValueAtTime(volumeNormal, 0)
 
       if (inicio > 0) {
@@ -1648,26 +1648,26 @@ const gerarVoz = async () => {
           inicio - duracaoEntradaVoz
         )
 
-        // Mant√©m a trilha normal at√© come√ßar a descida.
+        // MantÈm a trilha normal atÈ comeÁar a descida.
         trilhaGain.gain.setValueAtTime(
           volumeNormal,
           inicioDucking
         )
 
-        // Abaixa suavemente at√© o n√≠vel da locu√ß√£o.
+        // Abaixa suavemente atÈ o nÌvel da locuÁ„o.
         trilhaGain.gain.linearRampToValueAtTime(
           volumeDuranteVoz,
           inicio
         )
       } else {
-        // Se a voz come√ßa em 0, apenas fazemos a descida da trilha.
+        // Se a voz comeÁa em 0, apenas fazemos a descida da trilha.
         trilhaGain.gain.linearRampToValueAtTime(
           volumeDuranteVoz,
           Math.min(duracaoEntradaVoz, fimDaVoz)
         )
       }
 
-      // Mant√©m baixa durante toda a locu√ß√£o.
+      // MantÈm baixa durante toda a locuÁ„o.
       trilhaGain.gain.setValueAtTime(
         volumeDuranteVoz,
         fimDaVoz
@@ -1680,7 +1680,7 @@ const gerarVoz = async () => {
       )
 
       // -----------------------------------------------------
-      // FADE FINAL ‚Äî SOMENTE NO FINAL
+      // FADE FINAL ó SOMENTE NO FINAL
       // -----------------------------------------------------
       if (final > 0) {
         const fadeOutInicio = Math.max(
@@ -1688,7 +1688,7 @@ const gerarVoz = async () => {
           duracaoTotal - final
         )
 
-        // Garante que o fade come√ßa com a trilha j√° alta.
+        // Garante que o fade comeÁa com a trilha j· alta.
         trilhaGain.gain.setValueAtTime(
           volumeNormal,
           fadeOutInicio
@@ -1699,8 +1699,8 @@ const gerarVoz = async () => {
           duracaoTotal
         )
       } else {
-        // Sem fade configurado, mant√©m a trilha no volume normal
-        // at√© o final reservado para a subida.
+        // Sem fade configurado, mantÈm a trilha no volume normal
+        // atÈ o final reservado para a subida.
         trilhaGain.gain.setValueAtTime(
           volumeNormal,
           Math.min(fimSubidaTrilha, duracaoTotal)
@@ -1766,14 +1766,14 @@ const gerarVoz = async () => {
 
       if (!respostaMix.ok) {
         throw new Error(
-          'N√£o foi poss√≠vel converter a mixagem para MP3.'
+          'N„o foi possÌvel converter a mixagem para MP3.'
         )
       }
 
       const mp3Blob = await respostaMix.blob()
 
       if (!mp3Blob.size) {
-        throw new Error('A mixagem retornou um √°udio vazio.')
+        throw new Error('A mixagem retornou um ·udio vazio.')
       }
 
       const mixUrl = URL.createObjectURL(mp3Blob)
@@ -1788,7 +1788,7 @@ const gerarVoz = async () => {
       alert(
         erro instanceof Error
           ? erro.message
-          : 'N√£o foi poss√≠vel mixar a voz com a trilha.'
+          : 'N„o foi possÌvel mixar a voz com a trilha.'
       )
     } finally {
       setMixando(false)
@@ -1809,7 +1809,7 @@ const gerarVoz = async () => {
 
             <img
               src={logoFabrica}
-              alt="F√°brica da Voz"
+              alt="F·brica da Voz"
             />
 
           </div>
@@ -1820,7 +1820,7 @@ const gerarVoz = async () => {
                 '25px'
             }}
           >
-            Seu est√∫dio de voz profissional
+            Seu est˙dio de voz profissional
           </p>
 
         </header>
@@ -1862,7 +1862,7 @@ const gerarVoz = async () => {
                   marginBottom: '8px'
                 }}
               >
-                <h2 style={{ margin: 0 }}>üí≥ Comprar cr√©ditos</h2>
+                <h2 style={{ margin: 0 }}>?? Comprar crÈditos</h2>
                 <button
                   type="button"
                   onClick={() => setMostrarCompraCreditos(false)}
@@ -1876,12 +1876,12 @@ const gerarVoz = async () => {
                   }}
                   aria-label="Fechar"
                 >
-                  √ó
+                  ◊
                 </button>
               </div>
 
               <p style={{ margin: '0 0 20px', opacity: 0.72 }}>
-                1 cr√©dito = 1 locu√ß√£o de at√© 800 caracteres.
+                1 crÈdito = 1 locuÁ„o de atÈ 800 caracteres.
               </p>
 
               <div
@@ -1930,7 +1930,7 @@ const gerarVoz = async () => {
                       {pacote.creditos}
                     </div>
                     <div style={{ opacity: 0.72, marginBottom: '10px' }}>
-                      {pacote.creditos === 1 ? 'cr√©dito' : 'cr√©ditos'}
+                      {pacote.creditos === 1 ? 'crÈdito' : 'crÈditos'}
                     </div>
                     <div style={{ fontSize: '21px', fontWeight: 800, color: '#c084fc', marginBottom: '16px' }}>
                       {pacote.preco}
@@ -1969,7 +1969,7 @@ const gerarVoz = async () => {
                   fontSize: '13px'
                 }}
               >
-                üîí O pagamento ser√° integrado depois. Esta tela j√° est√° pronta com os pacotes de cr√©ditos.
+                ?? O pagamento ser· integrado depois. Esta tela j· est· pronta com os pacotes de crÈditos.
               </div>
             </div>
           </div>
@@ -2016,9 +2016,9 @@ const gerarVoz = async () => {
                 }}
               >
                 <div>
-                  <h2 style={{ margin: 0 }}>üïò Hist√≥rico de vinhetas</h2>
+                  <h2 style={{ margin: 0 }}>?? HistÛrico de vinhetas</h2>
                   <div style={{ marginTop: '5px', color: '#aaa', fontSize: '13px' }}>
-                    Seus √°udios ficam dispon√≠veis por 3 dias e n√£o consomem novos cr√©ditos.
+                    Seus ·udios ficam disponÌveis por 3 dias e n„o consomem novos crÈditos.
                   </div>
                 </div>
 
@@ -2032,19 +2032,19 @@ const gerarVoz = async () => {
                     fontSize: '28px',
                     cursor: 'pointer'
                   }}
-                  aria-label="Fechar hist√≥rico"
+                  aria-label="Fechar histÛrico"
                 >
-                  √ó
+                  ◊
                 </button>
               </div>
 
               {carregandoHistorico ? (
                 <div style={{ padding: '35px 10px', textAlign: 'center', color: '#c084fc', fontWeight: 700 }}>
-                  ‚è≥ Carregando seu hist√≥rico...
+                  ? Carregando seu histÛrico...
                 </div>
               ) : historico.length === 0 ? (
                 <div style={{ padding: '35px 10px', textAlign: 'center', color: '#aaa' }}>
-                  Voc√™ ainda n√£o tem vinhetas no hist√≥rico.
+                  VocÍ ainda n„o tem vinhetas no histÛrico.
                 </div>
               ) : (
                 <div style={{ display: 'grid', gap: '14px' }}>
@@ -2064,8 +2064,8 @@ const gerarVoz = async () => {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '7px' }}>
                           <strong>
-                            {item.tipo === 'mixagem' ? 'üéµ Mixagem' : 'üéôÔ∏è Locu√ß√£o'}
-                            {item.nome_voz ? ` ‚Äî ${item.nome_voz}` : ''}
+                            {item.tipo === 'mixagem' ? '?? Mixagem' : '??? LocuÁ„o'}
+                            {item.nome_voz ? ` ó ${item.nome_voz}` : ''}
                           </strong>
                           <span style={{ color: '#c084fc', fontSize: '12px' }}>
                             {item.estilo || 'Natural'}
@@ -2073,7 +2073,7 @@ const gerarVoz = async () => {
                         </div>
 
                         <div style={{ color: '#999', fontSize: '12px', marginBottom: '8px' }}>
-                          Gerada em {criado.toLocaleString('pt-BR')} ¬∑ expira em {expira.toLocaleString('pt-BR')}
+                          Gerada em {criado.toLocaleString('pt-BR')} ∑ expira em {expira.toLocaleString('pt-BR')}
                         </div>
 
                         <div style={{ color: '#ddd', fontSize: '13px', lineHeight: 1.45, marginBottom: '11px' }}>
@@ -2096,7 +2096,7 @@ const gerarVoz = async () => {
                                 href={item.url}
                                 download={`fabrica-da-voz-${item.id}.mp3`}
                               >
-                                ‚¨áÔ∏è Baixar novamente
+                                ?? Baixar novamente
                               </a>
 
                               <button
@@ -2111,13 +2111,13 @@ const gerarVoz = async () => {
                                   cursor: 'pointer'
                                 }}
                               >
-                                üóëÔ∏è Excluir
+                                ??? Excluir
                               </button>
                             </div>
                           </>
                         ) : (
                           <div style={{ color: '#facc15', fontSize: '13px' }}>
-                            N√£o foi poss√≠vel carregar este √°udio agora.
+                            N„o foi possÌvel carregar este ·udio agora.
                           </div>
                         )}
                       </div>
@@ -2142,7 +2142,7 @@ const gerarVoz = async () => {
                   cursor: carregandoHistorico ? 'wait' : 'pointer'
                 }}
               >
-                üîÑ Atualizar hist√≥rico
+                ?? Atualizar histÛrico
               </button>
             </div>
           </div>
@@ -2153,15 +2153,15 @@ const gerarVoz = async () => {
           <section className="hero">
 
             <span className="tag">
-              EST√öDIO DE VOZ
+              EST⁄DIO DE VOZ
             </span>
 
             <h2>
-              Crie sua voz profissional com intelig√™ncia artificial.
+              Crie sua voz profissional com inteligÍncia artificial.
             </h2>
 
             <p>
-              Transforme seu texto em uma locu√ß√£o profissional em poucos segundos.
+              Transforme seu texto em uma locuÁ„o profissional em poucos segundos.
             </p>
 
           </section>
@@ -2171,7 +2171,7 @@ const gerarVoz = async () => {
             <div className="editor">
 
               <h3>
-                Crie seu √°udio
+                Crie seu ·udio
               </h3>
 
               <div
@@ -2192,7 +2192,7 @@ const gerarVoz = async () => {
                 }}
               >
                 <span>
-                  üí≥ Cr√©ditos dispon√≠veis:{' '}
+                  ?? CrÈditos disponÌveis:{' '}
                   <strong>{creditos === null ? '...' : creditos}</strong>
                 </span>
 
@@ -2200,7 +2200,7 @@ const gerarVoz = async () => {
                   type="button"
                   onClick={() => void carregarCreditos()}
                   disabled={carregandoCreditos}
-                  title="Atualizar saldo de cr√©ditos"
+                  title="Atualizar saldo de crÈditos"
                   style={{
                     padding: '8px 11px',
                     borderRadius: '9px',
@@ -2212,7 +2212,7 @@ const gerarVoz = async () => {
                     opacity: carregandoCreditos ? 0.65 : 1
                   }}
                 >
-                  {carregandoCreditos ? '‚è≥' : 'üîÑ'}
+                  {carregandoCreditos ? '?' : '??'}
                 </button>
 
                 <button
@@ -2231,7 +2231,7 @@ const gerarVoz = async () => {
                     cursor: 'pointer'
                   }}
                 >
-                  üïò Hist√≥rico (3 dias)
+                  ?? HistÛrico (3 dias)
                 </button>
 
                 <button
@@ -2247,7 +2247,7 @@ const gerarVoz = async () => {
                     cursor: 'pointer'
                   }}
                 >
-                  + Comprar cr√©ditos
+                  + Comprar crÈditos
                 </button>
                 <button
                   type="button"
@@ -2432,31 +2432,31 @@ const gerarVoz = async () => {
                   }}
                 >
                   <option value="normal">
-                    Natural ‚Äî Voz natural e profissional
+                    Natural ó Voz natural e profissional
                   </option>
                   <option value="animado">
-                    Animado ‚Äî Mais energia e entusiasmo
+                    Animado ó Mais energia e entusiasmo
                   </option>
                   <option value="muitoAnimado">
-                    Muito Animado ‚Äî Mais ritmo e empolga√ß√£o
+                    Muito Animado ó Mais ritmo e empolgaÁ„o
                   </option>
                   <option value="superImpacto">
-                    Impacto ‚Äî Forte, intenso e marcante
+                    Impacto ó Forte, intenso e marcante
                   </option>
                   <option value="serio">
-                    S√©rio ‚Äî Firme, s√©rio e profissional
+                    SÈrio ó Firme, sÈrio e profissional
                   </option>
                   <option value="urgente">
-                    Urgente ‚Äî Aten√ß√£o e intensidade
+                    Urgente ó AtenÁ„o e intensidade
                   </option>
                   <option value="comercial">
-                    Comercial ‚Äî Persuasivo e vendedor
+                    Comercial ó Persuasivo e vendedor
                   </option>
                   <option value="festa">
-                    Festa ‚Äî Alegre e descontra√≠do
+                    Festa ó Alegre e descontraÌdo
                   </option>
                   <option value="solene">
-                    Solene ‚Äî Grave e respeitoso
+                    Solene ó Grave e respeitoso
                   </option>
                 </select>
 
@@ -2464,7 +2464,7 @@ const gerarVoz = async () => {
                   marginTop: '14px'
                 }}>
                   <label>
-                    üéôÔ∏è Como voc√™ quer que o locutor fale?
+                    ??? Como vocÍ quer que o locutor fale?
                   </label>
 
                   <textarea
@@ -2474,7 +2474,7 @@ const gerarVoz = async () => {
                       setInstrucaoPersonalizada(e.target.value.slice(0, 300))
                     }
                     maxLength={300}
-                    placeholder="Ex.: fale como locutor de r√°dio, com bastante energia e entusiasmo..."
+                    placeholder="Ex.: fale como locutor de r·dio, com bastante energia e entusiasmo..."
                     rows={2}
                     style={{
                       width: '100%',
@@ -2546,7 +2546,7 @@ const gerarVoz = async () => {
                     )
                   }
                 >
-                  R√°pido
+                  R·pido
                 </button>
 
                 <button
@@ -2563,7 +2563,7 @@ const gerarVoz = async () => {
                     )
                   }
                 >
-                  Super r√°pido
+                  Super r·pido
                 </button>
 
               </div>
@@ -2580,7 +2580,7 @@ const gerarVoz = async () => {
               ================================================= */}
 
               <label>
-                Texto da locu√ß√£o
+                Texto da locuÁ„o
               </label>
 
               <textarea
@@ -2589,7 +2589,7 @@ const gerarVoz = async () => {
   value={texto}
   onChange={(e) => setTexto(e.target.value)}
   
-  placeholder="Digite aqui o texto que voc√™ quer transformar..."
+  placeholder="Digite aqui o texto que vocÍ quer transformar..."
 />
 
 <div
@@ -2603,7 +2603,7 @@ const gerarVoz = async () => {
     opacity: 0.85
   }}
 >
-  {texto.length} caracteres ‚Ä¢ {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} cr√©ditos
+  {texto.length} caracteres ï {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} crÈditos
 </div>
 <button
   type="button"
@@ -2611,7 +2611,7 @@ const gerarVoz = async () => {
   onClick={corrigirTextoComIA}
   disabled={corrigindoTexto}
 >
-  {corrigindoTexto ? 'Corrigindo texto...' : '‚ú® Corrigir texto com IA'}
+  {corrigindoTexto ? 'Corrigindo texto...' : '? Corrigir texto com IA'}
 </button>
 
               <div style={{
@@ -2628,11 +2628,11 @@ fontSize: '12px',
 fontWeight: 400
               }}>
                 <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
-                  ‚ö†Ô∏è ATEN√á√ÉO
+                  ?? ATEN«√O
                 </div>
                 <div>
-                  N√£o nos responsabilizamos por erros de escrita do usu√°rio,
-                  corrigiremos apenas erros de pron√∫ncia ou devaneios da IA.
+                  N„o nos responsabilizamos por erros de escrita do usu·rio,
+                  corrigiremos apenas erros de pron˙ncia ou devaneios da IA.
                 </div>
               </div>
 
@@ -2647,8 +2647,8 @@ fontWeight: 400
                   disabled={gerando}
                 >
                   {gerando
-                    ? '‚è≥ Gerando...'
-                    : 'üîä Gerar voz'}
+                    ? '? Gerando...'
+                    : '?? Gerar voz'}
                 </button>
               </div>
 
@@ -2660,7 +2660,7 @@ fontWeight: 400
                 <div className="resultado-pos-geracao">
 
                   <div className="titulo-previa">
-                    üéß Pr√©via da sua locu√ß√£o
+                    ?? PrÈvia da sua locuÁ„o
                   </div>
 
                   <audio
@@ -2676,7 +2676,7 @@ fontWeight: 400
                       href={audioUrl}
                       download="fabrica-da-voz.mp3"
                     >
-                      ‚¨áÔ∏è Baixar √°udio
+                      ?? Baixar ·udio
                     </a>
 
                     <button
@@ -2686,7 +2686,7 @@ fontWeight: 400
                         setMostrarTrilhas(!mostrarTrilhas)
                       }
                     >
-                      üéµ{' '}
+                      ??{' '}
                       {mostrarTrilhas
                         ? 'Fechar trilhas'
                         : 'Adicionar trilha'}
@@ -2702,7 +2702,7 @@ fontWeight: 400
                     <div className="painel-trilhas">
 
                       <h3>
-                        üéµ Escolha uma trilha
+                        ?? Escolha uma trilha
                       </h3>
 
                       {/* =================================================
@@ -2712,11 +2712,11 @@ fontWeight: 400
                       <div className="editor-tempo">
 
                         <h3>
-                          ‚è±Ô∏è Ajuste da trilha
+                          ?? Ajuste da trilha
                         </h3>
 
                         <p>
-                          Escolha quanto tempo de trilha ficar√° antes e depois da sua locu√ß√£o.
+                          Escolha quanto tempo de trilha ficar· antes e depois da sua locuÁ„o.
                         </p>
 
                         <div className="tempo-opcoes">
@@ -2724,7 +2724,7 @@ fontWeight: 400
                           <div className="tempo-campo">
 
                             <label>
-                              ‚èÆÔ∏è Trilha antes da voz
+                              ?? Trilha antes da voz
                             </label>
 
                             <input
@@ -2754,7 +2754,7 @@ fontWeight: 400
                           <div className="tempo-campo">
 
                             <label>
-                              ‚è≠Ô∏è Trilha depois da voz
+                              ?? Trilha depois da voz
                             </label>
 
                             <input
@@ -2784,11 +2784,11 @@ fontWeight: 400
                         </div>
 
                         <div className="resumo-tempo">
-                          üéµ {segundosInicio}s de trilha
-                          {' ‚Üí '}
-                          üéôÔ∏è Locu√ß√£o
-                          {' ‚Üí '}
-                          {segundosFinal}s de trilha üéµ
+                          ?? {segundosInicio}s de trilha
+                          {' ? '}
+                          ??? LocuÁ„o
+                          {' ? '}
+                          {segundosFinal}s de trilha ??
                         </div>
 
                       </div>
@@ -2800,11 +2800,11 @@ fontWeight: 400
                       <div className="trilha-item">
 
                         <strong>
-                          üì§ Enviar minha pr√≥pria trilha
+                          ?? Enviar minha prÛpria trilha
                         </strong>
 
                         <p>
-                          Escolha uma m√∫sica ou trilha de √°udio do seu computador.
+                          Escolha uma m˙sica ou trilha de ·udio do seu computador.
                         </p>
 
                         <input
@@ -2819,7 +2819,7 @@ fontWeight: 400
                               marginTop: '10px'
                             }}
                           >
-                            üéµ{' '}
+                            ??{' '}
                             <strong>
                               {nomeTrilhaArquivo}
                             </strong>
@@ -2856,8 +2856,8 @@ fontWeight: 400
                               }}
                             >
                               {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
-                                ? `‚úì Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `üìç Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                                ? `? Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
+                                : `?? Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
                             </button>
                           </>
                         )}
@@ -2870,7 +2870,7 @@ fontWeight: 400
 
                       <div className="estilos" style={{ marginTop: '20px' }}>
                         <label>
-                          üéµ Estilo da trilha
+                          ?? Estilo da trilha
                         </label>
 
                         <select
@@ -2955,8 +2955,8 @@ fontWeight: 400
                               }}
                             >
                               {pontoTrilhaConfirmado && trilhaSelecionada === trilha.arquivo
-                                ? `‚úì Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `üìç Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                                ? `? Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
+                                : `?? Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
                             </button>
 
                             <button
@@ -2977,8 +2977,8 @@ fontWeight: 400
                               }}
                             >
                               {trilhaSelecionada === trilha.arquivo
-                                ? '‚úì Trilha selecionada'
-                                : `‚úì Usar ${trilha.nome}`}
+                                ? '? Trilha selecionada'
+                                : `? Usar ${trilha.nome}`}
                             </button>
                           </div>
                         ))}
@@ -2996,12 +2996,12 @@ fontWeight: 400
                            }}
                          >
                             {pontoTrilhaConfirmado
-                              ? <>‚úì <strong>Ponto de in√≠cio selecionado:</strong>{' '}
+                              ? <>? <strong>Ponto de inÌcio selecionado:</strong>{' '}
                                   {Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}
                                   :
                                   {Math.floor(inicioTrilha % 60).toString().padStart(2, '0')}
                                 </>
-                              : <>üìç <strong>In√≠cio da trilha:</strong> 00:00</>}
+                              : <>?? <strong>InÌcio da trilha:</strong> 00:00</>}
                             <div
                               style={{
                                 marginTop: '6px',
@@ -3010,8 +3010,8 @@ fontWeight: 400
                               }}
                             >
                               {pontoTrilhaConfirmado
-                                ? '‚úì Ponto confirmado. Agora √© s√≥ mixar a voz com a trilha.'
-                                : 'Ou√ßa a trilha, posicione no trecho desejado e clique em ‚ÄúUsar este ponto‚Äù.'}
+                                ? '? Ponto confirmado. Agora È sÛ mixar a voz com a trilha.'
+                                : 'OuÁa a trilha, posicione no trecho desejado e clique em ìUsar este pontoî.'}
                            </div>
                          </div>
                        ) : null}
@@ -3040,7 +3040,7 @@ fontWeight: 400
                               fontWeight: 700
                             }}
                           >
-                            üéôÔ∏è Volume da voz: {volumeVoz}%
+                            ??? Volume da voz: {volumeVoz}%
                           </label>
 
                           <input
@@ -3068,13 +3068,13 @@ fontWeight: 400
                               fontWeight: 700
                             }}
                           >
-                            üéµ Volume da trilha: {volumeTrilha}%
+                            Volume da trilha: {volumeTrilha}%
                           </label>
 
                           <input
                             type="range"
                             min="0"
-                            max="100"
+                            max="200"
                             step="1"
                             value={volumeTrilha}
                             onChange={(e) =>
@@ -3095,14 +3095,14 @@ fontWeight: 400
                               opacity: 0.75
                             }}
                           >
-                            Durante a voz, a trilha √© reduzida automaticamente para deixar o locutor em destaque.
+                            Durante a voz, a trilha È reduzida automaticamente para deixar o locutor em destaque.
                           </small>
 
                         </div>
                       )}
 
                       {/* =================================================
-                          FINALIZA√á√ÉO DO √ÅUDIO
+                          FINALIZA«√O DO ¡UDIO
                       ================================================= */}
 
                       {(trilhaSelecionada || trilhaArquivo) && (
@@ -3123,7 +3123,7 @@ fontWeight: 400
                               marginBottom: '14px'
                             }}
                           >
-                            üéõÔ∏è Finaliza√ß√£o do √°udio
+                            ??? FinalizaÁ„o do ·udio
                           </div>
 
                           <button
@@ -3146,7 +3146,7 @@ fontWeight: 400
                               transition: '0.2s'
                             }}
                           >
-                            {reverbAtivo ? '‚ú® Reverb: ATIVADO' : '‚ú® Reverb: DESLIGADO'}
+                            {reverbAtivo ? '? Reverb: ATIVADO' : '? Reverb: DESLIGADO'}
                           </button>
 
                           <div style={{ marginTop: '12px' }}>
@@ -3176,7 +3176,7 @@ fontWeight: 400
                                   marginBottom: '7px'
                                 }}
                               >
-                                üîä Volume do Reverb: {volumeReverb}%
+                                ?? Volume do Reverb: {volumeReverb}%
                               </div>
 
                               <input
@@ -3196,7 +3196,7 @@ fontWeight: 400
                             </div>
                           )}
 
-                              üéß Efeitos sonoros
+                              ?? Efeitos sonoros
                             </div>
 
                             <select
@@ -3216,7 +3216,7 @@ fontWeight: 400
                               <option value="">Nenhum efeito</option>
                               <option value="/efeitos/Laser.mp3">Laser</option>
                               <option value="/efeitos/Impacto.mp3">Impacto</option>
-                              <option value="/efeitos/Transmiss√£o.mp3">Transmiss√£o</option>
+                              <option value="/efeitos/Transmiss„o.mp3">Transmiss„o</option>
                               <option value="/efeitos/Buzina.mp3">Buzina</option>
                               <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
                               <option value="/efeitos/Demonstrativo.mp3">Demonstrativo</option>
@@ -3250,7 +3250,7 @@ fontWeight: 400
                                 />
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
-                                  <span>Posi√ß√£o na locu√ß√£o</span>
+                                  <span>PosiÁ„o na locuÁ„o</span>
                                   <strong style={{ color: '#facc15' }}>{posicaoEfeito.toFixed(1)}s</strong>
                                 </div>
                                 <input
@@ -3281,7 +3281,7 @@ fontWeight: 400
                                   cursor: 'pointer'
                                 }}
                               >
-                                ‚ûï Adicionar segundo efeito
+                                ? Adicionar segundo efeito
                               </button>
                             )}
 
@@ -3317,7 +3317,7 @@ fontWeight: 400
                                   <option value="">Nenhum efeito</option>
                                   <option value="/efeitos/Laser.mp3">Laser</option>
                                   <option value="/efeitos/Impacto.mp3">Impacto</option>
-                                  <option value="/efeitos/Transmiss√£o.mp3">Transmiss√£o</option>
+                                  <option value="/efeitos/Transmiss„o.mp3">Transmiss„o</option>
                                   <option value="/efeitos/Buzina.mp3">Buzina</option>
                                   <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
                                 </select>
@@ -3331,7 +3331,7 @@ fontWeight: 400
                                     <input type="range" min="0" max="100" value={volumeEfeito2} onChange={(e) => setVolumeEfeito2(Number(e.target.value))} style={{ width: '100%', accentColor: '#a855f7' }} />
 
                                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
-                                      <span>Posi√ß√£o na locu√ß√£o</span>
+                                      <span>PosiÁ„o na locuÁ„o</span>
                                       <strong style={{ color: '#facc15' }}>{posicaoEfeito2.toFixed(1)}s</strong>
                                     </div>
                                     <input type="range" min="0" max="60" step="0.1" value={posicaoEfeito2} onChange={(e) => setPosicaoEfeito2(Number(e.target.value))} style={{ width: '100%', accentColor: '#a855f7' }} />
@@ -3368,11 +3368,11 @@ fontWeight: 400
                               fontSize: '14px'
                             }}
                           >
-                            <strong>üí° DICA IMPORTANTE</strong>
+                            <strong>?? DICA IMPORTANTE</strong>
                             <div style={{ marginTop: '5px', color: '#f3f3f3' }}>
-                              Voc√™ pode trocar a trilha, os efeitos, o volume e a posi√ß√£o dos efeitos
-                              e <strong>mixar novamente quantas vezes quiser sem gastar novos cr√©ditos.</strong>
-                              O cr√©dito √© descontado somente ao gerar a locu√ß√£o.
+                              VocÍ pode trocar a trilha, os efeitos, o volume e a posiÁ„o dos efeitos
+                              e <strong>mixar novamente quantas vezes quiser sem gastar novos crÈditos.</strong>
+                              O crÈdito È descontado somente ao gerar a locuÁ„o.
                             </div>
                           </div>
 
@@ -3391,8 +3391,8 @@ fontWeight: 400
                             disabled={mixando}
                           >
                             {mixando
-                              ? '‚è≥ Mixando...'
-                              : 'üéöÔ∏è Mixar voz + trilha'}
+                              ? '? Mixando...'
+                              : '??? Mixar voz + trilha'}
                           </button>
 
                         </div>
@@ -3406,7 +3406,7 @@ fontWeight: 400
                         <div className="resultado-mixagem">
 
                           <div className="titulo-previa">
-                            üéµ Mixagem pronta
+                            ?? Mixagem pronta
                           </div>
 
                           <audio
@@ -3420,7 +3420,7 @@ fontWeight: 400
                             download="fabrica-da-voz-mixagem.mp3"
                             className="botao-download-mixagem"
                           >
-                            ‚¨áÔ∏è Baixar mixagem
+                            ?? Baixar mixagem
                           </a>
 
                         </div>
@@ -3446,6 +3446,10 @@ fontWeight: 400
 }
 
 export default App
+
+
+
+
 
 
 
