@@ -2472,11 +2472,11 @@ const gerarVoz = async () => {
                     }
                     maxLength={300}
                     placeholder="Ex.: fale como locutor de rádio, com bastante energia e entusiasmo..."
-                    rows={3}
+                    rows={2}
                     style={{
                       width: '100%',
                       marginTop: '8px',
-                      padding: '12px 14px',
+                      padding: '9px 12px',
                       borderRadius: '10px',
                       border: '1px solid rgba(139, 92, 246, 0.55)',
                       background: '#171020',
@@ -2613,15 +2613,15 @@ const gerarVoz = async () => {
                 marginBottom: '18px',
                 padding: '16px 18px',
                 borderRadius: '14px',
-                border: '1px solid rgba(192, 132, 252, 0.28)',
-background: 'rgba(124, 58, 237, 0.08)',
-color: '#d8c7ef',
+                border: '1px solid rgba(250, 204, 21, 0.45)',
+background: 'rgba(245, 158, 11, 0.08)',
+color: '#f3f3f3',
 boxShadow: 'none',
 lineHeight: 1.45,
 fontSize: '12px',
 fontWeight: 400
               }}>
-                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#c084fc', fontWeight: 600 }}>
+                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
                   ⚠️ ATENÇÃO
                 </div>
                 <div>
@@ -3105,7 +3105,7 @@ fontWeight: 400
                             marginTop: '20px',
                             padding: '18px',
                             borderRadius: '14px',
-                            background: 'rgba(124, 58, 237, 0.08)',
+                            background: 'rgba(245, 158, 11, 0.08)',
                             border: '1px solid rgba(139, 92, 246, 0.35)'
                           }}
                         >
@@ -3402,6 +3402,7 @@ fontWeight: 400
 }
 
 export default App
+
 
 
 
