@@ -2482,7 +2482,10 @@ const gerarVoz = async () => {
                       background: '#171020',
                       color: '#ffffff',
                       fontSize: '14px',
-                      resize: 'vertical',
+                      height: '58px',
+                      minHeight: '58px',
+                      maxHeight: '58px',
+                      resize: 'none',
                       outline: 'none',
                       boxSizing: 'border-box'
                     }}
@@ -3402,6 +3405,9 @@ fontWeight: 400
 }
 
 export default App
+
+
+
 
 
 
