@@ -1185,40 +1185,40 @@ app.post(
       // =====================================================
 
       let textoParaVoz = textoLimpo;
-      let estabilidadeEstilo = 0.50;
+let estabilidadeEstilo = 0.50;
 
-      if (estilo === "animado") {
-        textoParaVoz = `[excited] ${textoLimpo}`;
-        estabilidadeEstilo = 0.30;
+if (estilo === "animado") {
+  textoParaVoz = `[excited] ${textoLimpo}`;
+  estabilidadeEstilo = 0.45;
 
-      } else if (estilo === "muitoAnimado") {
-        textoParaVoz = `[excited] [happily] ${textoLimpo}`;
-        estabilidadeEstilo = 0.22;
+} else if (estilo === "muitoAnimado") {
+  textoParaVoz = `[excited] ${textoLimpo}`;
+  estabilidadeEstilo = 0.40;
 
-      } else if (estilo === "superImpacto") {
-        textoParaVoz = `[shouts] ${textoLimpo}`;
-        estabilidadeEstilo = 0.20;
+} else if (estilo === "superImpacto") {
+  textoParaVoz = `[shouts] ${textoLimpo}`;
+  estabilidadeEstilo = 0.42;
 
-      } else if (estilo === "serio") {
-        textoParaVoz = `[serious] ${textoLimpo}`;
-        estabilidadeEstilo = 0.68;
+} else if (estilo === "serio") {
+  textoParaVoz = `[serious] ${textoLimpo}`;
+  estabilidadeEstilo = 0.65;
 
-      } else if (estilo === "urgente") {
-        textoParaVoz = `[shouts] [excited] ${textoLimpo}`;
-        estabilidadeEstilo = 0.18;
+} else if (estilo === "urgente") {
+  textoParaVoz = `[shouts] ${textoLimpo}`;
+  estabilidadeEstilo = 0.40;
 
-      } else if (estilo === "comercial") {
-        textoParaVoz = `[excited] ${textoLimpo}`;
-        estabilidadeEstilo = 0.25;
+} else if (estilo === "comercial") {
+  textoParaVoz = `[excited] ${textoLimpo}`;
+  estabilidadeEstilo = 0.45;
 
-      } else if (estilo === "festa") {
-        textoParaVoz = `[excited] [happily] ${textoLimpo}`;
-        estabilidadeEstilo = 0.22;
+} else if (estilo === "festa") {
+  textoParaVoz = `[happily] ${textoLimpo}`;
+  estabilidadeEstilo = 0.42;
 
-      } else if (estilo === "solene") {
-        textoParaVoz = `[calm] [serious] ${textoLimpo}`;
-        estabilidadeEstilo = 0.78;
-      }
+} else if (estilo === "solene") {
+  textoParaVoz = `[calm] [serious] ${textoLimpo}`;
+  estabilidadeEstilo = 0.72;
+}
 
       // =====================================================
       // =====================================================
@@ -2030,6 +2030,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 
