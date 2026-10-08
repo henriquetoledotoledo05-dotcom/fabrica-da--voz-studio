@@ -249,6 +249,7 @@ function App() {
   const [instrucaoPersonalizada, setInstrucaoPersonalizada] = useState('')
 
   const [reverbAtivo, setReverbAtivo] = useState(false)
+  const [volumeReverb, setVolumeReverb] = useState(30)
 
   const [efeitoSelecionado, setEfeitoSelecionado] = useState('')
   const [volumeEfeito, setVolumeEfeito] = useState(70)
@@ -951,7 +952,8 @@ const gerarVoz = async () => {
             voiceId: vozAtual.id,
             estilo: estiloSelecionado,
             instrucaoPersonalizada: instrucaoPersonalizada.trim(),
-            reverb: reverbAtivo
+            reverb: reverbAtivo,
+            volumeReverb: volumeReverb
           })
         }
       )
@@ -3156,6 +3158,44 @@ fontWeight: 400
                                 marginBottom: '8px'
                               }}
                             >
+                          {reverbAtivo && (
+                            <div
+                              style={{
+                                marginTop: '12px',
+                                padding: '12px 14px',
+                                borderRadius: '12px',
+                                background: 'rgba(139,92,246,0.08)',
+                                border: '1px solid rgba(139,92,246,0.18)'
+                              }}
+                            >
+                              <div
+                                style={{
+                                  color: '#ffffff',
+                                  fontSize: '14px',
+                                  fontWeight: 700,
+                                  marginBottom: '7px'
+                                }}
+                              >
+                                🔊 Volume do Reverb: {volumeReverb}%
+                              </div>
+
+                              <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={volumeReverb}
+                                onChange={(e) =>
+                                  setVolumeReverb(Number(e.target.value))
+                                }
+                                style={{
+                                  width: '100%',
+                                  accentColor: '#a855f7',
+                                  cursor: 'pointer'
+                                }}
+                              />
+                            </div>
+                          )}
+
                               🎧 Efeitos sonoros
                             </div>
 
@@ -3406,6 +3446,8 @@ fontWeight: 400
 }
 
 export default App
+
+
 
 
 

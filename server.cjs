@@ -822,7 +822,7 @@ async function mixarAudio(
       // Voz:
       // começa após os segundos iniciais
       // e recebe silêncio depois.
-      `[0:a]adelay=${delayMs}|${delayMs},` +`(reverb ? "aecho=0.8:0.9:70:0.25," : "")` +`apad=pad_dur=${final}[voz];` +
+      `[0:a]adelay=${delayMs}|${delayMs},` + (reverb ? `aecho=0.8:0.9:70:${Math.max(0, Math.min(0.40, (Number(volumeReverb ?? 30) / 100) * 0.40))},` : "") + `apad=pad_dur=${final}[voz];` +
 
       // Trilha:
       // 20% de volume, duração final exata
@@ -1108,6 +1108,7 @@ app.post(
         categoria,
         estilo,
         reverb,
+        volumeReverb,
         instrucaoPersonalizada,
       } = req.body;
 
@@ -2030,6 +2031,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 
