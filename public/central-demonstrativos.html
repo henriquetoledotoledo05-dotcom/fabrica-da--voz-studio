@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#10091b">
 <meta property="og:title" content="Central de Vozes">
-<meta property="og:description" content="OuÃ§a os demonstrativos e escolha a voz ideal para sua locuÃ§Ã£o.">
+<meta property="og:description" content="Ouça os demonstrativos e escolha a voz ideal para sua locução.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.fabricadavozstudio.com.br/central-demonstrativos">
 <meta property="og:image" content="https://www.fabricadavozstudio.com.br/central-demonstrativo-whatsapp.jpg">
@@ -13,7 +13,7 @@
 <meta property="og:image:type" content="image/jpeg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Central de Vozes">
-<meta name="twitter:description" content="OuÃ§a os demonstrativos e escolha a voz ideal para sua locuÃ§Ã£o.">
+<meta name="twitter:description" content="Ouça os demonstrativos e escolha a voz ideal para sua locução.">
 <meta name="twitter:image" content="https://www.fabricadavozstudio.com.br/central-demonstrativo-whatsapp.jpg">
 <title>Central de Demonstrativos</title>
 <style>
@@ -52,24 +52,24 @@ footer{text-align:center;color:#bcaecb;padding:28px 16px;border-top:1px solid #f
 <header>
   <img class="cover-central" src="/central-demonstrativo-capa.png" alt="Central de Vozes" width="900" height="360">
   <div class="logo">CENTRAL <span>DE VOZES</span></div>
-  <p>Central de Demonstrativos<br>OuÃ§a as vozes e escolha a ideal para sua locuÃ§Ã£o!</p>
+  <p>Central de Demonstrativos<br>Ouça as vozes e escolha a ideal para sua locução!</p>
   <div class="actions">
     <button class="gold" id="share">Compartilhar central</button>
     <button class="primary" id="copy">Copiar link</button>
   </div>
 </header>
 <main class="wrap">
-  <input class="search" id="search" type="search" placeholder="ðŸ”Ž Buscar locutor pelo nome...">
+  <input class="search" id="search" type="search" placeholder="🔎 Buscar locutor pelo nome...">
   <section id="masculinos-section">
-  <h2 class="category-title">ðŸŽ™ï¸ Locutores masculinos</h2>
+  <h2 class="category-title">🎙️ Locutores masculinos</h2>
   <div class="grid" id="masculinos"></div>
 </section>
 <section id="femininos-section">
-  <h2 class="category-title">ðŸŽ¤ Locutoras femininas</h2>
+  <h2 class="category-title">🎤 Locutoras femininas</h2>
   <div class="grid" id="femininos"></div>
 </section>
 <section id="infantis-section">
-  <h2 class="category-title">ðŸ§’ Vozes infantis</h2>
+  <h2 class="category-title">🧒 Vozes infantis</h2>
   <div class="grid" id="infantis"></div>
 </section>
   <div class="empty" id="empty">Nenhum locutor encontrado.</div>
@@ -83,18 +83,18 @@ const locutores = [
   ["Pedro","pedro.png","PEDRO.mp3"],
   ["Henrique","/henrique-foto.png","HENRIQUE.mp3"],
   ["Rafael","/rafael-foto.png","RAFAEL.mp3"],
-  ["VinÃ­cius","/vinicius-foto.png","VINÃCIUS.mp3"],
+  ["Vinícius","/vinicius-foto.png","VINÍCIUS.mp3"],
   ["Vitor","/vitor-foto.png","VITOR.mp3"],
-  ["LourenÃ§o","lourenco.png","LOURENÃ‡O.mp3"],
+  ["Lourenço","lourenco.png","LOURENÇO.mp3"],
   ["Gustavo","gustavo.png","GUSTAVO.mp3"],
   ["Flavinha","/flavinha-foto.png","FLAVINHA.mp3"],
   ["Aninha","/aninha-foto.png","ANINHA.mp3"],
   ["Paulinho","/paulinho-foto.png","PAULINHO.mp3"],
-  ["Luiza","luiza.png","LUÃZA.mp3"],
+  ["Luiza","luiza.png","LUÍZA.mp3"],
   ["Gaby","gaby.png","GABY.mp3"],
   ["Angelo","/angelo-foto.png","ANGELO.mp3"],
   ["Bruno","/bruno-foto.png","BRUNO.mp3"],
-  ["LetÃ­cia","/leticia-foto.png","LETÃCIA.mp3"],
+  ["Letícia","/leticia-foto.png","LETÍCIA.mp3"],
   ["Regiane","/regiane-foto.png","REGIANE.mp3"],
   ["Ricardo","/ricardo-foto.png","RICARDO.mp3"],
   ["Belkis","/belkis-foto.png","BELKIS.mp3"]
@@ -107,11 +107,11 @@ function renderizar(filtro="") {
   const grupos = [
     {
       id: "masculinos",
-      nomes: ["Noah","Celso","Pedro","Henrique","Rafael","VinÃ­cius","Vitor","LourenÃ§o","Gustavo","Angelo","Bruno","Ricardo"]
+      nomes: ["Noah","Celso","Pedro","Henrique","Rafael","Vinícius","Vitor","Lourenço","Gustavo","Angelo","Bruno","Ricardo"]
     },
     {
       id: "femininos",
-      nomes: ["Nina","Luiza","Gaby","LetÃ­cia","Regiane","Belkis"]
+      nomes: ["Nina","Luiza","Gaby","Letícia","Regiane","Belkis"]
     },
     {
       id: "infantis",
@@ -173,10 +173,10 @@ function renderizar(filtro="") {
 async function compartilhar(nome = "") {
   const nomeLimpo = String(nome || "").trim();
   const mensagem = nomeLimpo
-    ? `Olha essa voz da FÃ¡brica da Voz! ðŸŽ™ï¸\nLocutor escolhido: ${nomeLimpo}\nOuÃ§a os demonstrativos: ${location.href}`
-    : `OuÃ§a os demonstrativos e escolha sua voz favorita na Central de Vozes: ${location.href}`;
+    ? `Olha essa voz da Fábrica da Voz! 🎙️\nLocutor escolhido: ${nomeLimpo}\nOuça os demonstrativos: ${location.href}`
+    : `Ouça os demonstrativos e escolha sua voz favorita na Central de Vozes: ${location.href}`;
   const dados = {
-    title: nomeLimpo ? `Locutor ${nomeLimpo} - FÃ¡brica da Voz` : "Central de Vozes",
+    title: nomeLimpo ? `Locutor ${nomeLimpo} - Fábrica da Voz` : "Central de Vozes",
     text: mensagem,
     url: location.href
   };
