@@ -17,28 +17,35 @@
 <meta name="twitter:image" content="https://www.fabricadavozstudio.com.br/central-demonstrativo-capa.png">
 <title>Central de Demonstrativos</title>
 <style>
-:root{color-scheme:dark;--bg:#10091b;--card:#1d142b;--purple:#a855f7;--gold:#ffd166;--white:#fff}
+:root{color-scheme:dark;--bg:#09070d;--panel:#15101d;--purple:#a855f7;--gold:#ffcc00;--white:#fff;--muted:#d1d1d6}
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(145deg,#10091b,#211033 60%,#10091b);color:var(--white);font-family:Arial,sans-serif;min-height:100vh}
-header{text-align:center;padding:36px 16px 25px;border-bottom:1px solid #ffffff18}
-.logo{font-size:clamp(27px,5vw,42px);font-weight:900;letter-spacing:-1px}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at top,#21102f 0,#0d0913 45%,#070609 100%);color:var(--white);font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+header{padding:24px 18px 34px;text-align:center;border-bottom:1px solid #a855f733;background:linear-gradient(180deg,#130b1d99,#09070d22)}
+.cover-central{display:block;width:100%;max-width:1000px;height:auto;max-height:none;object-fit:contain;margin:0 auto 26px;border-radius:18px;border:1px solid #a855f7;box-shadow:0 0 28px #a855f733}
+.logo{font-size:clamp(30px,5vw,48px);font-weight:900;letter-spacing:1px;text-shadow:0 0 22px #a855f744}
 .logo span{color:var(--gold)}
-header p{color:#d4c8df;line-height:1.5}
-.wrap{max-width:1120px;margin:auto;padding:22px 16px 45px}
-.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:22px}
-button,.sharelink{border:0;border-radius:10px;padding:12px 16px;font-weight:bold;cursor:pointer;text-decoration:none}
-.primary{background:var(--purple);color:white}
-.gold{background:var(--gold);color:#24132f}
-.search{width:100%;max-width:520px;display:block;margin:0 auto 24px;padding:14px;border:1px solid #59436f;border-radius:10px;background:#170e23;color:white;font-size:16px}
-.category-title{font-size:24px;margin:30px 0 16px;padding-bottom:10px;border-bottom:2px solid #a855f7;color:#ffd166}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-.card{background:linear-gradient(155deg,#261835,#191020);border:1px solid #ffffff18;border-radius:16px;padding:18px;text-align:center;box-shadow:0 8px 22px #0002}
-.photo{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#382448;border:3px solid var(--purple);margin:0 auto 12px;display:block}
-.card h2{font-size:20px;margin:8px 0 14px}
-audio{width:100%;height:42px;margin:0 0 12px}
-.card button{width:100%}
-footer{text-align:center;color:#bcaecb;padding:24px;font-size:13px}
+header p{color:var(--muted);line-height:1.6;margin:12px auto 22px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+button{border:1px solid transparent;border-radius:11px;padding:13px 17px;font-weight:800;letter-spacing:.2px;cursor:pointer;transition:transform .18s,box-shadow .18s}
+button:hover{transform:translateY(-2px);box-shadow:0 0 18px #a855f755}
+.primary{background:linear-gradient(135deg,#a855f7,#7629bd);color:#fff}
+.gold{background:linear-gradient(135deg,#ffdf40,#ffcc00);color:#17121f}
+.wrap{max-width:1240px;margin:auto;padding:28px 18px 52px}
+.search{width:100%;max-width:620px;display:block;margin:0 auto 30px;padding:16px 18px;border:1px solid #68418a;border-radius:13px;background:#100b16;color:#fff;font-size:16px;outline:none}
+.search:focus{border-color:var(--purple);box-shadow:0 0 0 3px #a855f722}
+.category-title{font-size:clamp(22px,3vw,28px);margin:36px 0 18px;padding-bottom:12px;border-bottom:1px solid #a855f766;color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,225px),1fr));gap:18px}
+.card{min-width:0;background:linear-gradient(155deg,#1b1424,#0d0a12 78%);border:1px solid #a855f733;border-radius:18px;padding:22px 17px;text-align:center;box-shadow:0 12px 30px #0005;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-4px);border-color:#a855f7;box-shadow:0 12px 32px #0007,0 0 18px #a855f71c}
+.photo{width:124px;height:124px;border-radius:50%;object-fit:cover;object-position:center;background:#20162b;border:3px solid var(--purple);box-shadow:0 0 0 4px #a855f71c,0 0 24px #a855f733;margin:0 auto 15px;display:block}
+.card h2{font-size:21px;margin:8px 0 16px;color:#fff;letter-spacing:.2px}
+audio{width:100%;height:42px;margin:0 0 14px;accent-color:var(--purple)}
+.card button{width:100%;min-height:46px;background:linear-gradient(135deg,#a855f7,#7629bd);color:#fff;border:1px solid #c084fc55;font-size:14px}
+footer{text-align:center;color:#bcaecb;padding:28px 16px;border-top:1px solid #ffffff12;font-size:13px}
 .empty{text-align:center;color:#d4c8df;display:none;padding:24px}
-.cover-central{display:block;width:min(100%,1100px);height:auto;max-height:none;object-fit:contain;margin:0 auto 22px;border-radius:16px;border:1px solid #a855f7;box-shadow:0 10px 30px #0008}
+@media(max-width:520px){header{padding:14px 12px 26px}.cover-central{border-radius:12px;margin-bottom:20px}.wrap{padding:20px 13px 36px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card{padding:15px 10px;border-radius:14px}.photo{width:88px;height:88px}.card h2{font-size:17px}.card button{font-size:12px;padding:12px 8px}.category-title{margin-top:28px}}
+@media(max-width:350px){.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -94,7 +101,7 @@ const locutores = [
 ];
 const baseFotos = "/central-demonstrativos/fotos/";
 const baseAudios = "/central%20de%20demonstrativo/";
-const grid = document.getElementById("voices");
+
 
 function renderizar(filtro="") {
   const grupos = [
@@ -155,24 +162,35 @@ function renderizar(filtro="") {
 
       const btn = document.createElement("button");
       btn.className = "primary";
-      btn.textContent = "Compartilhar esta central";
-      btn.onclick = compartilhar;
+      btn.textContent = "Compartilhar este locutor";
+      btn.onclick = () => compartilhar(nome);
 
       card.append(img, titulo, player, btn);
       gridGrupo.appendChild(card);
     });
   });
 }
-async function compartilhar() {
-  const dados = {title:"Central de Demonstrativos",text:"Ouça os demonstrativos e escolha sua voz favorita:",url:location.href};
+async function compartilhar(nome = "") {
+  const nomeLimpo = String(nome || "").trim();
+  const mensagem = nomeLimpo
+    ? `Olha essa voz da Fábrica da Voz! 🎙️\nLocutor escolhido: ${nomeLimpo}\nOuça os demonstrativos: ${location.href}`
+    : `Ouça os demonstrativos e escolha sua voz favorita na Central de Vozes: ${location.href}`;
+  const dados = {
+    title: nomeLimpo ? `Locutor ${nomeLimpo} - Fábrica da Voz` : "Central de Vozes",
+    text: mensagem,
+    url: location.href
+  };
   try {
-    if (navigator.share) await navigator.share(dados);
-    else {
-      await navigator.clipboard.writeText(location.href);
-      alert("Link copiado! Agora é só enviar para seu cliente.");
+    if (navigator.share) {
+      await navigator.share(dados);
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(mensagem);
+      alert("Mensagem copiada! Agora escolha onde deseja compartilhar.");
+    } else {
+      prompt("Copie a mensagem para compartilhar:", mensagem);
     }
   } catch(e) {
-    if(e.name !== "AbortError") alert("Copie o endereço da página e envie para seu cliente.");
+    if (e.name !== "AbortError") prompt("Copie a mensagem para compartilhar:", mensagem);
   }
 }
 document.getElementById("share").onclick = compartilhar;
