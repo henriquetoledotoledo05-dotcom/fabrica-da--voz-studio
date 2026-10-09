@@ -1,4 +1,4 @@
-﻿const crypto = require("crypto");
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -1910,6 +1910,10 @@ const distPath = path.join(__dirname, "dist");
 
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
+
+  app.get("/central-demonstrativos", (req, res) => {
+    res.sendFile(path.join(distPath, "central-demonstrativos.html"));
+  });
 
   // SPA: qualquer rota que não seja /api/* recebe o index.html.
   app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
