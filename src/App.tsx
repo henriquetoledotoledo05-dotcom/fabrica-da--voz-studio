@@ -2264,7 +2264,7 @@ const gerarVoz = async () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => window.open("https://www.fabricadavozstudio.com.br/central-demonstrativos.html", "_blank", "noopener,noreferrer")}
+                  onClick={() => window.open("https://www.fabricadavozstudio.com.br/central-demonstrativos", "_blank", "noopener,noreferrer")}
                   style={{
                     padding: "8px 13px",
                     borderRadius: "9px",
@@ -2280,7 +2280,7 @@ const gerarVoz = async () => {
                 <button
                   type="button"
                   onClick={async () => {
-                    const link = "https://www.fabricadavozstudio.com.br/central-demonstrativos.html"
+                    const link = "https://www.fabricadavozstudio.com.br/central-demonstrativos"
                     try {
                       if (navigator.share) {
                         await navigator.share({ title: "Central de Vozes", text: "Ouça os demonstrativos de voz:", url: link })
