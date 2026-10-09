@@ -2264,7 +2264,50 @@ const gerarVoz = async () => {
                 </button>
                 <button
                   type="button"
-                  onClick={sairDaFabrica}
+                  onClick={() => window.open("https://www.fabricadavozstudio.com.br/central-demonstrativos.html", "_blank", "noopener,noreferrer")}
+                  style={{
+                    padding: "8px 13px",
+                    borderRadius: "9px",
+                    border: "1px solid #d8a5ff",
+                    background: "linear-gradient(135deg, #9333ea, #581c87)",
+                    color: "#fff",
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  🎙️ Central de Vozes
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const link = "https://www.fabricadavozstudio.com.br/central-demonstrativos.html"
+                    try {
+                      if (navigator.share) {
+                        await navigator.share({ title: "Central de Vozes", text: "Ouça os demonstrativos de voz:", url: link })
+                      } else {
+                        await navigator.clipboard.writeText(link)
+                        alert("Link da Central de Vozes copiado!")
+                      }
+                    } catch (erro) {
+                      if (erro instanceof Error && erro.name !== "AbortError") {
+                        window.prompt("Copie o link da Central de Vozes:", link)
+                      }
+                    }
+                  }}
+                  style={{
+                    padding: "8px 13px",
+                    borderRadius: "9px",
+                    border: "1px solid #facc15",
+                    background: "rgba(250,204,21,0.12)",
+                    color: "#fde68a",
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  🔗 Compartilhar central
+                </button>
+                <button
+                  type="button"
                   style={{
                     padding: '8px 13px',
                     borderRadius: '9px',
