@@ -2288,7 +2288,7 @@ const gerarVoz = async () => {
       }}>&#128188;</div>
       <div style={{flex: 1, minWidth: 0}}>
         <div style={{fontSize: '18px', color: '#d8b4fe', marginBottom: '4px'}}>Seus créditos</div>
-        <div style={{fontSize: 'clamp(27px, 5vw, 40px)', fontWeight: 800, lineHeight: 1.15, overflowWrap: 'anywhere'}}>
+        <div style={{fontSize: 'clamp(22px, 5vw, 40px)', fontWeight: 800, lineHeight: 1.15, whiteSpace: 'nowrap', overflowWrap: 'normal'}}>
           {creditos === null ? '...' : creditos} créditos
         </div>
       </div>
