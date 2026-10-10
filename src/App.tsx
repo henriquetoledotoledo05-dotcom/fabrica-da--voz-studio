@@ -282,6 +282,9 @@ function App() {
   const [mixando, setMixando] =
     useState(false)
 
+  const [masterizando, setMasterizando] = useState(false);
+  const [audioMasterizadoUrl, setAudioMasterizadoUrl] = useState("");
+
   const [mostrarHistorico, setMostrarHistorico] =
     useState(false)
 
@@ -1807,6 +1810,64 @@ const gerarVoz = async () => {
       setMixando(false)
     }
   }
+
+  const masterizarAudio = async () => {
+    if (!mixAudioUrl || masterizando) return;
+
+    setMasterizando(true);
+
+    try {
+      const respostaOriginal = await fetch(mixAudioUrl);
+
+      if (!respostaOriginal.ok) {
+        throw new Error("Não foi possível carregar a mixagem original.");
+      }
+
+      const arquivoOriginal = await respostaOriginal.blob();
+
+      const resposta = await fetch("/api/masterizar-audio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "audio/mpeg",
+        },
+        body: arquivoOriginal,
+      });
+
+      if (!resposta.ok) {
+        let mensagem = "Não foi possível masterizar o áudio.";
+
+        try {
+          const dados = await resposta.json();
+          if (dados && dados.erro) mensagem = dados.erro;
+        } catch {}
+
+        throw new Error(mensagem);
+      }
+
+      const arquivoMasterizado = await resposta.blob();
+
+      if (!arquivoMasterizado.size) {
+        throw new Error("O áudio masterizado ficou vazio.");
+      }
+
+      const novaUrl = URL.createObjectURL(arquivoMasterizado);
+
+      setAudioMasterizadoUrl((urlAnterior) => {
+        if (urlAnterior) URL.revokeObjectURL(urlAnterior);
+        return novaUrl;
+      });
+    } catch (erro) {
+      console.error("Erro na masterização:", erro);
+
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : "Ocorreu um erro ao masterizar o áudio."
+      );
+    } finally {
+      setMasterizando(false);
+    }
+  };
 
   // =====================================================
   // EDITOR
@@ -3478,6 +3539,38 @@ fontWeight: 400
                           >
                             ⬇️ Baixar mixagem
                           </a>
+
+                          <button
+                            type="button"
+                            className="botao-trilha"
+                            onClick={masterizarAudio}
+                            disabled={masterizando}
+                            style={{ width: "100%", marginTop: "12px" }}
+                          >
+                            {masterizando
+                              ? "Masterizando áudio..."
+                              : "Masterizar áudio"}
+                          </button>
+
+                          {audioMasterizadoUrl && (
+                            <div style={{ marginTop: "18px" }}>
+                              <div className="titulo-previa">
+                                Áudio masterizado
+                              </div>
+                              <audio
+                                className="player-audio"
+                                controls
+                                src={audioMasterizadoUrl}
+                              />
+                              <a
+                                href={audioMasterizadoUrl}
+                                download="fabrica-da-voz-masterizado.mp3"
+                                className="botao-download-mixagem"
+                              >
+                                Baixar áudio masterizado
+                              </a>
+                            </div>
+                          )}
 
                         </div>
                       )}
