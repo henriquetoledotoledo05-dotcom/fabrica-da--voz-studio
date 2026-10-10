@@ -258,13 +258,13 @@ function App() {
   const [volumeEfeito2, setVolumeEfeito2] = useState(70)
   const [posicaoEfeito2, setPosicaoEfeito2] = useState(3)
   const [mostrarSegundoEfeito, setMostrarSegundoEfeito] = useState(false)
-    
+
   const [velocidade, setVelocidade] =
     useState('normal')  
 
   const [texto, setTexto] =
     useState('')
-  
+
   const [corrigindoTexto, setCorrigindoTexto] = useState(false)  
 
   const [audioUrl, setAudioUrl] =
@@ -2248,140 +2248,123 @@ const gerarVoz = async () => {
                 Crie seu áudio
               </h3>
 
-              <div
-                style={{
-                  margin: '8px 0 18px',
-                  padding: '10px 14px',
-                  borderRadius: '10px',
-                  background: 'rgba(139, 92, 246, 0.10)',
-                  border: '1px solid rgba(139, 92, 246, 0.25)',
-                  color: '#c084fc',
-                  fontWeight: 700,
-                  textAlign: 'center',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  flexWrap: 'wrap'
-                }}
-              >
-                <span>
-                  💳 Créditos disponíveis:{' '}
-                  <strong>{creditos === null ? '...' : creditos}</strong>
-                </span>
 
-                <button
-                  type="button"
-                  onClick={() => void carregarCreditos()}
-                  disabled={carregandoCreditos}
-                  title="Atualizar saldo de créditos"
-                  style={{
-                    padding: '8px 11px',
-                    borderRadius: '9px',
-                    border: '1px solid rgba(192,132,252,0.45)',
-                    background: 'rgba(124,58,237,0.16)',
-                    color: '#c084fc',
-                    cursor: carregandoCreditos ? 'wait' : 'pointer',
-                    fontWeight: 700,
-                    opacity: carregandoCreditos ? 0.65 : 1
-                  }}
-                >
-                  {carregandoCreditos ? '⏳' : '🔄'}
-                </button>
+<div style={{
+  margin: '8px 0 24px',
+  padding: '22px',
+  borderRadius: '28px',
+  background: '#100819',
+  border: '1px solid rgba(192,132,252,0.22)',
+  color: '#fff',
+  boxSizing: 'border-box',
+  width: '100%',
+  boxShadow: '0 12px 35px rgba(0,0,0,0.25)'
+}}>
+  <div style={{
+    padding: '24px',
+    borderRadius: '30px',
+    background: '#211431',
+    border: '1px solid rgba(192,132,252,0.35)',
+    boxSizing: 'border-box'
+  }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '18px',
+      paddingBottom: '26px',
+      borderBottom: '1px solid rgba(216,180,254,0.22)'
+    }}>
+      <div style={{
+        width: '76px',
+        height: '76px',
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '22px',
+        background: '#38234b',
+        color: '#facc15',
+        fontSize: '36px'
+      }}>&#128188;</div>
+      <div style={{flex: 1, minWidth: 0}}>
+        <div style={{fontSize: '18px', color: '#d8b4fe', marginBottom: '4px'}}>Seus créditos</div>
+        <div style={{fontSize: 'clamp(27px, 5vw, 40px)', fontWeight: 800, lineHeight: 1.15, overflowWrap: 'anywhere'}}>
+          {creditos === null ? '...' : creditos} créditos
+        </div>
+      </div>
+      <button type="button" onClick={() => void carregarCreditos()} disabled={carregandoCreditos} title="Atualizar saldo de créditos" style={{
+        border: 0, background: 'transparent', color: '#d8b4fe',
+        fontSize: '30px', padding: '8px', cursor: carregandoCreditos ? 'wait' : 'pointer'
+      }}>{carregandoCreditos ? '...' : '↻'}</button>
+    </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMostrarHistorico(true)
-                    void carregarHistorico()
-                  }}
-                  style={{
-                    padding: '8px 13px',
-                    borderRadius: '9px',
-                    border: '1px solid rgba(255,255,255,0.20)',
-                    background: 'rgba(255,255,255,0.06)',
-                    color: '#fff',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  🕘 Histórico (3 dias)
-                </button>
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gap: '14px',
+      marginTop: '24px',
+      marginBottom: '22px'
+    }}>
+      <button type="button" onClick={() => { setMostrarHistorico(true); void carregarHistorico(); }} style={{
+        minWidth: 0, minHeight: '155px', padding: '18px 10px',
+        borderRadius: '24px', border: '1px solid rgba(255,255,255,0.04)',
+        background: '#30213d', color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: '9px', textAlign: 'center'
+      }}>
+        <span style={{fontSize: '32px', color: '#facc15'}}>&#128340;</span>
+        <span style={{fontSize: '20px', fontWeight: 700}}>Histórico</span>
+        <span style={{fontSize: '15px', color: '#c4b5d0'}}>Últimos 3 dias</span>
+      </button>
+      <button type="button" onClick={() => setMostrarCompraCreditos(true)} style={{
+        minWidth: 0, minHeight: '155px', padding: '18px 10px',
+        borderRadius: '24px', border: '1px solid rgba(255,255,255,0.04)',
+        background: '#30213d', color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: '9px', textAlign: 'center'
+      }}>
+        <span style={{fontSize: '32px', color: '#facc15'}}>&#128722;</span>
+        <span style={{fontSize: '20px', fontWeight: 700}}>Comprar créditos</span>
+        <span style={{fontSize: '15px', color: '#c4b5d0'}}>Adicionar saldo</span>
+      </button>
+    </div>
 
-                <button
-                  type="button"
-                  onClick={() => setMostrarCompraCreditos(true)}
-                  style={{
-                    padding: '8px 13px',
-                    borderRadius: '9px',
-                    border: '1px solid #8b5cf6',
-                    background: 'linear-gradient(135deg, #7c3aed, #4c1d95)',
-                    color: '#fff',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Comprar créditos
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.open("https://www.fabricadavozstudio.com.br/central-demonstrativos", "_blank", "noopener,noreferrer")}
-                  style={{
-                    padding: "8px 13px",
-                    borderRadius: "9px",
-                    border: "1px solid #d8a5ff",
-                    background: "linear-gradient(135deg, #9333ea, #581c87)",
-                    color: "#fff",
-                    fontWeight: 700,
-                    cursor: "pointer"
-                  }}
-                >
-                  🎙️ Central de Vozes
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const link = "https://www.fabricadavozstudio.com.br/central-demonstrativos"
-                    try {
-                      if (navigator.share) {
-                        await navigator.share({ title: "Central de Vozes", text: "Ouça os demonstrativos de voz:", url: link })
-                      } else {
-                        await navigator.clipboard.writeText(link)
-                        alert("Link da Central de Vozes copiado!")
-                      }
-                    } catch (erro) {
-                      if (erro instanceof Error && erro.name !== "AbortError") {
-                        window.prompt("Copie o link da Central de Vozes:", link)
-                      }
-                    }
-                  }}
-                  style={{
-                    padding: "8px 13px",
-                    borderRadius: "9px",
-                    border: "1px solid #facc15",
-                    background: "rgba(250,204,21,0.12)",
-                    color: "#fde68a",
-                    fontWeight: 700,
-                    cursor: "pointer"
-                  }}
-                >
-                  🔗 Compartilhar central
-                </button>
-                <button
-                  type="button"
-                  style={{
-                    padding: '8px 13px',
-                    borderRadius: '9px',
-                    border: '1px solid rgba(255,255,255,0.20)',
-                    background: 'rgba(255,255,255,0.06)',
-                    color: '#fff',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Sair
-                </button>
-              </div>
+    <button type="button" onClick={() => window.open("https://www.fabricadavozstudio.com.br/central-demonstrativos", "_blank", "noopener,noreferrer")} style={{
+      width: '100%', minHeight: '76px', padding: '16px',
+      borderRadius: '23px', border: '1px solid #9333ea',
+      background: '#7625c9', color: '#fff', fontSize: '22px',
+      fontWeight: 750, cursor: 'pointer', marginBottom: '16px'
+    }}>&#127908; &nbsp; Central de Vozes</button>
+
+    <button type="button" onClick={async () => {
+      const link = "https://www.fabricadavozstudio.com.br/central-demonstrativos";
+      try {
+        if (navigator.share) {
+          await navigator.share({title: "Central de Vozes", text: "Ouça os demonstrativos de voz:", url: link});
+        } else {
+          await navigator.clipboard.writeText(link);
+          alert("Link da Central de Vozes copiado!");
+        }
+      } catch (erro) {
+        if (erro instanceof Error && erro.name !== "AbortError") {
+          window.prompt("Copie o link da Central de Vozes:", link);
+        }
+      }
+    }} style={{
+      width: '100%', minHeight: '76px', padding: '16px',
+      borderRadius: '23px', border: '2px solid #d6bd65',
+      background: 'transparent', color: '#f5dc78',
+      fontSize: '21px', fontWeight: 700, cursor: 'pointer'
+    }}>&#128279; &nbsp; Compartilhar central</button>
+
+    <div style={{display: 'flex', justifyContent: 'center', paddingTop: '22px'}}>
+      <button type="button" onClick={() => void sairDaFabrica()} style={{
+        padding: '10px 18px', border: 0, background: 'transparent',
+        color: '#bbaec8', fontSize: '17px', cursor: 'pointer'
+      }}>Sair da conta</button>
+    </div>
+  </div>
+</div>
 
               {/* =================================================
                   VOZES
@@ -2705,7 +2688,7 @@ const gerarVoz = async () => {
   className="campo-texto"
   value={texto}
   onChange={(e) => setTexto(e.target.value)}
-  
+
   placeholder="Digite aqui o texto que você quer transformar..."
 />
 
