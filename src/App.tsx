@@ -2395,9 +2395,9 @@ const gerarVoz = async () => {
             ? 'voz ativo'
             : 'voz'
         }
-        onClick={() =>
-          setVozSelecionada(voz.id)
-        }
+        onClick={() => {
+          setVozSelecionada(voz.id);
+        }}
       >
         <img
           src={voz.foto}
@@ -2435,9 +2435,9 @@ const gerarVoz = async () => {
             ? 'voz ativo'
             : 'voz'
         }
-        onClick={() =>
-          setVozSelecionada(voz.id)
-        }
+        onClick={() => {
+          setVozSelecionada(voz.id);
+        }}
       >
         <img
           src={voz.foto}
@@ -2475,9 +2475,9 @@ const gerarVoz = async () => {
             ? 'voz ativo'
             : 'voz'
         }
-        onClick={() =>
-          setVozSelecionada(voz.id)
-        }
+        onClick={() => {
+          setVozSelecionada(voz.id);
+        }}
       >
         <img
           src={voz.foto}
@@ -2558,7 +2558,53 @@ const gerarVoz = async () => {
                   <option value="solene">
                     Solene — Grave e respeitoso
                   </option>
-                </select>
+                
+                  <option value="aoVivoLoja">
+                    Ao Vivo &#8212; Loja e Ofertas
+                  </option>
+</select>
+
+                {estiloSelecionado === 'aoVivoLoja' && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '14px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(234, 179, 8, 0.45)',
+                    background: 'rgba(139, 92, 246, 0.12)',
+                    color: '#f3e8ff',
+                    fontSize: '14px',
+                    lineHeight: 1.6
+                  }}>
+                    <div style={{
+                      color: '#facc15',
+                      fontWeight: 800,
+                      marginBottom: '6px'
+                    }}>
+                      LOCAÇÃO DE LOJA E OFERTAS
+                    </div>
+                    Ideal para supermercados, lojas, feirões, queimas de estoque e promoções. Voz animada com efeito de reverberação para dar sensação de anúncio no microfone da loja.
+                    <div style={{
+                      marginTop: '8px',
+                      color: '#d8b4fe',
+                      fontWeight: 700
+                    }}>
+                      Disponível com Celso, Henrique e Gustavo.
+                    </div>
+                    {!['Celso', 'Henrique', 'Gustavo'].includes(vozAtual.nome) && (
+                      <div style={{
+                        marginTop: '10px',
+                        padding: '10px',
+                        borderRadius: '8px',
+                        background: 'rgba(250, 204, 21, 0.12)',
+                        border: '1px solid rgba(250, 204, 21, 0.6)',
+                        color: '#facc15',
+                        fontWeight: 700
+                      }}>
+                        Atenção: para usar este estilo, selecione o locutor Celso, Henrique ou Gustavo.
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div style={{
                   marginTop: '14px'
