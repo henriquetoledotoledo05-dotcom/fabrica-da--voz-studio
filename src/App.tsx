@@ -1367,6 +1367,8 @@ const gerarVoz = async () => {
 
     setMixando(true)
 
+    let contexto: AudioContext | null = null
+
     try {
       const vozResponse = await fetch(audioOriginalUrl)
 
@@ -1402,7 +1404,7 @@ const gerarVoz = async () => {
         throw new Error('Seu navegador não suporta mixagem de áudio.')
       }
 
-      const contexto = new AudioContextClass()
+      contexto = new AudioContextClass()
 
       const voz = await contexto.decodeAudioData(vozBuffer.slice(0))
       const trilha = await contexto.decodeAudioData(trilhaBuffer.slice(0))
@@ -1540,7 +1542,7 @@ const gerarVoz = async () => {
         0.01
       )
 
-      const sampleRate = contexto.sampleRate
+      const sampleRate = Math.min(contexto.sampleRate, 32000)
       const canais = Math.max(2, voz.numberOfChannels)
       const frames = Math.max(
         1,
@@ -1797,7 +1799,6 @@ const gerarVoz = async () => {
 
       await salvarNoHistorico(mp3Blob, 'mixagem')
 
-      await contexto.close()
     } catch (erro) {
       console.error('Erro na mixagem:', erro)
 
@@ -1807,6 +1808,13 @@ const gerarVoz = async () => {
           : 'Não foi possível mixar a voz com a trilha.'
       )
     } finally {
+      try {
+        if (contexto && contexto.state !== 'closed') {
+          await contexto.close()
+        }
+      } catch (erroFechamento) {
+        console.warn('Falha ao fechar o contexto de audio:', erroFechamento)
+      }
       setMixando(false)
     }
   }
@@ -3624,21 +3632,3 @@ fontWeight: 400
 }
 
 export default App
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
