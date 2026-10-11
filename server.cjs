@@ -681,6 +681,50 @@ function alterarVelocidade(audioBuffer, speed) {
 }
 
 // =====================================================
+async function aplicarReverbDireto(audioBuffer, volume) {
+  const intensidade = Math.max(0, Math.min(100, Number(volume) || 0));
+
+  if (!audioBuffer || !audioBuffer.length || intensidade <= 0) {
+    return audioBuffer;
+  }
+
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn(ffmpegPath, [
+      "-hide_banner",
+      "-loglevel", "error",
+      "-i", "pipe:0",
+      "-af",
+      "aecho=1.0:0.8:80|150:" +
+        [0.25, 0.12].map(v => (v * intensidade / 100).toFixed(2)).join("|"),
+      "-c:a", "libmp3lame",
+      "-b:a", "128k",
+      "-f", "mp3",
+      "pipe:1"
+    ]);
+
+    const partes = [];
+    let erro = "";
+
+    ffmpeg.stdout.on("data", parte => partes.push(parte));
+    ffmpeg.stderr.on("data", parte => { erro += parte.toString(); });
+    ffmpeg.on("error", reject);
+
+    ffmpeg.on("close", codigo => {
+      if (codigo === 0 && partes.length) {
+        resolve(Buffer.concat(partes));
+      } else {
+        reject(new Error(erro || "Falha ao aplicar reverb direto."));
+      }
+    });
+
+    ffmpeg.stdin.on("error", erroEntrada => {
+      if (erroEntrada.code !== "EPIPE") reject(erroEntrada);
+    });
+
+    ffmpeg.stdin.end(audioBuffer);
+  });
+}
+
 // MIXAGEM PROFISSIONAL
 //
 // SEGUNDOS ANTES
@@ -695,7 +739,9 @@ async function mixarAudio(
   vozBuffer,
   trilhaBuffer,
   segundosInicio,
-  segundosFinal
+  segundosFinal,
+  reverb = false,
+  volumeReverb = 0
 ) {
   let inicio = Number(segundosInicio);
   let final = Number(segundosFinal);
@@ -822,7 +868,7 @@ async function mixarAudio(
       // Voz:
       // comeÃ§a apÃ³s os segundos iniciais
       // e recebe silÃªncio depois.
-      `[0:a]adelay=${delayMs}|${delayMs},` + (reverb && Number(volumeReverb ?? 0) > 0 ? `asplit=2[vozOriginal][reverbEntrada];[reverbEntrada]aecho=0.0:1.0:70:0.65,volume=${Math.max(0, Math.min(1, Number(volumeReverb ?? 0) / 100))}[reverbSom];[vozOriginal][reverbSom]amix=inputs=2:duration=longest:dropout_transition=0:weights=1 1,` : "") + `apad=pad_dur=${final}[voz];` +
+      `[0:a]adelay=${delayMs}|${delayMs},` + (reverb && Number(volumeReverb ?? 0) > 0 ? `asplit=2[vozOriginal][reverbEntrada];[reverbEntrada]aecho=0.8:0.9:90|180|300:0.7|0.55|0.4,volume=${Math.max(0, Math.min(1, Number(volumeReverb ?? 0) / 100))}[reverbSom];[vozOriginal][reverbSom]amix=inputs=2:duration=longest:dropout_transition=0:weights=1 1,` : "") + `apad=pad_dur=${final}[voz];` +
 
       // Trilha:
       // 20% de volume, duraÃ§Ã£o final exata
@@ -863,6 +909,14 @@ async function mixarAudio(
       argumentos,
       saidaPath
     );
+
+    if (reverb && Number(volumeReverb ?? 0) > 0) {
+      fs.copyFileSync(
+        saidaPath,
+        require("path").join(__dirname, "teste-eco-final.mp3")
+      );
+      console.log("?UDIO DE TESTE SALVO: teste-eco-final.mp3");
+    }
 
     console.log("");
     console.log(
@@ -1114,6 +1168,21 @@ app.post(
 
       console.log("ESTILO RECEBIDO:", estilo);
 
+      const vozesPermitidasAoVivo = [
+        "rpNe0HOx7heUulPiOEaG",
+        "xyyAflT5WWJ3HeqszUn0",
+        "g2E836wHBXhsWq15NkoD",
+      ];
+
+      if (
+        estilo === "aoVivoLoja" &&
+        !vozesPermitidasAoVivo.includes(voiceId)
+      ) {
+        return res.status(400).json({
+          erro: "O estilo Ao Vivo - Loja e Ofertas esta disponivel apenas para Celso, Henrique e Gustavo.",
+        });
+      }
+
       console.log("");
       console.log("=================================");
       console.log("GERANDO VOZ - ESTILO:", estilo);
@@ -1219,14 +1288,20 @@ if (estilo === "animado") {
 } else if (estilo === "solene") {
   textoParaVoz = `[calm] [serious] ${textoLimpo}`;
   estabilidadeEstilo = 0.72;
+
+} else if (estilo === "aoVivoLoja") {
+  textoParaVoz = `[excited] [happily] ${textoLimpo}`;
+  estabilidadeEstilo = 0.42;
 }
 
-      // =====================================================
-      // =====================================================
       // INSTRUÃ‡ÃƒO PERSONALIZADA - INTERPRETAÃ‡ÃƒO COM IA
       // =====================================================
 
-      if (instrucaoPersonalizada && instrucaoPersonalizada.trim()) {
+      if (
+        estilo !== "aoVivoLoja" &&
+        instrucaoPersonalizada &&
+        instrucaoPersonalizada.trim()
+      ) {
         try {
           console.log("INSTRUÃ‡ÃƒO PERSONALIZADA:", instrucaoPersonalizada);
 
@@ -1402,6 +1477,36 @@ Regras:
           creditosConsumidos.toString(),
       });
 
+      const aplicarEco =
+        estilo === "aoVivoLoja" || Boolean(reverb);
+
+      if (aplicarEco) {
+        const intensidadeEco =
+          estilo === "aoVivoLoja"
+            ? 65
+            : Number(volumeReverb ?? 0);
+
+        console.log(
+          "APLICANDO REVERB DIRETO:",
+          estilo,
+          intensidadeEco + "%"
+        );
+
+        audio = await aplicarReverbDireto(
+          audio,
+          intensidadeEco
+        );
+
+        if (!audio || !audio.length) {
+          throw new Error("O reverb retornou um ?udio vazio.");
+        }
+
+        res.set(
+          "Content-Length",
+          audio.length.toString()
+        );
+      }
+
       res.send(audio);
     } catch (erro) {
       console.error("");
@@ -1552,7 +1657,11 @@ app.post(
           vozBuffer,
           trilhaBuffer,
           segundosInicio,
-          segundosFinal
+          segundosFinal,
+          estilo === "aoVivoLoja" || Boolean(reverb),
+          estilo === "aoVivoLoja"
+            ? 65
+            : Number(volumeReverb ?? 0)
         );
 
       res.set({
