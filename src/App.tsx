@@ -775,12 +775,24 @@ function App() {
       nome: 'Ricardo',
       foto: '/ricardo-foto.png',
       demonstrativo: '/vozes/ricardo-voz.wav'
+    },
+    {
+      id: 'UaeEQHfiDI8l58WWXiwS',
+      nome: 'Leonardo',
+      foto: '/leonardo-foto.png',
+      demonstrativo: '/vozes/leonardo-voz.mp3'
+    },
+    {
+      id: 'oQL5kq26ctJzupM0mJot',
+      nome: 'Noel',
+      foto: '/noel-foto.png',
+      demonstrativo: '/vozes/noel-voz.mp3'
     }
   ]
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
