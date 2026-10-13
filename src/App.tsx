@@ -1051,6 +1051,13 @@ const gerarVoz = async () => {
       { nome: 'Comercial 01', arquivo: '/trilhas/comercial/01-comercial.mp3' },
       { nome: 'Comercial 02', arquivo: '/trilhas/comercial/02-comercial.mp3' },
       { nome: 'Comercial 03', arquivo: '/trilhas/comercial/03-comercial.mp3' },
+      { nome: 'Comercial 04', arquivo: '/trilhas/comercial/04-comercial.wav' },
+      { nome: 'Comercial 05', arquivo: '/trilhas/comercial/05-comercial.wav' },
+      { nome: 'Comercial 06', arquivo: '/trilhas/comercial/06-comercial.wav' },
+      { nome: 'Comercial 07', arquivo: '/trilhas/comercial/07-comercial.mp3' },
+      { nome: 'Comercial 08', arquivo: '/trilhas/comercial/08-comercial.mp3' },
+      { nome: 'Comercial 09', arquivo: '/trilhas/comercial/09-comercial.mp3' },
+      { nome: 'Comercial 10', arquivo: '/trilhas/comercial/10-comercial.mp3' },
     ],
     forro: [
       { nome: 'Forró 01', arquivo: '/trilhas/forro/01- Forró.mp3' },
@@ -1061,26 +1068,40 @@ const gerarVoz = async () => {
       { nome: 'Institucional 01', arquivo: '/trilhas/institucional/01-Trilha institucional.mp3' },
       { nome: 'Institucional 02', arquivo: '/trilhas/institucional/02-Trilha institucional.mp3' },
       { nome: 'Institucional 03', arquivo: '/trilhas/institucional/03-Trilha institucional.mp3' },
+      { nome: 'Institucional 04', arquivo: '/trilhas/institucional/04-Trilha institucional.mp3' },
+      { nome: 'Institucional 05', arquivo: '/trilhas/institucional/05-Trilha institucional.mp3' },
+      { nome: 'Institucional 06', arquivo: '/trilhas/institucional/06-Trilha institucional.mp3' },
     ],
     impacto: [
       { nome: 'Impacto 01', arquivo: '/trilhas/impacto/01- Impacto.mp3' },
       { nome: 'Impacto 02', arquivo: '/trilhas/impacto/02- Impacto.mp3' },
       { nome: 'Impacto 03', arquivo: '/trilhas/impacto/03- Impacto.mp3' },
+      { nome: 'Impacto 04', arquivo: '/trilhas/impacto/04- Impacto.mp3' },
+      { nome: 'Impacto 05', arquivo: '/trilhas/impacto/05- Impacto.mp3' },
     ],
     gospel: [
       { nome: 'Gospel 01', arquivo: '/trilhas/gospel/01- Gospel.mp3' },
       { nome: 'Gospel 02', arquivo: '/trilhas/gospel/02- Gospel.mp3' },
       { nome: 'Gospel 03', arquivo: '/trilhas/gospel/03- Gospel.mp3' },
+      { nome: 'Gospel 04', arquivo: '/trilhas/gospel/04- Gospel.mp3' },
+      { nome: 'Gospel 05', arquivo: '/trilhas/gospel/05- Gospel.mp3' },
+      { nome: 'Gospel 06', arquivo: '/trilhas/gospel/06- Gospel.mp3' },
     ],
     jornalistica: [
       { nome: 'Jornalística 01', arquivo: '/trilhas/jornalistica/01-Trilha jornaslística.mp3' },
       { nome: 'Jornalística 02', arquivo: '/trilhas/jornalistica/02-Trilha jornalística.mp3' },
       { nome: 'Jornalística 03', arquivo: '/trilhas/jornalistica/03-Trilha jornalística.mp3' },
+      { nome: 'Jornalística 04', arquivo: '/trilhas/jornalistica/04-Trilha jornalística.mp3' },
+      { nome: 'Jornalística 05', arquivo: '/trilhas/jornalistica/05-Trilha jornalística.mp3' },
+      { nome: 'Jornalística 06', arquivo: '/trilhas/jornalistica/06-Trilha jornalística.mp3' },
     ],
     gaucha: [
       { nome: 'Gaúcha 01', arquivo: '/trilhas/gaucha/01- Gaúcha.mp3' },
       { nome: 'Gaúcha 02', arquivo: '/trilhas/gaucha/02- Gaúcha.mp3' },
       { nome: 'Gaúcha 03', arquivo: '/trilhas/gaucha/03- Gaúcha.mp3' },
+      { nome: 'Gaúcha 04', arquivo: '/trilhas/gaucha/04- Gaúcha.mp3' },
+      { nome: 'Gaúcha 05', arquivo: '/trilhas/gaucha/05- Gaúcha.mp3' },
+      { nome: 'Gaúcha 06', arquivo: '/trilhas/gaucha/06- Gaúcha.mp3' },
     ],
     natal: [
       { nome: 'Natal 01', arquivo: '/trilhas/natal/01-natal.mp3' },
@@ -1096,6 +1117,14 @@ const gerarVoz = async () => {
       { nome: 'Eletrônica 01', arquivo: '/trilhas/eletronica/01- Eletrônica.mp3' },
       { nome: 'Eletrônica 02', arquivo: '/trilhas/eletronica/02- Eletrônica.mp3' },
       { nome: 'Eletrônica 03', arquivo: '/trilhas/eletronica/03- Eletrônica.mp3' },
+      { nome: 'Eletrônica 04', arquivo: '/trilhas/eletronica/04- Eletrõnica.mp3' },
+      { nome: 'Eletrônica 05', arquivo: '/trilhas/eletronica/05- Eletrônica.mp3' },
+      { nome: 'Eletrônica 06', arquivo: '/trilhas/eletronica/06- Eletrônica.mp3' },
+    ],
+    infantil: [
+      { nome: 'Infantil 01', arquivo: '/trilhas/infantil/01-Infantil.mp3' },
+      { nome: 'Infantil 02', arquivo: '/trilhas/infantil/02-Infantil.mp3' },
+      { nome: 'Infantil 03', arquivo: '/trilhas/infantil/03-Infantil.mp3' },
     ],
   }
 
@@ -1110,8 +1139,8 @@ const gerarVoz = async () => {
     { valor: 'natal', nome: '🎄 Natal' },
     { valor: 'sertanejo', nome: '🤠 Sertanejo' },
     { valor: 'eletronica', nome: '🎧 Eletrônica' },
+    { valor: 'infantil', nome: '🧸 Infantil' },
   ]
-
   const trilhasAtuais =
     trilhasPorEstilo[
       estiloTrilhaSelecionado as keyof typeof trilhasPorEstilo
