@@ -43,6 +43,9 @@ const paulinhoLocutor = '/paulinho-foto.png'
 
 
 function App() {
+  const [baixandoAudio, setBaixandoAudio] = useState(false)
+  const [baixandoMixagem, setBaixandoMixagem] = useState(false)
+  const [baixandoMasterizado, setBaixandoMasterizado] = useState(false)
     const [acessoLiberado, setAcessoLiberado] = useState(false)
 
   const [senhaAcesso, setSenhaAcesso] = useState('')
@@ -2837,13 +2840,23 @@ fontWeight: 400
 
                   <div className="acoes-geracao">
 
-                    <a
+                    <button
+                      type="button"
                       className="botao-download"
-                      href={audioUrl}
-                      download="fabrica-da-voz.mp3"
+                      disabled={baixandoAudio}
+                      onClick={() => {
+                        setBaixandoAudio(true)
+                        const link = document.createElement('a')
+                        link.href = audioUrl
+                        link.download = 'fabrica-da-voz.mp3'
+                        document.body.appendChild(link)
+                        link.click()
+                        link.remove()
+                        window.setTimeout(() => setBaixandoAudio(false), 1500)
+                      }}
                     >
-                      ⬇️ Baixar áudio
-                    </a>
+                      {baixandoAudio ? 'Preparando download...' : 'Baixar audio'}
+                    </button>
 
                     <button
                       type="button"
@@ -3581,13 +3594,23 @@ fontWeight: 400
                             src={mixAudioUrl}
                           />
 
-                          <a
-                            href={mixAudioUrl}
-                            download="fabrica-da-voz-mixagem.mp3"
+                          <button
+                            type="button"
                             className="botao-download-mixagem"
+                            disabled={baixandoMixagem}
+                            onClick={() => {
+                              setBaixandoMixagem(true)
+                              const link = document.createElement('a')
+                              link.href = mixAudioUrl
+                              link.download = 'fabrica-da-voz-mixagem.mp3'
+                              document.body.appendChild(link)
+                              link.click()
+                              link.remove()
+                              window.setTimeout(() => setBaixandoMixagem(false), 1500)
+                            }}
                           >
-                            ⬇️ Baixar mixagem
-                          </a>
+                            {baixandoMixagem ? 'Preparando download...' : 'Baixar mixagem'}
+                          </button>
 
                           <button
                             type="button"
@@ -3611,13 +3634,23 @@ fontWeight: 400
                                 controls
                                 src={audioMasterizadoUrl}
                               />
-                              <a
-                                href={audioMasterizadoUrl}
-                                download="fabrica-da-voz-masterizado.mp3"
+                              <button
+                                type="button"
                                 className="botao-download-mixagem"
+                                disabled={baixandoMasterizado}
+                                onClick={() => {
+                                  setBaixandoMasterizado(true)
+                                  const link = document.createElement('a')
+                                  link.href = audioMasterizadoUrl
+                                  link.download = 'fabrica-da-voz-masterizado.mp3'
+                                  document.body.appendChild(link)
+                                  link.click()
+                                  link.remove()
+                                  window.setTimeout(() => setBaixandoMasterizado(false), 1500)
+                                }}
                               >
-                                Baixar áudio masterizado
-                              </a>
+                                {baixandoMasterizado ? 'Preparando download...' : 'Baixar audio masterizado'}
+                              </button>
                             </div>
                           )}
 
