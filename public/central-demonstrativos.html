@@ -99,7 +99,9 @@ const locutores = [
   ["Ricardo","/ricardo-foto.png","RICARDO.mp3"],
   ["Leonardo","/leonardo-foto.png","LEONARDO.mp3"],
   ["Noel","/noel-foto.png","NOEL.mp3"],
-  ["Belkis","/belkis-foto.png","BELKIS.mp3"]
+  ["Belkis","/belkis-foto.png","BELKIS.mp3"],
+  ["Marcos","/marcos-foto.png","/vozes/marcos-voz.mp3"],
+  ["André","/andré-foto.png","/vozes/andré-voz.mp3"]
 ];
 const baseFotos = "/central-demonstrativos/fotos/";
 const baseAudios = "/central%20de%20demonstrativo/";
@@ -109,7 +111,7 @@ function renderizar(filtro="") {
   const grupos = [
     {
       id: "masculinos",
-      nomes: ["Noah","Celso","Pedro","Henrique","Rafael","Vinícius","Vitor","Lourenço","Gustavo","Angelo","Bruno","Ricardo","Leonardo","Noel"]
+      nomes: ["Noah","Celso","Pedro","Henrique","Rafael","Vinícius","Vitor","Lourenço","Gustavo","Angelo","Bruno","Ricardo","Leonardo","Noel","Marcos","André"]
     },
     {
       id: "femininos",
@@ -153,7 +155,7 @@ function renderizar(filtro="") {
       const player = document.createElement("audio");
       player.controls = true;
       player.preload = "none";
-      player.src = baseAudios + encodeURIComponent(audio);
+      player.src = audio.startsWith("/") ? audio : baseAudios + encodeURIComponent(audio);
       player.setAttribute("aria-label", "Ouvir demonstrativo de " + nome);
 
       player.addEventListener("play", () => {
