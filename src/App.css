@@ -3187,3 +3187,86 @@ b {
 
 
 
+
+/* Seletor compacto de locutores */
+.vozes-compactas {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seletor-locutor-compacto {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(168, 85, 247, 0.65);
+  background: #171020;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.seletor-locutor-compacto option,
+.seletor-locutor-compacto optgroup {
+  background: #171020;
+  color: #ffffff;
+}
+
+.voz-demo-compacto {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  background: #15101d;
+}
+
+.voz-demo-identificacao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.voz-demo-identificacao img {
+  width: 54px;
+  height: 54px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(245, 197, 66, 0.5);
+}
+
+.voz-demo-nome {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #ffffff;
+}
+
+.voz-demo-nome strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.voz-demo-nome .voz-especialidade {
+  text-align: left;
+}
+
+.audio-demo-compacto {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.vozes-compactas #campoTextoLocucao {
+  width: 100%;
+  box-sizing: border-box;
+  color: #ffffff;
+}
+
+.vozes-compactas #campoTextoLocucao::placeholder {
+  color: #aaa;
+}

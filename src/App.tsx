@@ -263,12 +263,12 @@ function App() {
   const [mostrarSegundoEfeito, setMostrarSegundoEfeito] = useState(false)
 
   const [velocidade, setVelocidade] =
-    useState('normal')  
+    useState('normal')
 
   const [texto, setTexto] =
     useState('')
 
-  const [corrigindoTexto, setCorrigindoTexto] = useState(false)  
+  const [corrigindoTexto, setCorrigindoTexto] = useState(false)
 
   const [audioUrl, setAudioUrl] =
     useState('')
@@ -642,7 +642,8 @@ function App() {
       id: 'rz25pon9uanPpUGOW98Y',
       nome: 'Noah',
       foto: noahLocutor,
-      demonstrativo: '/noah-amostra-novo.mp3',
+      demonstrativo: '/noah-amostra-novo.mp3'
+,
       especialidade: 'Institucional'
     },
 
@@ -650,7 +651,8 @@ function App() {
       id: 'cxaKsaoZvZoce6kBBu0n',
       nome: 'Nina',
       foto: ninaLocutora,
-      demonstrativo: '/nina-amostra-novo.mp3',
+      demonstrativo: '/nina-amostra-novo.mp3'
+,
       especialidade: 'Comercial feminina'
     },
 
@@ -658,7 +660,8 @@ function App() {
       id: 'rpNe0HOx7heUulPiOEaG',
       nome: 'Celso',
       foto: celsoLocutor,
-      demonstrativo: '/vozes/celso.mp3',
+      demonstrativo: '/vozes/celso.mp3'
+,
       especialidade: 'Promocional'
     },
 
@@ -666,35 +669,40 @@ function App() {
       id: '0utPdY4y5ppoXQxzubar',
       nome: 'Pedro',
       foto: pedroLocutor,
-      demonstrativo: '/vozes/pedro-amostra-novo.mp3',
+      demonstrativo: '/vozes/pedro-amostra-novo.mp3'
+,
       especialidade: 'Comercial'
     },
         {
       id: 'xyyAflT5WWJ3HeqszUn0',
       nome: 'Henrique',
       foto: henriqueLocutor,
-      demonstrativo: '/vozes/henrique-voz.mp3',
+      demonstrativo: '/vozes/henrique-voz.mp3'
+,
       especialidade: 'Institucional'
     },
         {
       id: 'xqmVsyH6TEc0qQYSNT8P',
       nome: 'Rafael',
       foto: rafaelLocutor,
-      demonstrativo: '/vozes/mateus-voz.mp3',
+      demonstrativo: '/vozes/mateus-voz.mp3'
+,
       especialidade: 'Promocional'
     },
         {
       id: 'B7HqRIxroDpybJI9vXMj',
       nome: 'Vinícius',
       foto: viniciusLocutor,
-      demonstrativo: '/vozes/vinicius-voz.mp3',
+      demonstrativo: '/vozes/vinicius-voz.mp3'
+,
       especialidade: 'Comercial'
     },
         {
       id: 'a5zGngtwpITbxmy3Sekk',
       nome: 'Vitor',
       foto: vitorLocutor,
-      demonstrativo: '/vozes/vitor-voz.mp3',
+      demonstrativo: '/vozes/vitor-voz.mp3'
+,
       especialidade: 'Animado'
     },
 
@@ -702,7 +710,8 @@ function App() {
       id: 'DQRaZFBAlsnenMlFVe0R',
       nome: 'Lourenço',
       foto: lourencoLocutor,
-      demonstrativo: '/vozes/lourenco.mp3',
+      demonstrativo: '/vozes/lourenco.mp3'
+,
       especialidade: 'Grave e impactante'
     },
 
@@ -710,7 +719,8 @@ function App() {
       id: 'g2E836wHBXhsWq15NkoD',
       nome: 'Gustavo',
       foto: gustavoLocutor,
-      demonstrativo: '/vozes/gustavo.mp3',
+      demonstrativo: '/vozes/gustavo.mp3'
+,
       especialidade: 'Promocional'
     },
 
@@ -718,7 +728,8 @@ function App() {
       id: '8Rw0UhFNLhw1t75pidLJ',
       nome: 'Flavinha',
       foto: flavinhaLocutora,
-      demonstrativo: '/vozes/flavinha-voz-nova.mp3',
+      demonstrativo: '/vozes/flavinha-voz-nova.mp3'
+,
       especialidade: 'Animada'
     },
 
@@ -726,7 +737,8 @@ function App() {
       id: '3T1fxRR4KTmnl9K43DtE',
       nome: 'Aninha',
       foto: aninhaLocutora,
-      demonstrativo: '/vozes infantis/aninha.mp3',
+      demonstrativo: '/vozes infantis/aninha.mp3'
+,
       especialidade: 'Infantil'
     },
 
@@ -734,7 +746,8 @@ function App() {
       id: 'Tkf2paIF3z04RS9egsf2',
       nome: 'Paulinho',
       foto: paulinhoLocutor,
-      demonstrativo: '/vozes/paulinho-voz-nova.mp3',
+      demonstrativo: '/vozes/paulinho-voz-nova.mp3'
+,
       especialidade: 'Infantil'
     },
 
@@ -742,7 +755,8 @@ function App() {
       id: 'myEJoaX0UkuoJmX7w2Rf',
       nome: 'Luiza',
       foto: luizaLocutora,
-      demonstrativo: '/vozes/luiza.mp3',
+      demonstrativo: '/vozes/luiza.mp3'
+,
       especialidade: 'Comercial feminina'
     },
 
@@ -750,7 +764,8 @@ function App() {
       id: 'qn85SVnJvSWg5wutkjZa',
       nome: 'Gaby',
       foto: gabyLocutora,
-      demonstrativo: '/vozes/gaby.mp3',
+      demonstrativo: '/vozes/gaby.mp3'
+,
       especialidade: 'Animada'
     }
   ,
@@ -758,7 +773,8 @@ function App() {
       id: 'u1vCfFgLgJ3YbJEqXmbf',
       nome: 'Angelo',
       foto: '/angelo-foto.png',
-      demonstrativo: '/vozes/angelo-voz.mp3',
+      demonstrativo: '/vozes/angelo-voz.mp3'
+,
       especialidade: 'Impacto'
     },
 
@@ -766,7 +782,8 @@ function App() {
       id: 'exVv2CbwvTu1WNVuSWXs',
       nome: 'Bruno',
       foto: '/bruno-foto.png',
-      demonstrativo: '/vozes/bruno-voz.mp3',
+      demonstrativo: '/vozes/bruno-voz.mp3'
+,
       especialidade: 'Promocional'
     },
 
@@ -774,7 +791,8 @@ function App() {
       id: 'gyiJ08WU9Wi2LNY7nTcB',
       nome: 'Letícia',
       foto: '/leticia-foto.png',
-      demonstrativo: '/vozes/leticia-voz.mp3',
+      demonstrativo: '/vozes/leticia-voz.mp3'
+,
       especialidade: 'Comercial feminina'
     },
 
@@ -782,7 +800,8 @@ function App() {
       id: 'Oxtl4GQ22m0Q0rh8YGCI',
       nome: 'Regiane',
       foto: '/regiane-foto.png',
-      demonstrativo: '/vozes/regiane-voz.mp3',
+      demonstrativo: '/vozes/regiane-voz.mp3'
+,
       especialidade: 'Institucional feminina'
     },
 
@@ -790,28 +809,32 @@ function App() {
       id: '0Np4P6bO9DGhECZoT8Ls',
       nome: 'Belkis',
       foto: '/belkis-foto.png',
-      demonstrativo: '/vozes/belkis-voz.mp3',
+      demonstrativo: '/vozes/belkis-voz.mp3'
+,
       especialidade: 'Comercial feminina'
     },
     {
       id: 'qPAKBzRQkQs6EIhLSbMi',
       nome: 'Ricardo',
       foto: '/ricardo-foto.png',
-      demonstrativo: '/vozes/ricardo-voz.wav',
+      demonstrativo: '/vozes/ricardo-voz.wav'
+,
       especialidade: 'Grave e impactante'
     },
     {
       id: 'UaeEQHfiDI8l58WWXiwS',
       nome: 'Leonardo',
       foto: '/leonardo-foto.png',
-      demonstrativo: '/vozes/leonardo-voz.mp3',
+      demonstrativo: '/vozes/leonardo-voz.mp3'
+,
       especialidade: 'Institucional'
     },
     {
       id: 'oQL5kq26ctJzupM0mJot',
       nome: 'Noel',
       foto: '/noel-foto.png',
-      demonstrativo: '/vozes/noel-voz.mp3',
+      demonstrativo: '/vozes/noel-voz.mp3'
+,
       especialidade: 'Promocional'
     },
     {
@@ -955,7 +978,7 @@ const iniciarPagamento = async (pacote: {
         : 'Não foi possível iniciar o pagamento.'
     )
   }
-}  
+}
 const gerarVoz = async () => {
     const textoDigitado = texto.trim()
 
@@ -2455,158 +2478,124 @@ const gerarVoz = async () => {
   </div>
 </div>
 
-              {/* =================================================
+                            {/* =================================================
                   VOZES
               ================================================= */}
 
-              <div className="vozes">
+              <div className="vozes vozes-compactas">
+                <label htmlFor="seletorLocutor">Escolha o locutor</label>
 
-                <label>
-                  Escolha a voz
-                </label>
+                <select
+                  id="seletorLocutor"
+                  className="seletor-locutor-compacto"
+                  value={vozSelecionada}
+                  onChange={(e) => setVozSelecionada(e.target.value)}
+                >
+                  <optgroup label="Masculino">
+                    {vozesMasculinas.map((voz) => (
+                      <option key={voz.id} value={voz.id}>
+                        {voz.nome}{voz.especialidade ? " - " + voz.especialidade : ""}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Feminino">
+                    {vozesFemininas.map((voz) => (
+                      <option key={voz.id} value={voz.id}>
+                        {voz.nome}{voz.especialidade ? " - " + voz.especialidade : ""}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Infantil">
+                    {vozesInfantis.map((voz) => (
+                      <option key={voz.id} value={voz.id}>
+                        {voz.nome}{voz.especialidade ? " - " + voz.especialidade : ""}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
 
-                <div className="opcoes-voz">
-
-                  <h3 className="titulo-sexo-voz">
-  MASCULINO
-</h3>
-
-{vozesMasculinas.map(
-  (voz) => (
-    <div
-      className="voz-card"
-      key={voz.id}
-    >
-      <button
-        type="button"
-        className={
-          vozSelecionada === voz.id
-            ? 'voz ativo'
-            : 'voz'
-        }
-        onClick={() => {
-          setVozSelecionada(voz.id);
-        }}
-      >
-        <img
-          src={voz.foto}
-          alt={voz.nome}
-        />
-
-        <span>
-          {voz.nome}
-        </span>
-        {voz.especialidade && (
-          <small className="voz-especialidade">
-            {voz.especialidade}
-          </small>
-        )}
-      </button>
-
-      <audio
-        controls
-        preload="metadata"
-        src={voz.demonstrativo}
-      />
-    </div>
-  )
-)}
-
-<h3 className="titulo-sexo-voz">
-  FEMININA
-</h3>
-
-{vozesFemininas.map(
-  (voz) => (
-    <div
-      className="voz-card"
-      key={voz.id}
-    >
-      <button
-        type="button"
-        className={
-          vozSelecionada === voz.id
-            ? 'voz ativo'
-            : 'voz'
-        }
-        onClick={() => {
-          setVozSelecionada(voz.id);
-        }}
-      >
-        <img
-          src={voz.foto}
-          alt={voz.nome}
-        />
-
-        <span>
-          {voz.nome}
-        </span>
-        {voz.especialidade && (
-          <small className="voz-especialidade">
-            {voz.especialidade}
-          </small>
-        )}
-      </button>
-
-      <audio
-        controls
-        preload="metadata"
-        src={voz.demonstrativo}
-      />
-    </div>
-  )
-)}
-
-<h3 className="titulo-sexo-voz">
-  INFANTIL
-</h3>
-
-{vozesInfantis.map(
-  (voz) => (
-    <div
-      className="voz-card"
-      key={voz.id}
-    >
-      <button
-        type="button"
-        className={
-          vozSelecionada === voz.id
-            ? 'voz ativo'
-            : 'voz'
-        }
-        onClick={() => {
-          setVozSelecionada(voz.id);
-        }}
-      >
-        <img
-          src={voz.foto}
-          alt={voz.nome}
-        />
-
-        <span>
-          {voz.nome}
-        </span>
-        {voz.especialidade && (
-          <small className="voz-especialidade">
-            {voz.especialidade}
-          </small>
-        )}
-      </button>
-
-      <audio
-        controls
-        preload="metadata"
-        src={voz.demonstrativo}
-      />
-    </div>
-  )
-)}
-
+                <div className="voz-demo-compacto">
+                  <div className="voz-demo-identificacao">
+                    <img src={vozAtual.foto} alt={vozAtual.nome} />
+                    <div className="voz-demo-nome">
+                      <strong>{vozAtual.nome}</strong>
+                      {vozAtual.especialidade && (
+                        <small className="voz-especialidade">
+                          {vozAtual.especialidade}
+                        </small>
+                      )}
+                    </div>
+                  </div>
+                  <audio
+                    className="audio-demo-compacto"
+                    controls
+                    preload="metadata"
+                    src={vozAtual.demonstrativo}
+                  />
                 </div>
 
+{/* TEXTO */}
+
+              <label>
+                Texto da locução
+              </label>
+
+              <textarea
+  id="campoTextoLocucao"
+  className="campo-texto"
+  value={texto}
+  onChange={(e) => setTexto(e.target.value)}
+
+  placeholder="Digite aqui o texto que você quer transformar..."
+/>
+
+<div
+  className="contador-caracteres"
+  style={{
+    marginTop: '7px',
+    textAlign: 'right',
+    color: '#aaa',
+    fontSize: '12px',
+    fontWeight: 400,
+    opacity: 0.85
+  }}
+>
+  {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
+</div>
+<button
+  type="button"
+  className="botao-corrigir"
+  onClick={corrigirTextoComIA}
+  disabled={corrigindoTexto}
+>
+  {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
+</button>
+
+              <div style={{
+                marginTop: '14px',
+                marginBottom: '18px',
+                padding: '16px 18px',
+                borderRadius: '14px',
+                border: '1px solid rgba(250, 204, 21, 0.45)',
+background: 'rgba(245, 158, 11, 0.08)',
+color: '#f3f3f3',
+boxShadow: 'none',
+lineHeight: 1.45,
+fontSize: '12px',
+fontWeight: 400
+              }}>
+                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
+                  ⚠️ ATENÇÃO
+                </div>
+                <div>
+                  Não nos responsabilizamos por erros de escrita do usuário,
+                  corrigiremos apenas erros de pronúncia ou devaneios da IA.
+                </div>
               </div>
 
-              {/* =================================================
+
+              </div>
+{/* =================================================
                   ESTILOS
               ================================================= */}
 
@@ -2662,7 +2651,7 @@ const gerarVoz = async () => {
                   <option value="solene">
                     Solene — Grave e respeitoso
                   </option>
-                
+
                   <option value="aoVivoLoja">
                     Ao Vivo &#8212; Loja e Ofertas
                   </option>
@@ -2824,67 +2813,6 @@ const gerarVoz = async () => {
                     '20px'
                 }}
               />
-
-              {/* =================================================
-                  TEXTO
-              ================================================= */}
-
-              <label>
-                Texto da locução
-              </label>
-
-              <textarea
-  id="campoTextoLocucao"
-  className="campo-texto"
-  value={texto}
-  onChange={(e) => setTexto(e.target.value)}
-
-  placeholder="Digite aqui o texto que você quer transformar..."
-/>
-
-<div
-  className="contador-caracteres"
-  style={{
-    marginTop: '7px',
-    textAlign: 'right',
-    color: '#aaa',
-    fontSize: '12px',
-    fontWeight: 400,
-    opacity: 0.85
-  }}
->
-  {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
-</div>
-<button
-  type="button"
-  className="botao-corrigir"
-  onClick={corrigirTextoComIA}
-  disabled={corrigindoTexto}
->
-  {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
-</button>
-
-              <div style={{
-                marginTop: '14px',
-                marginBottom: '18px',
-                padding: '16px 18px',
-                borderRadius: '14px',
-                border: '1px solid rgba(250, 204, 21, 0.45)',
-background: 'rgba(245, 158, 11, 0.08)',
-color: '#f3f3f3',
-boxShadow: 'none',
-lineHeight: 1.45,
-fontSize: '12px',
-fontWeight: 400
-              }}>
-                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
-                  ⚠️ ATENÇÃO
-                </div>
-                <div>
-                  Não nos responsabilizamos por erros de escrita do usuário,
-                  corrigiremos apenas erros de pronúncia ou devaneios da IA.
-                </div>
-              </div>
 
               {/* =================================================
                   GERAR

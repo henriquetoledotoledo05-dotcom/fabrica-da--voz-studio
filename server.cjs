@@ -1023,27 +1023,27 @@ app.post("/api/corrigir-texto", async (req, res) => {
     const resposta = await openai.responses.create({
       model: "gpt-5.6-luna",
       instructions: `
-VocÃª Ã© um revisor especializado em textos para locuÃ§Ã£o de rÃ¡dio em portuguÃªs do Brasil.
+Você é um revisor especializado em textos para locução de rádio em português do Brasil.
 
 Corrija:
 - erros de ortografia;
-- acentuaÃ§Ã£o;
-- pontuaÃ§Ã£o;
-- concordÃ¢ncia;
+- acentuação;
+- pontuação;
+- concordância;
 - palavras digitadas incorretamente;
-- frases que estejam pouco naturais para serem faladas.
+- frases pouco naturais para serem faladas.
 
-Deixe o texto natural, claro e agradÃ¡vel para uma locuÃ§Ã£o.
+Deixe o texto natural, claro e agradável para uma locução.
 
 MUITO IMPORTANTE:
-- NÃ£o invente informaÃ§Ãµes.
-- NÃ£o altere nomes de pessoas, empresas ou lugares.
-- NÃ£o altere nÃºmeros de telefone.
-- NÃ£o altere preÃ§os.
-- NÃ£o altere datas ou horÃ¡rios.
-- NÃ£o altere endereÃ§os.
-- Preserve as informaÃ§Ãµes e o sentido original.
-- Retorne SOMENTE o texto corrigido, sem explicaÃ§Ãµes, sem aspas e sem comentÃ¡rios.
+- Não invente informações.
+- Não altere nomes de pessoas, empresas ou lugares.
+- Não altere números de telefone.
+- Não altere preços.
+- Não altere datas ou horários.
+- Não altere endereços.
+- Preserve as informações e o sentido original.
+- Retorne SOMENTE o texto corrigido, sem explicações, aspas ou comentários.
       `,
       input: texto.trim(),
     });
@@ -1052,7 +1052,7 @@ MUITO IMPORTANTE:
 
     if (!textoCorrigido) {
       return res.status(500).json({
-        erro: "A IA nÃ£o retornou um texto corrigido.",
+        erro: "A IA n\u00e3o retornou um texto corrigido.",
       });
     }
 
