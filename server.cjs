@@ -1212,6 +1212,31 @@ app.post(
       }
 
       const textoLimpo = texto.trim();
+      // MODERACAO DE SEGURANCA ANTES DO CONSUMO DE CREDITOS
+      if (!openai) {
+        return res.status(503).json({
+          erro: "Verificacao de seguranca indisponivel. Nenhum credito foi consumido."
+        });
+      }
+
+      try {
+        const verificacao = await openai.moderations.create({
+          model: "omni-moderation-latest",
+          input: textoLimpo
+        });
+
+        if (verificacao.results?.[0]?.flagged) {
+          return res.status(400).json({
+            erro: "Este texto precisa ser revisado. Nenhum credito foi consumido."
+          });
+        }
+      } catch (erroModeracao) {
+        console.error("Falha na verificacao de seguranca:", erroModeracao.status || "erro");
+        return res.status(503).json({
+          erro: "Verificacao de seguranca indisponivel. Nenhum credito foi consumido."
+        });
+      }
+
       const quantidadeCaracteres = textoLimpo.length;
       const creditosNecessarios =
         calcularCreditosNecessarios(textoLimpo);
