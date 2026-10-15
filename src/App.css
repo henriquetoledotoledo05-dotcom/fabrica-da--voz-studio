@@ -3166,5 +3166,24 @@ b {
   color: inherit;
 }
 
+/* ESPECIALIDADE DE CADA LOCUTOR */
+.voz-especialidade {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  color: #f5c542 !important;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.voz.ativo .voz-especialidade {
+  color: #ffe58a !important;
+}
+
+
 
 

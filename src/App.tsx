@@ -12,11 +12,11 @@ import luizaLocutora from './assets/luisa-locutor.png'
 import lourencoLocutor from './assets/lourenco-locutor.png'
 import gustavoLocutor from './assets/gustavo-locutor.png'
 
-type Voz = {
-  id: string
+type Voz = {  id: string
   nome: string
   foto: string
   demonstrativo: string
+  especialidade?: string
 }
 
 type HistoricoVinheta = {
@@ -642,166 +642,191 @@ function App() {
       id: 'rz25pon9uanPpUGOW98Y',
       nome: 'Noah',
       foto: noahLocutor,
-      demonstrativo: '/noah-amostra-novo.mp3'
+      demonstrativo: '/noah-amostra-novo.mp3',
+      especialidade: 'Institucional'
     },
 
     {
       id: 'cxaKsaoZvZoce6kBBu0n',
       nome: 'Nina',
       foto: ninaLocutora,
-      demonstrativo: '/nina-amostra-novo.mp3'
+      demonstrativo: '/nina-amostra-novo.mp3',
+      especialidade: 'Comercial feminina'
     },
 
     {
       id: 'rpNe0HOx7heUulPiOEaG',
       nome: 'Celso',
       foto: celsoLocutor,
-      demonstrativo: '/vozes/celso.mp3'
+      demonstrativo: '/vozes/celso.mp3',
+      especialidade: 'Promocional'
     },
 
     {
       id: '0utPdY4y5ppoXQxzubar',
       nome: 'Pedro',
       foto: pedroLocutor,
-      demonstrativo: '/vozes/pedro-amostra-novo.mp3'
+      demonstrativo: '/vozes/pedro-amostra-novo.mp3',
+      especialidade: 'Comercial'
     },
         {
       id: 'xyyAflT5WWJ3HeqszUn0',
       nome: 'Henrique',
       foto: henriqueLocutor,
-      demonstrativo: '/vozes/henrique-voz.mp3'
+      demonstrativo: '/vozes/henrique-voz.mp3',
+      especialidade: 'Institucional'
     },
         {
       id: 'xqmVsyH6TEc0qQYSNT8P',
       nome: 'Rafael',
       foto: rafaelLocutor,
-      demonstrativo: '/vozes/mateus-voz.mp3'
+      demonstrativo: '/vozes/mateus-voz.mp3',
+      especialidade: 'Promocional'
     },
         {
       id: 'B7HqRIxroDpybJI9vXMj',
       nome: 'Vinícius',
       foto: viniciusLocutor,
-      demonstrativo: '/vozes/vinicius-voz.mp3'
+      demonstrativo: '/vozes/vinicius-voz.mp3',
+      especialidade: 'Comercial'
     },
         {
       id: 'a5zGngtwpITbxmy3Sekk',
       nome: 'Vitor',
       foto: vitorLocutor,
-      demonstrativo: '/vozes/vitor-voz.mp3'
+      demonstrativo: '/vozes/vitor-voz.mp3',
+      especialidade: 'Animado'
     },
 
     {
       id: 'DQRaZFBAlsnenMlFVe0R',
       nome: 'Lourenço',
       foto: lourencoLocutor,
-      demonstrativo: '/vozes/lourenco.mp3'
+      demonstrativo: '/vozes/lourenco.mp3',
+      especialidade: 'Grave e impactante'
     },
 
     {
       id: 'g2E836wHBXhsWq15NkoD',
       nome: 'Gustavo',
       foto: gustavoLocutor,
-      demonstrativo: '/vozes/gustavo.mp3'
+      demonstrativo: '/vozes/gustavo.mp3',
+      especialidade: 'Promocional'
     },
 
     {
       id: '8Rw0UhFNLhw1t75pidLJ',
       nome: 'Flavinha',
       foto: flavinhaLocutora,
-      demonstrativo: '/vozes/flavinha-voz-nova.mp3'
+      demonstrativo: '/vozes/flavinha-voz-nova.mp3',
+      especialidade: 'Animada'
     },
 
     {
       id: '3T1fxRR4KTmnl9K43DtE',
       nome: 'Aninha',
       foto: aninhaLocutora,
-      demonstrativo: '/vozes infantis/aninha.mp3'
+      demonstrativo: '/vozes infantis/aninha.mp3',
+      especialidade: 'Infantil'
     },
 
     {
       id: 'Tkf2paIF3z04RS9egsf2',
       nome: 'Paulinho',
       foto: paulinhoLocutor,
-      demonstrativo: '/vozes/paulinho-voz-nova.mp3'
+      demonstrativo: '/vozes/paulinho-voz-nova.mp3',
+      especialidade: 'Infantil'
     },
 
     {
       id: 'myEJoaX0UkuoJmX7w2Rf',
       nome: 'Luiza',
       foto: luizaLocutora,
-      demonstrativo: '/vozes/luiza.mp3'
+      demonstrativo: '/vozes/luiza.mp3',
+      especialidade: 'Comercial feminina'
     },
 
     {
       id: 'qn85SVnJvSWg5wutkjZa',
       nome: 'Gaby',
       foto: gabyLocutora,
-      demonstrativo: '/vozes/gaby.mp3'
+      demonstrativo: '/vozes/gaby.mp3',
+      especialidade: 'Animada'
     }
   ,
     {
       id: 'u1vCfFgLgJ3YbJEqXmbf',
       nome: 'Angelo',
       foto: '/angelo-foto.png',
-      demonstrativo: '/vozes/angelo-voz.mp3'
+      demonstrativo: '/vozes/angelo-voz.mp3',
+      especialidade: 'Impacto'
     },
 
     {
       id: 'exVv2CbwvTu1WNVuSWXs',
       nome: 'Bruno',
       foto: '/bruno-foto.png',
-      demonstrativo: '/vozes/bruno-voz.mp3'
+      demonstrativo: '/vozes/bruno-voz.mp3',
+      especialidade: 'Promocional'
     },
 
     {
       id: 'gyiJ08WU9Wi2LNY7nTcB',
       nome: 'Letícia',
       foto: '/leticia-foto.png',
-      demonstrativo: '/vozes/leticia-voz.mp3'
+      demonstrativo: '/vozes/leticia-voz.mp3',
+      especialidade: 'Comercial feminina'
     },
 
     {
       id: 'Oxtl4GQ22m0Q0rh8YGCI',
       nome: 'Regiane',
       foto: '/regiane-foto.png',
-      demonstrativo: '/vozes/regiane-voz.mp3'
+      demonstrativo: '/vozes/regiane-voz.mp3',
+      especialidade: 'Institucional feminina'
     },
 
     {
       id: '0Np4P6bO9DGhECZoT8Ls',
       nome: 'Belkis',
       foto: '/belkis-foto.png',
-      demonstrativo: '/vozes/belkis-voz.mp3'
+      demonstrativo: '/vozes/belkis-voz.mp3',
+      especialidade: 'Comercial feminina'
     },
     {
       id: 'qPAKBzRQkQs6EIhLSbMi',
       nome: 'Ricardo',
       foto: '/ricardo-foto.png',
-      demonstrativo: '/vozes/ricardo-voz.wav'
+      demonstrativo: '/vozes/ricardo-voz.wav',
+      especialidade: 'Grave e impactante'
     },
     {
       id: 'UaeEQHfiDI8l58WWXiwS',
       nome: 'Leonardo',
       foto: '/leonardo-foto.png',
-      demonstrativo: '/vozes/leonardo-voz.mp3'
+      demonstrativo: '/vozes/leonardo-voz.mp3',
+      especialidade: 'Institucional'
     },
     {
       id: 'oQL5kq26ctJzupM0mJot',
       nome: 'Noel',
       foto: '/noel-foto.png',
-      demonstrativo: '/vozes/noel-voz.mp3'
+      demonstrativo: '/vozes/noel-voz.mp3',
+      especialidade: 'Promocional'
     },
     {
       id: 'mmUpm90TBHi5276nYDJk',
       nome: 'Marcos',
       foto: '/marcos-foto.png',
-      demonstrativo: '/vozes/marcos-voz.mp3'
+      demonstrativo: '/vozes/marcos-voz.mp3',
+      especialidade: 'Impacto'
     },
     {
       id: 'GiNbP6xPhrH6X8DJBD08',
       nome: 'André',
       foto: '/andré-foto.png',
-      demonstrativo: '/vozes/andré-voz.mp3'
+      demonstrativo: '/vozes/andré-voz.mp3',
+      especialidade: 'Impacto'
     }
   ]
 
@@ -2471,6 +2496,11 @@ const gerarVoz = async () => {
         <span>
           {voz.nome}
         </span>
+        {voz.especialidade && (
+          <small className="voz-especialidade">
+            {voz.especialidade}
+          </small>
+        )}
       </button>
 
       <audio
@@ -2511,6 +2541,11 @@ const gerarVoz = async () => {
         <span>
           {voz.nome}
         </span>
+        {voz.especialidade && (
+          <small className="voz-especialidade">
+            {voz.especialidade}
+          </small>
+        )}
       </button>
 
       <audio
@@ -2551,6 +2586,11 @@ const gerarVoz = async () => {
         <span>
           {voz.nome}
         </span>
+        {voz.especialidade && (
+          <small className="voz-especialidade">
+            {voz.especialidade}
+          </small>
+        )}
       </button>
 
       <audio
