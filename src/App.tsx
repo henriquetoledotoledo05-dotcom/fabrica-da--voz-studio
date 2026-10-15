@@ -2534,67 +2534,6 @@ const gerarVoz = async () => {
                   />
                 </div>
 
-{/* TEXTO */}
-
-              <label>
-                Texto da locução
-              </label>
-
-              <textarea
-  id="campoTextoLocucao"
-  className="campo-texto"
-  value={texto}
-  onChange={(e) => setTexto(e.target.value)}
-
-  placeholder="Digite aqui o texto que você quer transformar..."
-/>
-
-<div
-  className="contador-caracteres"
-  style={{
-    marginTop: '7px',
-    textAlign: 'right',
-    color: '#aaa',
-    fontSize: '12px',
-    fontWeight: 400,
-    opacity: 0.85
-  }}
->
-  {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
-</div>
-<button
-  type="button"
-  className="botao-corrigir"
-  onClick={corrigirTextoComIA}
-  disabled={corrigindoTexto}
->
-  {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
-</button>
-
-              <div style={{
-                marginTop: '14px',
-                marginBottom: '18px',
-                padding: '16px 18px',
-                borderRadius: '14px',
-                border: '1px solid rgba(250, 204, 21, 0.45)',
-background: 'rgba(245, 158, 11, 0.08)',
-color: '#f3f3f3',
-boxShadow: 'none',
-lineHeight: 1.45,
-fontSize: '12px',
-fontWeight: 400
-              }}>
-                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
-                  ⚠️ ATENÇÃO
-                </div>
-                <div>
-                  Não nos responsabilizamos por erros de escrita do usuário,
-                  corrigiremos apenas erros de pronúncia ou devaneios da IA.
-                </div>
-              </div>
-
-
-              </div>
 {/* =================================================
                   ESTILOS
               ================================================= */}
@@ -2744,7 +2683,68 @@ fontWeight: 400
                 </div>
 
               </div>
-              {/* =================================================
+              {/* TEXTO */}
+
+              <label>
+                Texto da locução
+              </label>
+
+              <textarea
+  id="campoTextoLocucao"
+  className="campo-texto"
+  value={texto}
+  onChange={(e) => setTexto(e.target.value)}
+
+  placeholder="Digite aqui o texto que você quer transformar..."
+/>
+
+<div
+  className="contador-caracteres"
+  style={{
+    marginTop: '7px',
+    textAlign: 'right',
+    color: '#aaa',
+    fontSize: '12px',
+    fontWeight: 400,
+    opacity: 0.85
+  }}
+>
+  {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
+</div>
+<button
+  type="button"
+  className="botao-corrigir"
+  onClick={corrigirTextoComIA}
+  disabled={corrigindoTexto}
+>
+  {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
+</button>
+
+              <div style={{
+                marginTop: '14px',
+                marginBottom: '18px',
+                padding: '16px 18px',
+                borderRadius: '14px',
+                border: '1px solid rgba(250, 204, 21, 0.45)',
+background: 'rgba(245, 158, 11, 0.08)',
+color: '#f3f3f3',
+boxShadow: 'none',
+lineHeight: 1.45,
+fontSize: '12px',
+fontWeight: 400
+              }}>
+                <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
+                  ⚠️ ATENÇÃO
+                </div>
+                <div>
+                  Não nos responsabilizamos por erros de escrita do usuário,
+                  corrigiremos apenas erros de pronúncia ou devaneios da IA.
+                </div>
+              </div>
+
+
+              </div>
+{/* =================================================
                   VELOCIDADE
               ================================================= */}
 
