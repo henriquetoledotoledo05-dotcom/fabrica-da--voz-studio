@@ -1216,9 +1216,17 @@ const gerarVoz = async () => {
       { nome: 'Comercial 10', arquivo: '/trilhas/comercial/10-comercial.mp3' },
     ],
     forro: [
-      { nome: 'Forró 01', arquivo: '/trilhas/forro/01- Forró.mp3' },
-      { nome: 'Forró 02', arquivo: '/trilhas/forro/02- Forró.mp3' },
-      { nome: 'Forró 03', arquivo: '/trilhas/forro/03- Forró.mp3' },
+      { nome: 'Forró 01', arquivo: '/trilhas/forro/01-forro.mp3' },
+      { nome: 'Forró 02', arquivo: '/trilhas/forro/02-forro.mp3' },
+      { nome: 'Forró 03', arquivo: '/trilhas/forro/03-forro.mp3' },
+      { nome: 'Forró 04', arquivo: '/trilhas/forro/04-forro.mp3' },
+      { nome: 'Forró 05', arquivo: '/trilhas/forro/05-forro.mp3' },
+      { nome: 'Forró 06', arquivo: '/trilhas/forro/06-forro.mp3' },
+      { nome: 'Forró 07', arquivo: '/trilhas/forro/07-forro.mp3' },
+      { nome: 'Forró 08', arquivo: '/trilhas/forro/08-forro.mp3' },
+      { nome: 'Forró 09', arquivo: '/trilhas/forro/09-forro.mp3' },
+      { nome: 'Forró 10', arquivo: '/trilhas/forro/10-forro.mp3' },
+      { nome: 'Forró 11', arquivo: '/trilhas/forro/11-forro.mp3' },
     ],
     institucional: [
       { nome: 'Institucional 01', arquivo: '/trilhas/institucional/01-Trilha institucional.mp3' },
@@ -3829,6 +3837,11 @@ fontWeight: 400
                               <option value="/efeitos/Transmissão.mp3">Transmissão</option>
                               <option value="/efeitos/Buzina.mp3">Buzina</option>
                               <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                              <option value="/efeitos/Assobio.mp3">Assobio</option>
+                              <option value="/efeitos/Buzina carro.wav">Buzina de carro</option>
+                              <option value="/efeitos/Liquido no copo.mp3">Liquido no copo</option>
+                              <option value="/efeitos/Motor.wav">Motor</option>
+                              <option value="/efeitos/Telefone.mp3">Telefone</option>
                               <option value="/efeitos/Demonstrativo.mp3">Demonstrativo</option>
                             </select>
 
@@ -3930,6 +3943,11 @@ fontWeight: 400
                                   <option value="/efeitos/Transmissão.mp3">Transmissão</option>
                                   <option value="/efeitos/Buzina.mp3">Buzina</option>
                                   <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                                <option value="/efeitos/Assobio.mp3">Assobio</option>
+                                <option value="/efeitos/Buzina carro.wav">Buzina de carro</option>
+                                <option value="/efeitos/Liquido no copo.mp3">Liquido no copo</option>
+                                <option value="/efeitos/Motor.wav">Motor</option>
+                                <option value="/efeitos/Telefone.mp3">Telefone</option>
                                 </select>
 
                                 {efeito2Selecionado && (
