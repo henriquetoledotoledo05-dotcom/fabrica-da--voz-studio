@@ -244,6 +244,13 @@ function App() {
 }
 
 
+  const [mostrarDJExpress, setMostrarDJExpress] = useState(false)
+  const [nomeDJ, setNomeDJ] = useState('')
+  const [vozDJSelecionada, setVozDJSelecionada] = useState('rz25pon9uanPpUGOW98Y')
+  const [estiloDJ, setEstiloDJ] = useState('pancadao')
+  const [textoDJ, setTextoDJ] = useState('')
+  const [gerandoDJ, setGerandoDJ] = useState(false)
+  const [audioDJUrl, setAudioDJUrl] = useState('')
   const [vozSelecionada, setVozSelecionada] =
     useState('rz25pon9uanPpUGOW98Y')
 
@@ -1102,6 +1109,95 @@ const gerarVoz = async () => {
     }
   }
 
+  // =====================================================
+  // GERADOR EXCLUSIVO DJ EXPRESS
+  // =====================================================
+
+  const gerarJingleDJ = async () => {
+    const nomeLimpo = nomeDJ.trim()
+    const textoLimpo = textoDJ.trim()
+
+    if (!nomeLimpo) {
+      alert('Digite seu nome artístico de DJ.')
+      return
+    }
+
+    if (!textoLimpo) {
+      alert('Digite o texto da sua vinheta.')
+      return
+    }
+
+    if (nomeLimpo.length > 60 || textoLimpo.length > 800) {
+      alert('Confira os limites: nome artístico até 60 caracteres e texto até 800.')
+      return
+    }
+
+    if (gerandoDJ) return
+
+    setGerandoDJ(true)
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      if (sessionError || !sessionData.session) {
+        throw new Error('Faça login para gerar sua vinheta DJ.')
+      }
+
+      const resposta = await fetch('/api/gerar-jingle-dj', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          nomeDJ: nomeLimpo,
+          texto: textoLimpo,
+          voiceId: vozDJSelecionada,
+          estilo: estiloDJ,
+        }),
+      })
+
+      if (!resposta.ok) {
+        let mensagem = 'Não foi possível gerar a vinheta DJ.'
+
+        try {
+          const dadosErro = await resposta.json()
+          mensagem = dadosErro.erro || mensagem
+        } catch {
+          // Mantém a mensagem padrão se a resposta não for JSON.
+        }
+
+        await carregarCreditos()
+        throw new Error(mensagem)
+      }
+
+      const audioBlob = await resposta.blob()
+
+      if (!audioBlob.size) {
+        throw new Error('O servidor retornou um áudio vazio.')
+      }
+
+      const novaUrl = URL.createObjectURL(audioBlob)
+
+      setAudioDJUrl((urlAnterior) => {
+        if (urlAnterior) URL.revokeObjectURL(urlAnterior)
+        return novaUrl
+      })
+
+      await carregarCreditos()
+    } catch (erro) {
+      console.error('Erro ao gerar vinheta DJ:', erro)
+
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : 'Não foi possível gerar a vinheta DJ.'
+      )
+    } finally {
+      setGerandoDJ(false)
+    }
+  }
   // =====================================================
   // TRILHAS POR ESTILO
   // =====================================================
@@ -1982,6 +2078,319 @@ const gerarVoz = async () => {
   };
 
   // =====================================================
+  // DJ EXPRESS - ESTUDIO EXCLUSIVO
+  // =====================================================
+
+  if (mostrarDJExpress) {
+    const estilosDJ = [
+      { id: 'pancadao', nome: 'Pancadão', descricao: 'Voz forte e impacto curto', simbolo: '💥' },
+      { id: 'reiDaPista', nome: 'Rei da Pista', descricao: 'Voz poderosa e final marcante', simbolo: '👑' },
+      { id: 'fantasma', nome: 'Fantasma', descricao: 'Eco longo e misterioso', simbolo: '👻' },
+      { id: 'explosao', nome: 'Explosão', descricao: 'Impacto no começo e no fim', simbolo: '⚡' },
+      { id: 'assinaturaDJ', nome: 'Assinatura DJ', descricao: 'Destaque para o nome artístico', simbolo: '🎧' },
+      { id: 'alerta', nome: 'Alerta', descricao: 'Chamada intensa e vibrante', simbolo: '🚨' },
+    ]
+
+    return (
+      <div style={{
+        minHeight: '100vh',
+        padding: '24px 16px 40px',
+        boxSizing: 'border-box',
+        background: 'radial-gradient(circle at top, #35104f 0%, #100a18 48%, #080808 100%)',
+        color: '#fff',
+      }}>
+        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
+          <button
+            type="button"
+            onClick={() => setMostrarDJExpress(false)}
+            style={{
+              border: '1px solid rgba(216,180,254,0.35)',
+              borderRadius: '12px',
+              padding: '10px 15px',
+              color: '#e9d5ff',
+              background: '#21152c',
+              cursor: 'pointer',
+              marginBottom: '22px',
+              fontWeight: 700,
+            }}
+          >
+            ← Voltar à Fábrica da Voz
+          </button>
+
+          <div style={{
+            textAlign: 'center',
+            padding: '24px 16px',
+            borderRadius: '24px',
+            border: '1px solid rgba(168,85,247,0.5)',
+            background: 'linear-gradient(145deg, rgba(65,27,92,0.92), rgba(20,12,28,0.96))',
+            boxShadow: '0 0 35px rgba(147,51,234,0.16)',
+            marginBottom: '20px',
+          }}>
+            <div style={{ fontSize: '46px' }}>🎧</div>
+            <h1 style={{
+              margin: '8px 0',
+              fontSize: 'clamp(28px, 6vw, 42px)',
+              fontWeight: 900,
+              letterSpacing: '1px',
+            }}>
+              <span style={{ color: '#fff' }}>DJ </span>
+              <span style={{ color: '#facc15' }}>EXPRESS</span>
+            </h1>
+            <p style={{ color: '#d8b4fe', margin: 0 }}>
+              Crie sua vinheta com efeitos exclusivos
+            </p>
+            <p style={{ color: '#facc15', fontWeight: 800, marginBottom: 0 }}>
+              2 créditos por geração · Até 800 caracteres
+            </p>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gap: '18px',
+            padding: '22px',
+            borderRadius: '22px',
+            background: 'rgba(25,18,34,0.96)',
+            border: '1px solid rgba(216,180,254,0.2)',
+          }}>
+            <label style={{ display: 'grid', gap: '8px', fontWeight: 700 }}>
+              Nome artístico do DJ
+              <input
+                value={nomeDJ}
+                onChange={(e) => setNomeDJ(e.target.value)}
+                maxLength={60}
+                placeholder="Ex.: DJ Henrique"
+                style={{
+                  width: '100%', boxSizing: 'border-box', padding: '14px',
+                  borderRadius: '12px', border: '1px solid #70429a',
+                  background: '#110c18', color: '#fff', fontSize: '16px',
+                }}
+              />
+            </label>
+
+            <div style={{ display: 'grid', gap: '8px' }}>
+              <div style={{ fontWeight: 700 }}>Escolha o locutor</div>
+              <details style={{
+                border: '1px solid #a855f7',
+                borderRadius: '14px',
+                background: '#110c18',
+                overflow: 'hidden',
+              }}>
+                <summary style={{
+                  padding: '14px',
+                  cursor: 'pointer',
+                  color: '#facc15',
+                  fontWeight: 800,
+                }}>
+                  {vozes.find((voz) => voz.id === vozDJSelecionada)?.nome || 'Selecione uma voz'} &#9662;
+                </summary>
+
+                <div style={{
+                  display: 'grid',
+                  gap: '10px',
+                  padding: '12px',
+                  maxHeight: '420px',
+                  overflowY: 'auto',
+                }}>
+                  {vozes.map((voz) => (
+                    <div key={voz.id} style={{
+                      display: 'grid',
+                      gridTemplateColumns: '56px minmax(0, 1fr)',
+                      gap: '12px',
+                      alignItems: 'center',
+                      padding: '12px',
+                      borderRadius: '12px',
+                      border: vozDJSelecionada === voz.id
+                        ? '2px solid #facc15'
+                        : '1px solid #5b3a70',
+                      background: vozDJSelecionada === voz.id
+                        ? '#30203e'
+                        : '#191120',
+                    }}>
+                      <img
+                        src={voz.foto}
+                        alt={voz.nome}
+                        style={{
+                          width: '56px',
+                          height: '56px',
+                          objectFit: 'cover',
+                          borderRadius: '50%',
+                          background: '#30213d',
+                        }}
+                      />
+                      <div style={{ display: 'grid', gap: '8px', minWidth: 0 }}>
+                        <div style={{ color: '#fff', fontWeight: 800 }}>
+                          {voz.nome}
+                        </div>
+                        {voz.especialidade && (
+                          <div style={{ color: '#c4b5d0', fontSize: '12px' }}>
+                            {voz.especialidade}
+                          </div>
+                        )}
+                        <audio
+                          controls
+                          preload="none"
+                          src={voz.demonstrativo}
+                          style={{ width: '100%', height: '36px' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            setVozDJSelecionada(voz.id);
+                            const detalhes = e.currentTarget.closest('details');
+                            if (detalhes) detalhes.open = false;
+                          }}
+                          style={{
+                            border: '1px solid #facc15',
+                            borderRadius: '9px',
+                            padding: '9px',
+                            background: vozDJSelecionada === voz.id
+                              ? '#facc15'
+                              : '#7625c9',
+                            color: vozDJSelecionada === voz.id ? '#21132f' : '#fff',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {vozDJSelecionada === voz.id ? '? Voz selecionada' : 'Selecionar voz'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            </div>
+
+            <div>
+              <div style={{ fontWeight: 800, marginBottom: '12px' }}>
+                Escolha o efeito
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '10px',
+              }}>
+                {estilosDJ.map((estilo) => {
+                  const selecionado = estiloDJ === estilo.id
+                  return (
+                    <button
+                      key={estilo.id}
+                      type="button"
+                      onClick={() => setEstiloDJ(estilo.id)}
+                      style={{
+                        minWidth: 0,
+                        textAlign: 'left',
+                        padding: '14px',
+                        borderRadius: '14px',
+                        border: selecionado ? '2px solid #facc15' : '1px solid #5b3a70',
+                        background: selecionado ? '#43205b' : '#191120',
+                        color: '#fff',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ fontSize: '22px' }}>{estilo.simbolo}</span>
+                      <div style={{ fontWeight: 800, marginTop: '5px' }}>{estilo.nome}</div>
+                      <div style={{ color: '#d8c8e5', fontSize: '13px', marginTop: '4px' }}>
+                        {estilo.descricao}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <label style={{ display: 'grid', gap: '8px', fontWeight: 700 }}>
+              Texto da vinheta
+              <textarea
+                value={textoDJ}
+                onChange={(e) => setTextoDJ(e.target.value)}
+                maxLength={800}
+                rows={5}
+                placeholder="Digite aqui o texto que o locutor vai falar..."
+                style={{
+                  width: '100%', boxSizing: 'border-box', padding: '14px',
+                  borderRadius: '12px', border: '1px solid #70429a',
+                  background: '#110c18', color: '#fff', fontSize: '16px',
+                  resize: 'vertical', lineHeight: 1.5,
+                }}
+              />
+              <span style={{
+                textAlign: 'right',
+                color: textoDJ.length >= 800 ? '#facc15' : '#c4b5d0',
+                fontSize: '13px',
+                fontWeight: 500,
+              }}>
+                {textoDJ.length}/800 caracteres
+              </span>
+            </label>
+
+            <button
+              type="button"
+              disabled={gerandoDJ}
+              onClick={() => void gerarJingleDJ()}
+              style={{
+                width: '100%',
+                minHeight: '58px',
+                padding: '15px',
+                borderRadius: '14px',
+                border: '1px solid #facc15',
+                background: gerandoDJ ? '#51445c' : 'linear-gradient(90deg, #8b2be2, #6420a0)',
+                color: '#fff',
+                fontSize: '18px',
+                fontWeight: 900,
+                cursor: gerandoDJ ? 'wait' : 'pointer',
+                opacity: gerandoDJ ? 0.75 : 1,
+              }}
+            >
+              {gerandoDJ ? 'GERANDO SUA VINHETA...' : '🎙️ GERAR VINHETA · 2 CRÉDITOS'}
+            </button>
+
+            {audioDJUrl && (
+              <div style={{
+                padding: '16px',
+                borderRadius: '14px',
+                border: '1px solid rgba(250,204,21,0.5)',
+                background: '#130e19',
+              }}>
+                <div style={{ color: '#facc15', fontWeight: 800, marginBottom: '12px' }}>
+                  Sua vinheta está pronta!
+                </div>
+                <audio controls src={audioDJUrl} style={{ width: '100%' }} />
+                <a
+                  href={audioDJUrl}
+                  download="vinheta-dj-express.mp3"
+                  style={{
+                    display: 'block',
+                    textAlign: 'center',
+                    marginTop: '14px',
+                    padding: '13px',
+                    borderRadius: '12px',
+                    background: '#facc15',
+                    color: '#21132f',
+                    textDecoration: 'none',
+                    fontWeight: 900,
+                  }}
+                >
+                  ⬇ Baixar MP3
+                </a>
+              </div>
+            )}
+
+            <div style={{
+              textAlign: 'center',
+              color: '#c4b5d0',
+              fontSize: '13px',
+              lineHeight: 1.6,
+            }}>
+              Efeitos de voz exclusivos. Não inclui trilha musical.
+              <br />
+              Saldo disponível: {creditos === null ? '...' : creditos} créditos.
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  // =====================================================
   // EDITOR
   // =====================================================
 
@@ -2412,7 +2821,7 @@ const gerarVoz = async () => {
 
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
       gap: '14px',
       marginTop: '24px',
       marginBottom: '22px'
@@ -2428,7 +2837,20 @@ const gerarVoz = async () => {
         <span style={{fontSize: '20px', fontWeight: 700}}>Histórico</span>
         <span style={{fontSize: '15px', color: '#c4b5d0'}}>Últimos 3 dias</span>
       </button>
-      <button type="button" onClick={() => setMostrarCompraCreditos(true)} style={{
+      <button type="button" title="Abrir DJ Express" onClick={() => setMostrarDJExpress(true)} style={{
+        minWidth: 0, minHeight: '155px', padding: '18px 10px',
+        borderRadius: '24px', border: '1px solid #a855f7',
+        background: 'linear-gradient(145deg, #442064, #21132f)',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: '9px', textAlign: 'center',
+        boxShadow: '0 0 18px rgba(168,85,247,0.18)'
+      }}>
+        <span style={{fontSize: '32px', color: '#facc15'}}>&#127911;</span>
+        <span style={{fontSize: '20px', fontWeight: 800}}>DJ EXPRESS</span>
+        <span style={{fontSize: '12px', fontWeight: 900, color: '#facc15', background: '#6b21a8', border: '1px solid #facc15', borderRadius: '20px', padding: '4px 12px'}}>&#10024; NOVO</span>
+        <span style={{fontSize: '14px', color: '#e9d5ff'}}>Vinhetas de DJ com efeitos</span>
+      </button>      <button type="button" onClick={() => setMostrarCompraCreditos(true)} style={{
         minWidth: 0, minHeight: '155px', padding: '18px 10px',
         borderRadius: '24px', border: '1px solid rgba(255,255,255,0.04)',
         background: '#30213d', color: '#fff', cursor: 'pointer',
@@ -3686,3 +4108,5 @@ fontWeight: 400
 }
 
 export default App
+
+
