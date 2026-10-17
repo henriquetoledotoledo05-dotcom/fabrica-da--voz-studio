@@ -1,4 +1,4 @@
-﻿
+
 /* =========================================================
    FÃBRICA DA VOZ - APP.CSS
    CSS LIMPO E ORGANIZADO
@@ -3211,6 +3211,10 @@ b {
 .seletor-locutor-compacto option,
 .seletor-locutor-compacto optgroup {
   background: #171020;
+  color: #facc15;
+}
+
+.seletor-locutor-compacto option {
   color: #ffffff;
 }
 

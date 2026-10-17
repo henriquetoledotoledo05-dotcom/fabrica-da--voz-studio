@@ -681,7 +681,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: ninaLocutora,
       demonstrativo: '/nina-amostra-novo.mp3'
 ,
-      especialidade: 'Comercial feminina'
+      especialidade: 'Comercial'
     },
 
     {
@@ -740,7 +740,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: lourencoLocutor,
       demonstrativo: '/vozes/lourenco.mp3'
 ,
-      especialidade: 'Grave e impactante'
+      especialidade: 'Impacto'
     },
 
     {
@@ -785,7 +785,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: luizaLocutora,
       demonstrativo: '/vozes/luiza.mp3'
 ,
-      especialidade: 'Comercial feminina'
+      especialidade: 'Comercial'
     },
 
     {
@@ -821,7 +821,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: '/leticia-foto.png',
       demonstrativo: '/vozes/leticia-voz.mp3'
 ,
-      especialidade: 'Comercial feminina'
+      especialidade: 'Comercial'
     },
 
     {
@@ -830,7 +830,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: '/regiane-foto.png',
       demonstrativo: '/vozes/regiane-voz.mp3'
 ,
-      especialidade: 'Institucional feminina'
+      especialidade: 'Institucional'
     },
 
     {
@@ -839,7 +839,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: '/belkis-foto.png',
       demonstrativo: '/vozes/belkis-voz.mp3'
 ,
-      especialidade: 'Comercial feminina'
+      especialidade: 'Comercial'
     },
     {
       id: 'qPAKBzRQkQs6EIhLSbMi',
@@ -847,7 +847,7 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: '/ricardo-foto.png',
       demonstrativo: '/vozes/ricardo-voz.wav'
 ,
-      especialidade: 'Grave e impactante'
+      especialidade: 'Grave'
     },
     {
       id: 'UaeEQHfiDI8l58WWXiwS',
