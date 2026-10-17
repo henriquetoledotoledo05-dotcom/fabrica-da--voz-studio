@@ -3364,3 +3364,34 @@ b {
     margin-left: 0 !important;
   }
 }
+/* Correção final: textos dentro dos cartões do menu no celular */
+@media (max-width: 600px) {
+  button[style*="min-height: 108px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) {
+    flex: 1 1 0% !important;
+    width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) > span {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) > span:first-child {
+    display: block !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) > span:nth-child(2) {
+    display: block !important;
+  }
+}

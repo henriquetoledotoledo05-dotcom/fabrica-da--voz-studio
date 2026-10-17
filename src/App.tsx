@@ -3293,7 +3293,7 @@ const gerarVoz = async () => {
           <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Mixagem, trilhas e efeitos.</span>
         </span>
         
-      <span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></button>
+      </button>
 
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
         width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
@@ -3315,7 +3315,7 @@ const gerarVoz = async () => {
           <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Vinhetas de DJ com efeitos.</span>
         </span>
         
-      <span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></button>
+      </button>
 
       <button type="button" onClick={() => { setMostrarCompraCreditos(true); }} style={{
         width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
