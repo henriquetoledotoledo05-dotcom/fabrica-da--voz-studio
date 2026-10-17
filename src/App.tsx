@@ -3289,7 +3289,7 @@ const gerarVoz = async () => {
           color: '#d8a2ff', fontSize: '27px'
         }}>&#127925;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>F&#225;brica Studio</span>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>F&#225;brica Studio<span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
           <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Mixagem, trilhas e efeitos.</span>
         </span>
         
@@ -3311,7 +3311,7 @@ const gerarVoz = async () => {
           color: '#d8a2ff', fontSize: '27px'
         }}>&#127911;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>DJ Express</span>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>DJ Express<span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
           <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Vinhetas de DJ com efeitos.</span>
         </span>
         

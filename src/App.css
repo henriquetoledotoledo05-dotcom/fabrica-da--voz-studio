@@ -3322,3 +3322,45 @@ b {
     font-size: 11px !important;
   }
 }
+/* Ajuste do menu principal para celulares */
+@media (max-width: 600px) {
+  button[style*="min-height: 108px"] {
+    min-height: 82px !important;
+    padding: 10px 12px !important;
+    gap: 10px !important;
+    border-radius: 16px !important;
+  }
+
+  button[style*="min-height: 108px"] > span:first-child {
+    width: 42px !important;
+    height: 42px !important;
+    flex: 0 0 42px !important;
+    border-radius: 12px !important;
+    font-size: 22px !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) > span:first-child {
+    font-size: 15px !important;
+    line-height: 1.25 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  button[style*="min-height: 108px"] > span:nth-child(2) > span:nth-child(2) {
+    font-size: 12px !important;
+    line-height: 1.3 !important;
+    margin-top: 3px !important;
+  }
+
+  button[style*="min-height: 108px"] > span:last-child {
+    flex: 0 0 auto !important;
+    font-size: 9px !important;
+    padding: 4px 6px !important;
+    margin-left: 0 !important;
+  }
+}
