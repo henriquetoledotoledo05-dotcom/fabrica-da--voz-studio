@@ -43,6 +43,7 @@ const paulinhoLocutor = '/paulinho-foto.png'
 
 
 function App() {
+  const [mostrarEditor, setMostrarEditor] = useState(false)
   const [baixandoAudio, setBaixandoAudio] = useState(false)
   const [baixandoMixagem, setBaixandoMixagem] = useState(false)
   const [baixandoMasterizado, setBaixandoMasterizado] = useState(false)
@@ -3222,91 +3223,166 @@ const gerarVoz = async () => {
       }}>{carregandoCreditos ? '...' : '↻'}</button>
     </div>
 
+
     <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
-      gap: '14px',
-      marginTop: '24px',
-      marginBottom: '22px'
+      display: 'flex', flexDirection: 'column', gap: '12px',
+      marginTop: '24px', marginBottom: '22px'
     }}>
+
+      <button type="button" onClick={() => { setMostrarEditor(true); window.setTimeout(() => document.querySelector('.vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} style={{
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #a855f7',
+        background: 'linear-gradient(145deg, #28163a, #17101f)',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
+      }}>
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#127916;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Criar Vinhetas e Spots</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Transforme seu texto em uma locu&#231;&#227;o profissional.</span>
+        </span>
+        
+      </button>
+
       <button type="button" onClick={() => { setMostrarHistorico(true); void carregarHistorico(); }} style={{
-        minWidth: 0, minHeight: '155px', padding: '18px 10px',
-        borderRadius: '24px', border: '1px solid rgba(255,255,255,0.04)',
-        background: '#30213d', color: '#fff', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: '9px', textAlign: 'center'
-      }}>
-        <span style={{fontSize: '32px', color: '#facc15'}}>&#128340;</span>
-        <span style={{fontSize: '20px', fontWeight: 700}}>Histórico</span>
-        <span style={{fontSize: '15px', color: '#c4b5d0'}}>Últimos 3 dias</span>
-      </button>
-      <button type="button" title="Abrir F?brica Studio" onClick={() => setMostrarFabricaStudio(true)} style={{
-        minWidth: 0, minHeight: '155px', padding: '18px 10px',
-        borderRadius: '24px', border: '1px solid #d6bd65',
-        background: 'linear-gradient(145deg, #30213d, #17101f)',
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #57356e',
+        background: '#17101f',
         color: '#fff', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: '9px', textAlign: 'center',
-        boxShadow: '0 0 18px rgba(214,189,101,0.14)'
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
-        <span style={{fontSize: '32px', color: '#facc15'}}>&#127925;</span>
-        <span style={{fontSize: '20px', fontWeight: 800}}>FÁBRICA STUDIO</span>
-        <span style={{fontSize: '12px', fontWeight: 900, color: '#facc15', background: '#6b21a8', border: '1px solid #facc15', borderRadius: '20px', padding: '4px 12px'}}>&#10024; NOVO</span>
-        <span style={{fontSize: '14px', color: '#e9d5ff'}}>Mixagem, trilhas e efeitos</span>
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#128340;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Hist&#243;rico</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>&#218;ltimos 3 dias de &#225;udios gerados.</span>
+        </span>
+        
       </button>
-      <button type="button" title="Abrir DJ Express" onClick={() => setMostrarDJExpress(true)} style={{
-        minWidth: 0, minHeight: '155px', padding: '18px 10px',
-        borderRadius: '24px', border: '1px solid #a855f7',
-        background: 'linear-gradient(145deg, #442064, #21132f)',
+
+      <button type="button" onClick={() => { setMostrarFabricaStudio(true); }} style={{
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #57356e',
+        background: '#17101f',
         color: '#fff', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: '9px', textAlign: 'center',
-        boxShadow: '0 0 18px rgba(168,85,247,0.18)'
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
-        <span style={{fontSize: '32px', color: '#facc15'}}>&#127911;</span>
-        <span style={{fontSize: '20px', fontWeight: 800}}>DJ EXPRESS</span>
-        <span style={{fontSize: '12px', fontWeight: 900, color: '#facc15', background: '#6b21a8', border: '1px solid #facc15', borderRadius: '20px', padding: '4px 12px'}}>&#10024; NOVO</span>
-        <span style={{fontSize: '14px', color: '#e9d5ff'}}>Vinhetas de DJ com efeitos</span>
-      </button>      <button type="button" onClick={() => setMostrarCompraCreditos(true)} style={{
-        minWidth: 0, minHeight: '155px', padding: '18px 10px',
-        borderRadius: '24px', border: '1px solid rgba(255,255,255,0.04)',
-        background: '#30213d', color: '#fff', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        justifyContent: 'center', gap: '9px', textAlign: 'center'
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#127925;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>F&#225;brica Studio</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Mixagem, trilhas e efeitos.</span>
+        </span>
+        
+      <span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></button>
+
+      <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #a855f7',
+        background: 'linear-gradient(145deg, #28163a, #17101f)',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
-        <span style={{fontSize: '32px', color: '#facc15'}}>&#128722;</span>
-        <span style={{fontSize: '20px', fontWeight: 700}}>Comprar créditos</span>
-        <span style={{fontSize: '15px', color: '#c4b5d0'}}>Adicionar saldo</span>
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#127911;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>DJ Express</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Vinhetas de DJ com efeitos.</span>
+        </span>
+        
+      <span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></button>
+
+      <button type="button" onClick={() => { setMostrarCompraCreditos(true); }} style={{
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #57356e',
+        background: '#17101f',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
+      }}>
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#128722;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Comprar cr&#233;ditos</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Adicione cr&#233;ditos &#224; sua conta.</span>
+        </span>
+        
+      </button>
+
+      <button type="button" onClick={() => { window.open('https://www.fabricadavozstudio.com.br/central-demonstrativos', '_blank', 'noopener,noreferrer'); }} style={{
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #57356e',
+        background: '#17101f',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
+      }}>
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#127908;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Central de Vozes</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Ou&#231;a os demonstrativos dos locutores.</span>
+        </span>
+        
+      </button>
+
+      <button type="button" onClick={() => { const link = 'https://www.fabricadavozstudio.com.br/central-demonstrativos'; if (navigator.share) { void navigator.share({ title: 'Central de Vozes', text: 'Ou&#231;a os demonstrativos de voz:', url: link }).catch(erro => { if (erro.name !== 'AbortError') window.prompt('Copie o link da Central de Vozes:', link); }); } else { void navigator.clipboard.writeText(link).then(() => alert('Link da Central de Vozes copiado!')).catch(() => window.prompt('Copie o link da Central de Vozes:', link)); } }} style={{
+        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
+        boxSizing: 'border-box', borderRadius: '22px',
+        border: '1px solid #57356e',
+        background: '#17101f',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
+      }}>
+        <span style={{
+          width: '54px', height: '54px', flex: '0 0 54px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '16px', background: '#38204a',
+          color: '#d8a2ff', fontSize: '27px'
+        }}>&#128279;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Compartilhar Central</span>
+          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Compartilhe o link dos demonstrativos.</span>
+        </span>
+        
       </button>
     </div>
-
-    <button type="button" onClick={() => window.open("https://www.fabricadavozstudio.com.br/central-demonstrativos", "_blank", "noopener,noreferrer")} style={{
-      width: '100%', minHeight: '76px', padding: '16px',
-      borderRadius: '23px', border: '1px solid #9333ea',
-      background: '#7625c9', color: '#fff', fontSize: '22px',
-      fontWeight: 750, cursor: 'pointer', marginBottom: '16px'
-    }}>&#127908; &nbsp; Central de Vozes</button>
-
-    <button type="button" onClick={async () => {
-      const link = "https://www.fabricadavozstudio.com.br/central-demonstrativos";
-      try {
-        if (navigator.share) {
-          await navigator.share({title: "Central de Vozes", text: "Ouça os demonstrativos de voz:", url: link});
-        } else {
-          await navigator.clipboard.writeText(link);
-          alert("Link da Central de Vozes copiado!");
-        }
-      } catch (erro) {
-        if (erro instanceof Error && erro.name !== "AbortError") {
-          window.prompt("Copie o link da Central de Vozes:", link);
-        }
-      }
-    }} style={{
-      width: '100%', minHeight: '76px', padding: '16px',
-      borderRadius: '23px', border: '2px solid #d6bd65',
-      background: 'transparent', color: '#f5dc78',
-      fontSize: '21px', fontWeight: 700, cursor: 'pointer'
-    }}>&#128279; &nbsp; Compartilhar central</button>
 
     <div style={{display: 'flex', justifyContent: 'center', paddingTop: '22px'}}>
       <button type="button" onClick={() => void sairDaFabrica()} style={{
@@ -3321,7 +3397,26 @@ const gerarVoz = async () => {
                   VOZES
               ================================================= */}
 
-              <div className="vozes vozes-compactas">
+              {mostrarEditor && (<>
+
+<div style={{ display: "flex", justifyContent: "flex-start", margin: "0 0 18px" }}>
+  <button
+    type="button"
+    onClick={() => setMostrarEditor(false)}
+    style={{
+      background: "#211333",
+      color: "#e4c8ff",
+      border: "1px solid #8b5cf6",
+      borderRadius: "10px",
+      padding: "10px 18px",
+      cursor: "pointer",
+      fontWeight: 600
+    }}
+  >
+    &#8592; Voltar ao menu
+  </button>
+</div>
+<div className="vozes vozes-compactas">
                 <label htmlFor="seletorLocutor">Escolha o locutor</label>
 
                 <select
@@ -4521,6 +4616,9 @@ fontWeight: 400
                 </div>
               )}
 
+
+          
+              </>)}
 
           </div>
 
