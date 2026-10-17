@@ -245,6 +245,27 @@ function App() {
 
 
   const [mostrarDJExpress, setMostrarDJExpress] = useState(false)
+  const [mostrarFabricaStudio, setMostrarFabricaStudio] = useState(false)
+const [studioVozArquivo, setStudioVozArquivo] = useState<File | null>(null)
+const [studioTrilhaArquivo, setStudioTrilhaArquivo] = useState<File | null>(null)
+const [studioEstiloTrilha, setStudioEstiloTrilha] = useState('comercial')
+const [studioTrilhaSelecionada, setStudioTrilhaSelecionada] = useState('')
+const [studioReverbAtivo, setStudioReverbAtivo] = useState(false)
+const [studioVolumeReverb, setStudioVolumeReverb] = useState(30)
+const [studioEfeito1, setStudioEfeito1] = useState('')
+const [studioVolumeEfeito1, setStudioVolumeEfeito1] = useState(70)
+const [studioPosicaoEfeito1, setStudioPosicaoEfeito1] = useState(0)
+const [studioEfeito2, setStudioEfeito2] = useState('')
+const [studioVolumeEfeito2, setStudioVolumeEfeito2] = useState(70)
+const [studioPosicaoEfeito2, setStudioPosicaoEfeito2] = useState(3)
+const [studioVolumeVoz, setStudioVolumeVoz] = useState(100)
+const [studioVolumeTrilha, setStudioVolumeTrilha] = useState(25)
+const [studioDucking, setStudioDucking] = useState(true)
+const [studioAtrasoVoz, setStudioAtrasoVoz] = useState(3)
+const [studioPontoTrilha, setStudioPontoTrilha] = useState(0)
+const [studioSegundosFinais, setStudioSegundosFinais] = useState(3)
+const [studioMixando, setStudioMixando] = useState(false)
+const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
   const [nomeDJ, setNomeDJ] = useState('')
   const [vozDJSelecionada, setVozDJSelecionada] = useState('rz25pon9uanPpUGOW98Y')
   const [estiloDJ, setEstiloDJ] = useState('pancadao')
@@ -2027,6 +2048,216 @@ const gerarVoz = async () => {
     }
   }
 
+
+  const mixarFabricaStudio = async () => {
+    if (!studioVozArquivo || (!studioTrilhaArquivo && !studioTrilhaSelecionada)) {
+      alert('Selecione a locucao e uma trilha musical.')
+      return
+    }
+
+    setStudioMixando(true)
+
+    let contexto: AudioContext | null = null
+    let novaUrl = ''
+
+    try {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & {
+          webkitAudioContext?: typeof AudioContext
+        }).webkitAudioContext
+
+      if (!AudioContextClass) {
+        throw new Error('Seu navegador nao suporta mixagem de audio.')
+      }
+
+      contexto = new AudioContextClass()
+
+      const respostaTrilha = studioTrilhaSelecionada
+        ? await fetch(encodeURI(studioTrilhaSelecionada))
+        : null
+
+      if (respostaTrilha && !respostaTrilha.ok) {
+        throw new Error('Não foi possível carregar a trilha selecionada.')
+      }
+
+      const [vozDados, trilhaDados] = await Promise.all([
+        studioVozArquivo.arrayBuffer(),
+        respostaTrilha ? respostaTrilha.arrayBuffer() : studioTrilhaArquivo!.arrayBuffer()
+      ])
+
+      const voz = await contexto.decodeAudioData(vozDados.slice(0))
+      const trilha = await contexto.decodeAudioData(trilhaDados.slice(0))
+
+      const carregarEfeitoStudio = async (caminho: string): Promise<AudioBuffer | null> => {
+        if (!caminho) return null
+        const resposta = await fetch(encodeURI(caminho))
+        if (!resposta.ok) throw new Error("Não foi possível carregar o efeito: " + caminho)
+        return await contexto!.decodeAudioData(await resposta.arrayBuffer())
+      }
+
+      const [bufferEfeito1, bufferEfeito2] = await Promise.all([
+        carregarEfeitoStudio(studioEfeito1),
+        carregarEfeitoStudio(studioEfeito2)
+      ])
+
+      const sampleRate = Math.min(contexto.sampleRate, 32000)
+      const canais = Math.max(2, voz.numberOfChannels)
+      const duracaoVoz = voz.duration
+      const subida = Math.min(0.8, Math.max(0.25, duracaoVoz / 10))
+      const atrasoVoz = Math.max(0, Math.min(30, studioAtrasoVoz))
+      const pontoTrilha = Math.max(0, Math.min(Math.max(0, trilha.duration - 0.05), studioPontoTrilha))
+      const duracaoFimVoz = atrasoVoz + duracaoVoz
+      const segundosFinais = Math.max(0, Math.min(60, studioSegundosFinais))
+      const duracaoBase = atrasoVoz + duracaoVoz + segundosFinais
+      const fimEfeito1 = bufferEfeito1 ? atrasoVoz + Math.max(0, studioPosicaoEfeito1) + bufferEfeito1.duration : 0
+      const fimEfeito2 = bufferEfeito2 ? atrasoVoz + Math.max(0, studioPosicaoEfeito2) + bufferEfeito2.duration : 0
+      const duracaoTotal = Math.max(duracaoBase, fimEfeito1, fimEfeito2)
+      const frames = Math.max(1, Math.ceil(duracaoTotal * sampleRate))
+
+      const offline = new OfflineAudioContext(canais, frames, sampleRate)
+
+      const vozSource = offline.createBufferSource()
+      vozSource.buffer = voz
+
+      const vozGain = offline.createGain()
+      vozGain.gain.value = Math.max(0, Math.min(1.5, studioVolumeVoz / 100))
+      vozSource.connect(vozGain)
+      vozGain.connect(offline.destination)
+
+      if (studioReverbAtivo && studioVolumeReverb > 0) {
+        const tamanhoImpulso = Math.floor(sampleRate * 1.8)
+        const impulso = offline.createBuffer(2, tamanhoImpulso, sampleRate)
+        for (let canal = 0; canal < impulso.numberOfChannels; canal++) {
+          const dados = impulso.getChannelData(canal)
+          for (let i = 0; i < tamanhoImpulso; i++) {
+            const decaimento = Math.pow(1 - i / tamanhoImpulso, 2.8)
+            dados[i] = (Math.random() * 2 - 1) * decaimento
+          }
+        }
+
+        const convolver = offline.createConvolver()
+        convolver.buffer = impulso
+        const reverbGain = offline.createGain()
+        reverbGain.gain.value = Math.max(0, Math.min(0.7, studioVolumeReverb / 100 * 0.7))
+        vozGain.connect(convolver)
+        convolver.connect(reverbGain)
+        reverbGain.connect(offline.destination)
+      }
+
+      vozSource.start(atrasoVoz)
+
+      const adicionarEfeitoStudio = (
+        buffer: AudioBuffer | null,
+        volume: number,
+        posicao: number
+      ) => {
+        if (!buffer) return
+        const source = offline.createBufferSource()
+        source.buffer = buffer
+        const gain = offline.createGain()
+        gain.gain.value = Math.max(0, Math.min(1, volume / 100))
+        source.connect(gain)
+        gain.connect(offline.destination)
+        source.start(Math.max(0, posicao))
+      }
+
+      adicionarEfeitoStudio(bufferEfeito1, studioVolumeEfeito1, studioPosicaoEfeito1)
+      adicionarEfeitoStudio(bufferEfeito2, studioVolumeEfeito2, studioPosicaoEfeito2)
+
+      const trilhaGain = offline.createGain()
+      const volumeNormal = Math.max(0, Math.min(2, studioVolumeTrilha / 100))
+      const volumeBaixo = studioDucking ? volumeNormal * 0.30 : volumeNormal
+
+      trilhaGain.gain.setValueAtTime(volumeNormal, 0)
+
+      if (studioDucking) {
+        if (atrasoVoz > 0) {
+          trilhaGain.gain.setValueAtTime(volumeNormal, atrasoVoz)
+          trilhaGain.gain.linearRampToValueAtTime(
+            volumeBaixo,
+            Math.min(duracaoFimVoz, atrasoVoz + 0.2)
+          )
+        } else {
+          trilhaGain.gain.setValueAtTime(volumeBaixo, 0)
+        }
+
+        trilhaGain.gain.setValueAtTime(volumeBaixo, duracaoFimVoz)
+        trilhaGain.gain.linearRampToValueAtTime(
+          volumeNormal,
+          Math.min(duracaoTotal, duracaoFimVoz + 0.3)
+        )
+      }
+
+      if (segundosFinais > 0) {
+        const inicioFade = Math.max(
+          duracaoFimVoz,
+          duracaoTotal - Math.min(3, segundosFinais)
+        )
+        trilhaGain.gain.setValueAtTime(volumeNormal, inicioFade)
+        trilhaGain.gain.linearRampToValueAtTime(0, duracaoTotal)
+      } else {
+        trilhaGain.gain.setValueAtTime(0, duracaoTotal)
+      }
+
+      trilhaGain.connect(offline.destination)
+
+      let tempo = 0
+      let primeiraParte = true
+      while (tempo < duracaoTotal) {
+        const source = offline.createBufferSource()
+        source.buffer = trilha
+        source.connect(trilhaGain)
+
+        const inicioFonte = primeiraParte ? pontoTrilha : 0
+        const disponivel = trilha.duration - inicioFonte
+        const duracaoParte = Math.min(disponivel, duracaoTotal - tempo)
+        if (duracaoParte <= 0) break
+
+        source.start(tempo, inicioFonte, duracaoParte)
+        tempo += duracaoParte
+        primeiraParte = false
+      }
+
+      const renderizado = await offline.startRendering()
+      const wavBlob = audioBufferParaWav(renderizado)
+
+      const resposta = await fetch('/api/converter-mp3', {
+        method: 'POST',
+        headers: { 'Content-Type': 'audio/wav' },
+        body: wavBlob
+      })
+
+      if (!resposta.ok) {
+        throw new Error('Nao foi possivel converter a mixagem para MP3.')
+      }
+
+      const mp3Blob = await resposta.blob()
+      if (!mp3Blob.size) {
+        throw new Error('O arquivo MP3 gerado esta vazio.')
+      }
+
+      novaUrl = URL.createObjectURL(mp3Blob)
+
+      setStudioMixAudioUrl((urlAnterior) => {
+        if (urlAnterior) URL.revokeObjectURL(urlAnterior)
+        return novaUrl
+      })
+    } catch (erro) {
+      console.error('Erro na mixagem do Studio:', erro)
+      alert(erro instanceof Error ? erro.message : 'Falha ao mixar os audios.')
+    } finally {
+      try {
+        if (contexto && contexto.state !== 'closed') {
+          await contexto.close()
+        }
+      } catch (erroFechamento) {
+        console.warn('Falha ao fechar o contexto de audio:', erroFechamento)
+      }
+
+      setStudioMixando(false)
+    }
+  }
   const masterizarAudio = async () => {
     if (!mixAudioUrl || masterizando) return;
 
@@ -2102,9 +2333,9 @@ const gerarVoz = async () => {
     return (
       <div style={{
         minHeight: '100vh',
-        padding: '24px 16px 40px',
+        padding: '32px 20px 48px',
         boxSizing: 'border-box',
-        background: 'radial-gradient(circle at top, #35104f 0%, #100a18 48%, #080808 100%)',
+        background: 'radial-gradient(ellipse at top, #28113b 0%, #100b16 42%, #08080c 100%)',
         color: '#fff',
       }}>
         <div style={{ maxWidth: '760px', margin: '0 auto' }}>
@@ -2399,6 +2630,170 @@ const gerarVoz = async () => {
     )
   }
   // =====================================================
+  // =====================================================
+  // FABRICA_STUDIO_TELA
+  if (mostrarFabricaStudio) {
+    return (
+      <div style={{ minHeight: '100vh', padding: '32px 20px 48px', boxSizing: 'border-box', background: 'radial-gradient(ellipse at top, #28113b 0%, #100b16 42%, #08080c 100%)', color: '#fff' }}>
+        <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
+          <button type="button" onClick={() => setMostrarFabricaStudio(false)} style={{ border: '1px solid rgba(216,180,254,0.35)', borderRadius: '12px', padding: '10px 15px', color: '#e9d5ff', background: '#21152c', cursor: 'pointer', marginBottom: '22px', fontWeight: 700 }}>
+            Voltar ao menu
+          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '22px', marginBottom: '24px', borderRadius: '20px', border: '1px solid rgba(192,132,252,0.35)', background: 'linear-gradient(120deg, rgba(74,29,105,0.65), rgba(18,12,27,0.95))', boxShadow: '0 16px 40px rgba(0,0,0,0.25)' }}>
+            <div style={{ flexShrink: 0, width: '58px', height: '58px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #a855f7, #6b21a8)', color: '#fff', fontSize: '30px', boxShadow: '0 0 24px rgba(168,85,247,0.25)' }}>&#9835;</div>
+            <div>
+              <div style={{ color: '#facc15', fontSize: '11px', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '5px' }}>ESTÚDIO DE PRODUÇÃO DE ÁUDIO</div>
+              <div style={{ color: '#f3e8ff', fontSize: '14px', lineHeight: 1.6 }}>Prepare sua locução, escolha a trilha, ajuste os efeitos e gere seu MP3.</div>
+            </div>
+          </div>
+          <h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 46px)', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '8px', textShadow: '0 0 28px rgba(168,85,247,0.28)' }}>FÁBRICA <span style={{ color: '#d8b4fe' }}>STUDIO</span></h1>
+          <p style={{ color: '#e9d5ff', marginTop: 0 }}>Seu estúdio de áudio online</p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '22px', marginTop: '32px' }}>
+            <section style={{ border: '1px solid rgba(192,132,252,0.20)', borderRadius: '16px', padding: '24px', background: 'linear-gradient(145deg, rgba(31,22,43,0.98), rgba(18,14,25,0.98))', boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}>
+              <h2 style={{ color: '#facc15', fontSize: '20px' }}>1. Sua locução</h2>
+              <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a gravação de voz no seu computador.</p>
+              <input type="file" accept="audio/*" onChange={(e) => {
+                const arquivo = e.target.files?.[0] || null;
+                setStudioVozArquivo(arquivo);
+                const audio = document.getElementById('studio-locucao') as HTMLAudioElement | null;
+                if (audio) {
+                  audio.src = arquivo ? URL.createObjectURL(arquivo) : '';
+                  audio.load();
+                }
+              }} style={{ width: '100%', color: '#fff', margin: '10px 0' }} />
+              <audio id="studio-locucao" controls style={{ width: '100%', marginTop: '10px' }} />
+              <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', border: '1px solid rgba(250,204,21,0.35)', background: 'rgba(15,10,22,0.65)' }}>
+                <h3 style={{ color: '#facc15', margin: '0 0 10px', fontSize: '16px' }}>Reverb da voz</h3>
+                <label style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
+                  <input type="checkbox" checked={studioReverbAtivo} onChange={(e) => setStudioReverbAtivo(e.target.checked)} />
+                  Ativar reverb somente na locução
+                </label>
+                <label htmlFor="studio-reverb-volume">Intensidade: {studioVolumeReverb}%</label>
+                <input id="studio-reverb-volume" type="range" min="0" max="100" value={studioVolumeReverb} onChange={(e) => setStudioVolumeReverb(Number(e.target.value))} style={{ display: 'block', width: '100%', marginTop: '10px' }} />
+              </div>
+            </section>
+
+            <section style={{ border: '1px solid rgba(192,132,252,0.20)', borderRadius: '16px', padding: '24px', background: 'linear-gradient(145deg, rgba(31,22,43,0.98), rgba(18,14,25,0.98))', boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}>
+              <h2 style={{ color: '#facc15', fontSize: '20px' }}>2. Trilha musical</h2>
+              <label htmlFor="studio-estilo-trilha" style={{ display: 'block', color: '#e9d5ff', margin: '12px 0 6px' }}>Categoria da trilha</label>
+              <select id="studio-estilo-trilha" value={studioEstiloTrilha} onChange={(e) => { setStudioEstiloTrilha(e.target.value); setStudioTrilhaSelecionada(''); setStudioTrilhaArquivo(null); }} style={{ width: '100%', padding: '12px', borderRadius: '10px', marginBottom: '12px', background: '#171020', color: '#fff' }}>
+                {estilosDeTrilha.map((estilo) => <option key={estilo.valor} value={estilo.valor}>{estilo.nome}</option>)}
+              </select>
+              <label htmlFor="studio-trilha-pronta" style={{ display: 'block', color: '#e9d5ff', margin: '8px 0 6px' }}>Trilha da biblioteca</label>
+              <select id="studio-trilha-pronta" value={studioTrilhaSelecionada} onChange={(e) => { const caminho = e.target.value; setStudioTrilhaSelecionada(caminho); setStudioTrilhaArquivo(null); const audio = document.getElementById('studio-trilha') as HTMLAudioElement | null; if (audio) { audio.src = caminho ? encodeURI(caminho) : ''; audio.load(); } }} style={{ width: '100%', padding: '12px', borderRadius: '10px', marginBottom: '12px', background: '#171020', color: '#fff' }}>
+                <option value="">Usar arquivo do computador</option>
+                {trilhasPorEstilo[studioEstiloTrilha as keyof typeof trilhasPorEstilo].map((trilha) => <option key={trilha.arquivo} value={trilha.arquivo}>{trilha.nome}</option>)}
+              </select>
+              <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a música de fundo para acompanhar sua locução.</p>
+              <input type="file" accept="audio/*" onChange={(e) => {
+                const arquivo = e.target.files?.[0] || null;
+                setStudioTrilhaArquivo(arquivo);
+                const audio = document.getElementById('studio-trilha') as HTMLAudioElement | null;
+                if (audio) {
+                  audio.src = arquivo ? URL.createObjectURL(arquivo) : '';
+                  audio.load();
+                }
+              }} style={{ width: '100%', color: '#fff', margin: '10px 0' }} />
+              <audio id="studio-trilha" controls style={{ width: '100%', marginTop: '10px' }} />
+              <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', border: '1px solid rgba(250,204,21,0.3)', background: 'rgba(15,10,22,0.65)' }}>
+                <label htmlFor="studio-ponto-trilha" style={{ display: 'block', color: '#facc15', fontWeight: 700 }}>Ponto inicial da trilha (segundos)</label>
+                <p style={{ color: '#e9d5ff', fontSize: '13px', margin: '6px 0 10px' }}>Escolha de qual segundo da música a mixagem deve começar.</p>
+                <input id="studio-ponto-trilha" type="number" min="0" max="3600" step="1" value={studioPontoTrilha} onChange={(e) => setStudioPontoTrilha(Math.max(0, Number(e.target.value) || 0))} style={{ display: 'block', width: '100%', padding: '10px', borderRadius: '8px', background: '#171020', color: '#fff', border: '1px solid rgba(216,180,254,0.35)', boxSizing: 'border-box' }} />
+              </div>
+            </section>
+          </div>
+
+          <section style={{ border: '1px solid rgba(216,180,254,0.25)', borderRadius: '18px', padding: '22px', marginTop: '18px', background: 'rgba(48,33,61,0.72)' }}>
+            <h2 style={{ color: '#facc15', fontSize: '20px' }}>3. Ajustes da mixagem</h2>
+            <label htmlFor="studio-volume-voz">Volume da locução: {studioVolumeVoz}%</label>
+            <input id="studio-volume-voz" type="range" min="0" max="150" value={studioVolumeVoz} onChange={(e) => {
+              const valor = Number(e.target.value);
+              setStudioVolumeVoz(valor);
+              const audio = document.getElementById('studio-locucao') as HTMLAudioElement | null;
+              if (audio) audio.volume = Math.min(1, valor / 100);
+            }} style={{ display: 'block', width: '100%', margin: '10px 0 20px' }} />
+
+            <label htmlFor="studio-volume-trilha">Volume da trilha: {studioVolumeTrilha}%</label>
+            <input id="studio-volume-trilha" type="range" min="0" max="200" value={studioVolumeTrilha} onChange={(e) => {
+              const valor = Number(e.target.value);
+              setStudioVolumeTrilha(valor);
+              const audio = document.getElementById('studio-trilha') as HTMLAudioElement | null;
+              if (audio) audio.volume = Math.min(1, valor / 100);
+            }} style={{ display: 'block', width: '100%', margin: '10px 0 20px' }} />
+
+            <label htmlFor="studio-atraso-voz">Segundos de musica antes da voz: {studioAtrasoVoz}s</label>
+            <input id="studio-atraso-voz" type="range" min="0" max="30" value={studioAtrasoVoz} onChange={(e) => setStudioAtrasoVoz(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '10px 0 20px' }} />
+            <label htmlFor="studio-segundos-finais">Segundos de música após a voz: {studioSegundosFinais}s</label>
+            <input id="studio-segundos-finais" type="range" min="0" max="60" value={studioSegundosFinais} onChange={(e) => setStudioSegundosFinais(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '10px 0 20px' }} />
+            <div style={{ borderTop: '1px solid rgba(216,180,254,0.25)', marginTop: '20px', paddingTop: '18px' }}>
+
+              <h3 style={{ color: '#facc15' }}>Efeitos sonoros</h3>
+              <label htmlFor="studio-efeito1">Primeiro efeito</label>
+              <select id="studio-efeito1" value={studioEfeito1} onChange={(e) => setStudioEfeito1(e.target.value)} style={{ display: 'block', width: '100%', padding: '12px', margin: '8px 0 14px', background: '#171020', color: '#fff', borderRadius: '10px' }}>
+                <option value="">Nenhum efeito</option>
+                <option value="/efeitos/Laser.mp3">Laser</option>
+                <option value="/efeitos/Impacto.mp3">Impacto</option>
+                <option value="/efeitos/Transmiss%C3%A3o.mp3">Transmissão</option>
+                <option value="/efeitos/Buzina.mp3">Buzina</option>
+                <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                <option value="/efeitos/Assobio.mp3">Assobio</option>
+                <option value="/efeitos/Buzina carro.wav">Buzina de carro</option>
+                <option value="/efeitos/Liquido no copo.mp3">Líquido no copo</option>
+                <option value="/efeitos/Motor.wav">Motor</option>
+                <option value="/efeitos/Telefone.mp3">Telefone</option>
+              </select>
+              <label htmlFor="studio-efeito1-volume">Volume do primeiro efeito: {studioVolumeEfeito1}%</label>
+              <input id="studio-efeito1-volume" type="range" min="0" max="100" value={studioVolumeEfeito1} onChange={(e) => setStudioVolumeEfeito1(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 14px' }} />
+              <label htmlFor="studio-efeito1-posicao">Posição do primeiro efeito: {studioPosicaoEfeito1.toFixed(1)}s</label>
+              <input id="studio-efeito1-posicao" type="range" min="0" max="60" step="0.1" value={studioPosicaoEfeito1} onChange={(e) => setStudioPosicaoEfeito1(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 18px' }} />
+
+              <label htmlFor="studio-efeito2">Segundo efeito (opcional)</label>
+              <select id="studio-efeito2" value={studioEfeito2} onChange={(e) => setStudioEfeito2(e.target.value)} style={{ display: 'block', width: '100%', padding: '12px', margin: '8px 0 14px', background: '#171020', color: '#fff', borderRadius: '10px' }}>
+                <option value="">Nenhum efeito</option>
+                <option value="/efeitos/Laser.mp3">Laser</option>
+                <option value="/efeitos/Impacto.mp3">Impacto</option>
+                <option value="/efeitos/Transmiss%C3%A3o.mp3">Transmissão</option>
+                <option value="/efeitos/Buzina.mp3">Buzina</option>
+                <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
+                <option value="/efeitos/Assobio.mp3">Assobio</option>
+                <option value="/efeitos/Buzina carro.wav">Buzina de carro</option>
+                <option value="/efeitos/Liquido no copo.mp3">Líquido no copo</option>
+                <option value="/efeitos/Motor.wav">Motor</option>
+                <option value="/efeitos/Telefone.mp3">Telefone</option>
+              </select>
+              <label htmlFor="studio-efeito2-volume">Volume do segundo efeito: {studioVolumeEfeito2}%</label>
+              <input id="studio-efeito2-volume" type="range" min="0" max="100" value={studioVolumeEfeito2} onChange={(e) => setStudioVolumeEfeito2(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 14px' }} />
+              <label htmlFor="studio-efeito2-posicao">Posição do segundo efeito: {studioPosicaoEfeito2.toFixed(1)}s</label>
+              <input id="studio-efeito2-posicao" type="range" min="0" max="60" step="0.1" value={studioPosicaoEfeito2} onChange={(e) => setStudioPosicaoEfeito2(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 18px' }} />
+            </div>
+            <label style={{ display: 'flex', gap: '10px', alignItems: 'center', margin: '12px 0 20px' }}>
+              <input type="checkbox" checked={studioDucking} onChange={(e) => setStudioDucking(e.target.checked)} />
+              Reduzir a trilha automaticamente durante a locução
+            </label>
+
+            <button type="button" disabled={studioMixando || !studioVozArquivo || (!studioTrilhaArquivo && !studioTrilhaSelecionada)} onClick={() => void mixarFabricaStudio()} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #facc15', background: studioMixando ? '#51445c' : 'linear-gradient(90deg, #8b2be2, #6420a0)', color: '#fff', fontSize: '17px', fontWeight: 900, cursor: studioMixando ? 'wait' : 'pointer', opacity: studioMixando ? 0.7 : 1 }}>
+              {studioMixando ? 'MIXANDO OS ÁUDIOS...' : 'MIXAR E GERAR MP3'}
+            </button>
+          </section>
+
+          {studioMixAudioUrl && (
+            <section style={{ border: '1px solid rgba(250,204,21,0.5)', borderRadius: '18px', padding: '22px', marginTop: '18px', background: 'rgba(48,33,61,0.72)' }}>
+              <h2 style={{ color: '#facc15', fontSize: '20px' }}>Mixagem pronta</h2>
+              <audio controls src={studioMixAudioUrl} style={{ width: '100%' }} />
+              <a href={studioMixAudioUrl} download="fabrica-studio-mixagem.mp3" style={{ display: 'block', textAlign: 'center', marginTop: '14px', padding: '14px', borderRadius: '12px', background: '#facc15', color: '#21132f', textDecoration: 'none', fontWeight: 900 }}>
+                Baixar MP3
+              </a>
+            </section>
+          )}
+          <p style={{ color: '#c4b5d0', marginTop: '24px', lineHeight: 1.6 }}>
+            A trilha fica em volume reduzido durante toda a locução e volta ao volume escolhido quando a voz termina.
+          </p>
+        </div>
+      </div>
+    );
+  }
   // EDITOR
   // =====================================================
 
@@ -2844,6 +3239,20 @@ const gerarVoz = async () => {
         <span style={{fontSize: '32px', color: '#facc15'}}>&#128340;</span>
         <span style={{fontSize: '20px', fontWeight: 700}}>Histórico</span>
         <span style={{fontSize: '15px', color: '#c4b5d0'}}>Últimos 3 dias</span>
+      </button>
+      <button type="button" title="Abrir F?brica Studio" onClick={() => setMostrarFabricaStudio(true)} style={{
+        minWidth: 0, minHeight: '155px', padding: '18px 10px',
+        borderRadius: '24px', border: '1px solid #d6bd65',
+        background: 'linear-gradient(145deg, #30213d, #17101f)',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', gap: '9px', textAlign: 'center',
+        boxShadow: '0 0 18px rgba(214,189,101,0.14)'
+      }}>
+        <span style={{fontSize: '32px', color: '#facc15'}}>&#127925;</span>
+        <span style={{fontSize: '20px', fontWeight: 800}}>FÁBRICA STUDIO</span>
+        <span style={{fontSize: '12px', fontWeight: 900, color: '#facc15', background: '#6b21a8', border: '1px solid #facc15', borderRadius: '20px', padding: '4px 12px'}}>&#10024; NOVO</span>
+        <span style={{fontSize: '14px', color: '#e9d5ff'}}>Mixagem, trilhas e efeitos</span>
       </button>
       <button type="button" title="Abrir DJ Express" onClick={() => setMostrarDJExpress(true)} style={{
         minWidth: 0, minHeight: '155px', padding: '18px 10px',
