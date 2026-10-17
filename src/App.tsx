@@ -3571,50 +3571,7 @@ const gerarVoz = async () => {
                     )}
                   </div>
                 )}
-
-                <div style={{
-                  marginTop: '14px'
-                }}>
-                  <label>
-                    🎙️ Como você quer que o locutor fale?
-                  </label>
-
-                  <textarea
-                    className="instrucao-personalizada"
-                    value={instrucaoPersonalizada}
-                    onChange={(e) =>
-                      setInstrucaoPersonalizada(e.target.value.slice(0, 300))
-                    }
-                    maxLength={300}
-                    placeholder="Ex.: fale como locutor de rádio, com bastante energia e entusiasmo..."
-                    rows={2}
-                    style={{
-                      width: '100%',
-                      marginTop: '8px',
-                      padding: '9px 12px',
-                      borderRadius: '10px',
-                      border: '1px solid rgba(139, 92, 246, 0.55)',
-                      background: '#171020',
-                      color: '#ffffff',
-                      fontSize: '14px',
-                      height: '58px',
-                      minHeight: '58px',
-                      maxHeight: '58px',
-                      resize: 'none',
-                      outline: 'none',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-
-                  <div style={{
-                    marginTop: '5px',
-                    textAlign: 'right',
-                    color: '#aaa',
-                    fontSize: '12px'
-                  }}>
-                    {instrucaoPersonalizada.length}/300 caracteres
-                  </div>
-                </div>
+
 
               </div>
               {/* TEXTO */}
