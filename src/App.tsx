@@ -3150,12 +3150,9 @@ const gerarVoz = async () => {
         <main className="main">
 
           <section className="hero">
-
-            <h2>
-
-            <p>
-
-          </section>
+  <h2>Crie locuções profissionais com IA</h2>
+  <p>Transforme seu texto em áudio em segundos</p>
+</section>
 
           <section className="editor-area">
 
@@ -3545,7 +3542,8 @@ const gerarVoz = async () => {
                     )}
                   </div>
                 )}
-
+
+
 
               </div>
               {/* TEXTO */}
