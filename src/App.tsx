@@ -3219,133 +3219,133 @@ const gerarVoz = async () => {
     }}>
 
       <button type="button" onClick={() => { setMostrarEditor(true); window.setTimeout(() => document.querySelector('.vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} style={{
-        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
-        boxSizing: 'border-box', borderRadius: '22px',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
         border: '1px solid #a855f7',
-        background: 'linear-gradient(145deg, #28163a, #17101f)',
+        background: 'linear-gradient(145deg, #21102e, #09070d)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
         <span style={{
-          width: '54px', height: '54px', flex: '0 0 54px',
+          width: '46px', height: '46px', flex: '0 0 46px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '16px', background: '#38204a',
-          color: '#d8a2ff', fontSize: '27px'
+          borderRadius: '13px', background: '#291536',
+          color: '#f5c542', fontSize: '24px'
         }}>&#127916;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Criar Vinhetas e Spots</span>
-          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie seu &#225;udio em segundos.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Criar Vinhetas e Spots</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie seu &#225;udio em segundos.</span>
         </span>
 
       </button>
 
       <button type="button" onClick={() => { window.open('https://www.fabricadavozstudio.com.br/central-demonstrativos', '_blank', 'noopener,noreferrer'); }} style={{
-        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
-        boxSizing: 'border-box', borderRadius: '22px',
-        border: '1px solid #57356e',
-        background: '#17101f',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
+        border: '1px solid #7c3aed',
+        background: 'linear-gradient(145deg, #160d20, #09070d)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
         <span style={{
-          width: '54px', height: '54px', flex: '0 0 54px',
+          width: '46px', height: '46px', flex: '0 0 46px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '16px', background: '#38204a',
-          color: '#d8a2ff', fontSize: '27px'
+          borderRadius: '13px', background: '#291536',
+          color: '#f5c542', fontSize: '24px'
         }}>&#127908;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Central de Vozes</span>
-          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Conhe&#231;a e teste nossos locutores.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Central de Vozes</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Conhe&#231;a e teste nossos locutores.</span>
         </span>
 
       </button>
 
       <button type="button" onClick={() => { setMostrarHistorico(true); void carregarHistorico(); }} style={{
-        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
-        boxSizing: 'border-box', borderRadius: '22px',
-        border: '1px solid #57356e',
-        background: '#17101f',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
+        border: '1px solid #7c3aed',
+        background: 'linear-gradient(145deg, #160d20, #09070d)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
         <span style={{
-          width: '54px', height: '54px', flex: '0 0 54px',
+          width: '46px', height: '46px', flex: '0 0 46px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '16px', background: '#38204a',
-          color: '#d8a2ff', fontSize: '27px'
+          borderRadius: '13px', background: '#291536',
+          color: '#f5c542', fontSize: '24px'
         }}>&#128340;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Hist&#243;rico</span>
-          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Seus &#225;udios recentes.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Hist&#243;rico</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Seus &#225;udios recentes.</span>
         </span>
 
       </button>
 
       <button type="button" onClick={() => { setMostrarFabricaStudio(true); }} style={{
-        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
-        boxSizing: 'border-box', borderRadius: '22px',
-        border: '1px solid #57356e',
-        background: '#17101f',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
+        border: '1px solid #7c3aed',
+        background: 'linear-gradient(145deg, #160d20, #09070d)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
         <span style={{
-          width: '54px', height: '54px', flex: '0 0 54px',
+          width: '46px', height: '46px', flex: '0 0 46px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '16px', background: '#38204a',
-          color: '#d8a2ff', fontSize: '27px'
+          borderRadius: '13px', background: '#291536',
+          color: '#f5c542', fontSize: '24px'
         }}>&#127925;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>F&#225;brica Studio<span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
-          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Mixagem, trilhas e efeitos.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>F&#225;brica Studio<span style={{background: "#f5c542", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "4px 7px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Mixagem, trilhas e efeitos.</span>
         </span>
 
       </button>
 
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
-        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
-        boxSizing: 'border-box', borderRadius: '22px',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
         border: '1px solid #a855f7',
-        background: 'linear-gradient(145deg, #28163a, #17101f)',
+        background: 'linear-gradient(145deg, #21102e, #09070d)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
         <span style={{
-          width: '54px', height: '54px', flex: '0 0 54px',
+          width: '46px', height: '46px', flex: '0 0 46px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '16px', background: '#38204a',
-          color: '#d8a2ff', fontSize: '27px'
+          borderRadius: '13px', background: '#291536',
+          color: '#f5c542', fontSize: '24px'
         }}>&#127911;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>DJ Express<span style={{background: "#facc15", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "5px 8px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
-          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Vinhetas de DJ com efeitos.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>DJ Express<span style={{background: "#f5c542", color: "#211333", fontSize: "11px", fontWeight: 900, padding: "4px 7px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Vinhetas de DJ com efeitos.</span>
         </span>
 
       </button>
 
       <button type="button" onClick={() => { setMostrarCompraCreditos(true); }} style={{
-        width: '100%', minWidth: 0, minHeight: '108px', padding: '16px',
-        boxSizing: 'border-box', borderRadius: '22px',
-        border: '1px solid #57356e',
-        background: '#17101f',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
+        border: '1px solid #7c3aed',
+        background: 'linear-gradient(145deg, #160d20, #09070d)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
       }}>
         <span style={{
-          width: '54px', height: '54px', flex: '0 0 54px',
+          width: '46px', height: '46px', flex: '0 0 46px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '16px', background: '#38204a',
-          color: '#d8a2ff', fontSize: '27px'
+          borderRadius: '13px', background: '#291536',
+          color: '#f5c542', fontSize: '24px'
         }}>&#128722;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '18px', fontWeight: 800, color: '#fff', lineHeight: 1.3}}>Comprar cr&#233;ditos</span>
-          <span style={{display: 'block', marginTop: '5px', fontSize: '13px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Adicione cr&#233;ditos &#224; sua conta.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Comprar cr&#233;ditos</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Adicione cr&#233;ditos &#224; sua conta.</span>
         </span>
 
       </button>
