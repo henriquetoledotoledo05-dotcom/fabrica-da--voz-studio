@@ -1,4 +1,4 @@
-
+Ôªø
 /* =========================================================
    F√É¬ÅBRICA DA VOZ - APP.CSS
    CSS LIMPO E ORGANIZADO
@@ -3364,7 +3364,7 @@ b {
     margin-left: 0 !important;
   }
 }
-/* CorreÁ„o final: textos dentro dos cartıes do menu no celular */
+/* Corre  o final: textos dentro dos cart es do menu no celular */
 @media (max-width: 600px) {
   button[style*="min-height: 108px"] {
     width: 100% !important;
@@ -3496,5 +3496,72 @@ main button[style*="min-height: 108px"] span[style*="background: #facc15"] {
 
   main button[style*="min-height: 108px"] > span:nth-child(2) > span:nth-child(2) {
     font-size: 12px !important;
+  }
+}
+/* ===== AJUSTE MOBILE FINAL ‚Äî F√ÅBRICA DA VOZ ===== */
+@media (max-width: 600px) {
+  .hero {
+    padding: 12px 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .hero h2 {
+    font-size: 25px !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.5px !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+
+  .hero p {
+    margin-top: 8px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+
+  main h3 {
+    margin-top: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  main button[style*="min-height: 108px"] {
+    min-height: 76px !important;
+    padding: 12px !important;
+  }
+
+  main button[style*="min-height: 108px"] svg {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  main button[style*="min-height: 108px"] span {
+    line-height: 1.25 !important;
+  }
+}
+/* ===== IDENTIDADE VISUAL PREMIUM ===== */
+:root {
+  --roxo-neon: #a855f7;
+  --dourado: #f5c542;
+  --fundo-premium: #08060d;
+}
+
+@media (max-width: 600px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .hero {
+    padding: 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .hero h2 {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    overflow-wrap: normal !important;
+  }
+
+  .hero p {
+    font-size: 13px !important;
   }
 }
