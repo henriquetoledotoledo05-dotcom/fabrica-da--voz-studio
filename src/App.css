@@ -3395,3 +3395,106 @@ b {
     display: block !important;
   }
 }
+/* ===== REDESIGN DA HOME — FÁBRICA DA VOZ ===== */
+main > .hero h2 {
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.7px;
+  text-shadow: 0 0 24px rgba(168, 85, 247, 0.24);
+}
+
+main > .hero p {
+  color: #cfc3dc !important;
+}
+
+main .main {
+  max-width: 980px;
+}
+
+main .main > div {
+  max-width: 100%;
+}
+
+/* Painel de créditos */
+main div[style*="background: rgb(16, 8, 25)"],
+main div[style*="background: #100819"] {
+  background: radial-gradient(ellipse at top left, #26123a 0%, #100819 58%, #09060d 100%) !important;
+  border: 1px solid rgba(168, 85, 247, 0.45) !important;
+  box-shadow: 0 0 32px rgba(126, 34, 206, 0.13), 0 18px 45px rgba(0,0,0,.35) !important;
+}
+
+main div[style*="background: #211431"] {
+  background: linear-gradient(155deg, #1d1029 0%, #100b17 100%) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+/* Menu principal */
+main button[style*="min-height: 108px"] {
+  min-height: 100px !important;
+  padding: 18px 20px !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(168, 85, 247, 0.42) !important;
+  background: linear-gradient(115deg, #21132f 0%, #120d19 72%, #0e0a14 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035), 0 8px 22px rgba(0,0,0,.22) !important;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+}
+
+main button[style*="min-height: 108px"]:hover {
+  transform: translateY(-2px);
+  border-color: #c084fc !important;
+  box-shadow: 0 0 22px rgba(168,85,247,.18), 0 12px 28px rgba(0,0,0,.3) !important;
+}
+
+main button[style*="min-height: 108px"] > span:first-child {
+  width: 58px !important;
+  height: 58px !important;
+  flex-basis: 58px !important;
+  border-radius: 17px !important;
+  background: linear-gradient(145deg, #43215e, #251433) !important;
+  color: #f5cc58 !important;
+  border: 1px solid rgba(192,132,252,.28);
+  font-size: 29px !important;
+}
+
+main button[style*="min-height: 108px"] > span:nth-child(2) > span:first-child {
+  font-size: 18px !important;
+  font-weight: 850 !important;
+  color: #fff !important;
+}
+
+main button[style*="min-height: 108px"] > span:nth-child(2) > span:nth-child(2) {
+  color: #cbbbd9 !important;
+  font-size: 13px !important;
+}
+
+/* Destaque dos recursos novos */
+main button[style*="min-height: 108px"] span[style*="background: #facc15"] {
+  box-shadow: 0 0 14px rgba(250,204,21,.18);
+  letter-spacing: .4px;
+}
+
+/* Ajustes para celular */
+@media (max-width: 600px) {
+  main button[style*="min-height: 108px"] {
+    min-height: 88px !important;
+    padding: 13px 14px !important;
+    gap: 12px !important;
+    border-radius: 17px !important;
+  }
+
+  main button[style*="min-height: 108px"] > span:first-child {
+    width: 46px !important;
+    height: 46px !important;
+    flex-basis: 46px !important;
+    font-size: 24px !important;
+    border-radius: 14px !important;
+  }
+
+  main button[style*="min-height: 108px"] > span:nth-child(2) > span:first-child {
+    font-size: 16px !important;
+  }
+
+  main button[style*="min-height: 108px"] > span:nth-child(2) > span:nth-child(2) {
+    font-size: 12px !important;
+  }
+}
