@@ -1,4 +1,4 @@
-﻿
+
 /* =========================================================
    FÃBRICA DA VOZ - APP.CSS
    CSS LIMPO E ORGANIZADO
@@ -3570,27 +3570,18 @@ main button[style*="min-height: 108px"] span[style*="background: #facc15"] {
   main button[style*="height: 88px"] {
     box-sizing: border-box !important;
     width: 100% !important;
-    height: auto !important;
-    min-height: 96px !important;
-    max-height: none !important;
-    padding: 12px !important;
-    gap: 12px !important;
-    border: 1px solid #a855f7 !important;
-    border-radius: 16px !important;
-    background: linear-gradient(145deg, #160d20, #08060d) !important;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.12) !important;
+    height: 76px !important;
+    min-height: 76px !important;
+    max-height: 76px !important;
+    padding: 8px 10px !important;
+    gap: 10px !important;
+    border-radius: 14px !important;
   }
 
   main button[style*="height: 88px"] > span:first-child {
-    width: 46px !important;
-    height: 46px !important;
-    flex: 0 0 46px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 13px !important;
-    background: #291536 !important;
-    color: #f5c542 !important;
+    width: 42px !important;
+    height: 42px !important;
+    flex: 0 0 42px !important;
   }
 
   main button[style*="height: 88px"] > span:nth-child(2) {
@@ -3600,17 +3591,13 @@ main button[style*="min-height: 108px"] span[style*="background: #facc15"] {
   }
 
   main button[style*="height: 88px"] > span:nth-child(2) > span:first-child {
-    font-size: 16px !important;
-    line-height: 1.2 !important;
-    color: #ffffff !important;
-    overflow-wrap: normal !important;
-    word-break: normal !important;
+    font-size: 15px !important;
+    line-height: 1.15 !important;
   }
 
   main button[style*="height: 88px"] > span:nth-child(2) > span:nth-child(2) {
-    margin-top: 3px !important;
-    font-size: 12px !important;
-    line-height: 1.3 !important;
-    color: #d4c5df !important;
+    margin-top: 2px !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
   }
 }
