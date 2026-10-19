@@ -2491,7 +2491,7 @@ const gerarVoz = async () => {
                             cursor: 'pointer',
                           }}
                         >
-                          {vozDJSelecionada === voz.id ? '? Voz selecionada' : 'Selecionar voz'}
+                          {vozDJSelecionada === voz.id ? '\u2713 Voz selecionada' : 'Selecionar voz'}
                         </button>
                       </div>
                     </div>
@@ -2812,15 +2812,6 @@ const gerarVoz = async () => {
             />
 
           </div>
-
-          <p
-            style={{
-              marginTop:
-                '25px'
-            }}
-          >
-            Seu estúdio de voz profissional
-          </p>
 
         </header>
 
@@ -3235,7 +3226,7 @@ const gerarVoz = async () => {
         }}>&#127916;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
           <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Criar Vinhetas e Spots</span>
-          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie seu &#225;udio em segundos.</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}></span>
         </span>
 
       </button>
@@ -4562,5 +4553,7 @@ fontWeight: 400
 }
 
 export default App
+
+
 
 

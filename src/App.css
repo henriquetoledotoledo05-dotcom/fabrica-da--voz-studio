@@ -3601,3 +3601,97 @@ main button[style*="min-height: 108px"] span[style*="background: #facc15"] {
     line-height: 1.2 !important;
   }
 }
+
+/* ===== VISUAL PREMIUM FABRICA DA VOZ ===== */
+:root {
+  --roxo-neon: #a855f7;
+  --dourado: #f5c542;
+  --fundo-premium: #08060d;
+}
+
+html,
+body,
+#root,
+.app {
+  background: #08060d !important;
+  color: #f8f5ff !important;
+}
+
+.app {
+  max-width: 1126px;
+  margin: 0 auto;
+}
+
+.topo {
+  background: #08060d !important;
+}
+
+.topo > p {
+  margin: 12px 12px 24px !important;
+  color: #f5c542 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+}
+
+main > .hero {
+  max-width: 850px;
+  margin: 0 auto 18px !important;
+  padding: 18px 16px !important;
+  text-align: center !important;
+}
+
+main > .hero h2 {
+  color: #ffffff !important;
+  font-size: clamp(23px, 4vw, 32px) !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+}
+
+main > .hero p {
+  color: #d4c5df !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  margin-top: 8px !important;
+}
+
+main button[style*="height: 88px"] {
+  border: 1px solid #8b5cf6 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #1b1028, #0d0913) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 18px rgba(168, 85, 247, 0.08);
+}
+
+main button[style*="height: 88px"]:hover {
+  border-color: #f5c542 !important;
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+}
+
+@media (max-width: 600px) {
+  .topo .logo img {
+    max-height: 240px;
+    object-fit: contain;
+  }
+
+  main > .hero {
+    padding: 12px 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  main button[style*="height: 88px"] {
+    height: 76px !important;
+    min-height: 76px !important;
+    max-height: 76px !important;
+    padding: 8px 10px !important;
+    gap: 10px !important;
+  }
+
+  main button[style*="height: 88px"] > span:first-child {
+    width: 42px !important;
+    height: 42px !important;
+    flex: 0 0 42px !important;
+  }
+}
+/* ===== FIM DO VISUAL PREMIUM ===== */
+
