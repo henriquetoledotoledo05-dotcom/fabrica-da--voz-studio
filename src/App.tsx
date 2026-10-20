@@ -2428,99 +2428,58 @@ const gerarVoz = async () => {
               />
             </label>
 
-            <div style={{ display: 'grid', gap: '8px' }}>
-              <div style={{ fontWeight: 700 }}>Escolha o locutor</div>
-              <details style={{
-                border: '1px solid #a855f7',
-                borderRadius: '14px',
-                background: '#110c18',
-                overflow: 'hidden',
-              }}>
-                <summary style={{
-                  padding: '14px',
-                  cursor: 'pointer',
-                  color: '#facc15',
-                  fontWeight: 800,
-                }}>
-                  {vozes.find((voz) => voz.id === vozDJSelecionada)?.nome || 'Selecione uma voz'} &#9662;
-                </summary>
-
-                <div style={{
-                  display: 'grid',
-                  gap: '10px',
+            <div style={{ display: 'grid', gap: '10px' }}>
+              <label htmlFor="seletorLocutorDJ" style={{ fontWeight: 700 }}>
+                Escolha o locutor
+              </label>
+              <select
+                id="seletorLocutorDJ"
+                value={vozDJSelecionada}
+                onChange={(e) => setVozDJSelecionada(e.target.value)}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
                   padding: '12px',
-                  maxHeight: '420px',
-                  overflowY: 'auto',
-                }}>
-                  {vozes.map((voz) => (
-                    <div key={voz.id} style={{
-                      display: 'grid',
-                      gridTemplateColumns: '56px minmax(0, 1fr)',
-                      gap: '12px',
-                      alignItems: 'center',
-                      padding: '12px',
-                      borderRadius: '12px',
-                      border: vozDJSelecionada === voz.id
-                        ? '2px solid #facc15'
-                        : '1px solid #5b3a70',
-                      background: vozDJSelecionada === voz.id
-                        ? '#30203e'
-                        : '#191120',
-                    }}>
-                      <img
-                        src={voz.foto}
-                        alt={voz.nome}
-                        style={{
-                          width: '56px',
-                          height: '56px',
-                          objectFit: 'cover',
-                          borderRadius: '50%',
-                          background: '#30213d',
-                        }}
-                      />
-                      <div style={{ display: 'grid', gap: '8px', minWidth: 0 }}>
-                        <div style={{ color: '#fff', fontWeight: 800 }}>
-                          {voz.nome}
-                        </div>
-                        {voz.especialidade && (
-                          <div style={{ color: '#c4b5d0', fontSize: '12px' }}>
-                            {voz.especialidade}
-                          </div>
-                        )}
-                        <audio
-                          controls
-                          preload="none"
-                          src={voz.demonstrativo}
-                          style={{ width: '100%', height: '36px' }}
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            setVozDJSelecionada(voz.id);
-                            const detalhes = e.currentTarget.closest('details');
-                            if (detalhes) detalhes.open = false;
-                          }}
-                          style={{
-                            border: '1px solid #facc15',
-                            borderRadius: '9px',
-                            padding: '9px',
-                            background: vozDJSelecionada === voz.id
-                              ? '#facc15'
-                              : '#7625c9',
-                            color: vozDJSelecionada === voz.id ? '#21132f' : '#fff',
-                            fontWeight: 800,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {vozDJSelecionada === voz.id ? '\u2713 Voz selecionada' : 'Selecionar voz'}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                  borderRadius: '10px',
+                  border: '1px solid #a855f7',
+                  background: '#110c18',
+                  color: '#fff',
+                  fontSize: '15px',
+                }}
+              >
+                {['mmUpm90TBHi5276nYDJk', 'a5zGngtwpITbxmy3Sekk', 'u1vCfFgLgJ3YbJEqXmbf', 'GiNbP6xPhrH6X8DJBD08', 'DQRaZFBAlsnenMlFVe0R', 'g0iauLqQtYFe6LlIx8oy', 'g2E836wHBXhsWq15NkoD', 'QbKKWw1Bp1k0ycDNqoY7', 'rpNe0HOx7heUulPiOEaG', 'gyiJ08WU9Wi2LNY7nTcB'].map((id) => {
+                  const voz = vozes.find((item) => item.id === id);
+                  return voz ? <option key={voz.id} value={voz.id}>{voz.nome}</option> : null;
+                })}
+              </select>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '56px minmax(0, 1fr)',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px',
+                borderRadius: '12px',
+                background: '#191120',
+                border: '1px solid #5b3a70',
+              }}>
+                <img
+                  src={vozes.find((voz) => voz.id === vozDJSelecionada)?.foto}
+                  alt={vozes.find((voz) => voz.id === vozDJSelecionada)?.nome || 'Locutor'}
+                  style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '50%' }}
+                />
+                <div style={{ display: 'grid', gap: '8px', minWidth: 0 }}>
+                  <strong style={{ color: '#fff' }}>
+                    {vozes.find((voz) => voz.id === vozDJSelecionada)?.nome || 'Selecione uma voz'}
+                  </strong>
+                  <audio
+                    controls
+                    preload="none"
+                    src={vozes.find((voz) => voz.id === vozDJSelecionada)?.demonstrativo}
+                    style={{ width: '100%', height: '36px' }}
+                  />
                 </div>
-              </details>
+              </div>
             </div>
-
             <div>
               <div style={{ fontWeight: 800, marginBottom: '12px' }}>
                 Escolha o efeito
