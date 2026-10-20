@@ -1,4 +1,4 @@
-﻿const crypto = require("crypto");
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -1855,8 +1855,10 @@ app.post("/api/gerar-jingle-dj", async (req, res) => {
       "UaeEQHfiDI8l58WWXiwS",
       "oQL5kq26ctJzupM0mJot",
       "mmUpm90TBHi5276nYDJk",
-      "GiNbP6xPhrH6X8DJBD08"
-    ];
+      "GiNbP6xPhrH6X8DJBD08",
+      "g0iauLqQtYFe6LlIx8oy",
+      "QbKKWw1Bp1k0ycDNqoY7",
+];
 
     if (
       typeof voiceId !== "string" ||
