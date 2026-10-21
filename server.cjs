@@ -1370,6 +1370,56 @@ async function devolverCreditos(userId, quantidade) {
   return data;
 }
 
+function textosSaoSemelhantes(textoOriginal, textoNovo) {
+  const normalizar = (texto) =>
+    String(texto || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  const original = normalizar(textoOriginal);
+  const novo = normalizar(textoNovo);
+
+  if (!original || !novo) return false;
+  if (original === novo) return true;
+
+  const palavrasOriginais = new Set(original.split(" "));
+  const palavrasNovas = new Set(novo.split(" "));
+
+  let emComum = 0;
+  for (const palavra of palavrasOriginais) {
+    if (palavrasNovas.has(palavra)) emComum++;
+  }
+
+  const menorQuantidade = Math.min(
+    palavrasOriginais.size,
+    palavrasNovas.size
+  );
+
+  const maiorQuantidade = Math.max(
+    palavrasOriginais.size,
+    palavrasNovas.size
+  );
+
+  const sobreposicao = emComum / menorQuantidade;
+  const semelhancaGlobal = emComum / maiorQuantidade;
+
+  // Textos curtos: permitir pequenas correcoes.
+  if (Math.max(original.length, novo.length) <= 30) {
+    return Math.abs(original.length - novo.length) <= 8 &&
+      emComum >= 2 &&
+      sobreposicao >= 0.5;
+  }
+
+  // Textos maiores: permitir corrigir palavras e acrescentar
+  // informacoes sem liberar anuncios completamente diferentes.
+  return emComum >= 3 &&
+    sobreposicao >= 0.75 &&
+    semelhancaGlobal >= 0.45;
+}
 function calcularCreditosNecessarios(texto) {
   const quantidadeCaracteres = texto.trim().length;
 
@@ -1499,6 +1549,27 @@ app.post(
       // =====================================================
 
       if (regenerar === true) {
+        const { data: ultimaGeracao, error: erroUltimaGeracao } =
+          await supabaseAdmin
+            .from("ultima_geracao_regeneracao")
+            .select("texto")
+            .eq("user_id", usuarioId)
+            .maybeSingle();
+
+        if (erroUltimaGeracao) {
+          console.error("ERRO AO VALIDAR ULTIMA GERACAO:", erroUltimaGeracao);
+          throw new Error("Nao foi possivel validar a ultima locucao.");
+        }
+
+        if (
+          !ultimaGeracao ||
+          !textosSaoSemelhantes(ultimaGeracao.texto, textoLimpo)
+        ) {
+          return res.status(400).json({
+            erro: "A regeneracao permite corrigir o texto da ultima locucao, mas nao criar um anuncio diferente. Use os creditos normais para isso."
+          });
+        }
+
         await consumirRegeneracao(usuarioId);
         regeneracaoConsumida = true;
         console.log("Uma regeneracao foi consumida.");
@@ -1770,6 +1841,20 @@ Regras:
           "Content-Length",
           audio.length.toString()
         );
+      }
+
+      {
+        const { error: erroSalvarUltimaGeracao } = await supabaseAdmin
+          .from("ultima_geracao_regeneracao")
+          .upsert(
+            { user_id: usuarioId, texto: textoLimpo, updated_at: new Date().toISOString() },
+            { onConflict: "user_id" }
+          );
+
+        if (erroSalvarUltimaGeracao) {
+          console.error("ERRO AO SALVAR ULTIMA GERACAO:", erroSalvarUltimaGeracao);
+          throw new Error("Nao foi possivel registrar a ultima locucao.");
+        }
       }
 
       res.send(audio);
