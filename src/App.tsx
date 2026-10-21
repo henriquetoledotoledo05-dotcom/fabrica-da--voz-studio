@@ -53,6 +53,8 @@ function App() {
   const [erroAcesso, setErroAcesso] = useState('')
   const [emailAcesso, setEmailAcesso] = useState('')
   const [creditos, setCreditos] = useState<number | null>(null)
+  const [regeneracoes, setRegeneracoes] = useState(0)
+  const [ultimaGeracao, setUltimaGeracao] = useState<{ texto: string; voiceId: string; estilo: string; instrucaoPersonalizada: string; reverb: boolean; volumeReverb: number } | null>(null)
   const [carregandoCreditos, setCarregandoCreditos] = useState(false)
   const [mostrarCompraCreditos, setMostrarCompraCreditos] = useState(false)
   const [mostrarCadastro, setMostrarCadastro] = useState(false)
@@ -75,7 +77,7 @@ function App() {
 
       const { data, error } = await supabase
         .from('perfis')
-        .select('creditos')
+        .select('creditos, regeneracoes')
         .eq('id', userData.user.id)
         .maybeSingle()
 
@@ -93,6 +95,7 @@ function App() {
       }
 
       setCreditos(Number(data.creditos ?? 0))
+      setRegeneracoes(Number(data.regeneracoes ?? 0))
     } finally {
       setCarregandoCreditos(false)
     }
@@ -1036,6 +1039,64 @@ const iniciarPagamento = async (pacote: {
     )
   }
 }
+const regenerarVoz = async () => {
+    if (!ultimaGeracao || !audioUrl) {
+      alert('Gere uma locucao primeiro.');
+      return;
+    }
+
+    if (regeneracoes <= 0) {
+      alert('Voce nao possui regeneracoes disponiveis.');
+      return;
+    }
+
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !sessionData.session) {
+      alert('Sua sessao expirou. Faca login novamente.');
+      return;
+    }
+
+    setGerando(true);
+    try {
+      const resposta = await fetch('/api/gerar-voz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({ ...ultimaGeracao, texto: texto.trim(), regenerar: true }),
+      });
+
+      if (!resposta.ok) {
+        const corpoErro = await resposta.text();
+        let mensagem = 'Erro ao regenerar a voz.';
+        try {
+          const dadosErro = JSON.parse(corpoErro);
+          mensagem = dadosErro.erro || dadosErro.error || dadosErro.message || mensagem;
+        } catch {
+          if (corpoErro.trim()) mensagem = corpoErro;
+        }
+        throw new Error(mensagem);
+      }
+
+      const audioBlob = await resposta.blob();
+      if (!audioBlob.size) throw new Error('O servidor retornou um audio vazio.');
+
+      const urlAudio = URL.createObjectURL(audioBlob);
+      setAudioUrl(urlAudio);
+      setAudioOriginalUrl(urlAudio);
+      setMixAudioUrl('');
+      await salvarNoHistorico(audioBlob, 'locucao');
+      await carregarCreditos();
+    } catch (erro) {
+      console.error('Erro ao regenerar voz:', erro);
+      await carregarCreditos();
+      alert(erro instanceof Error ? erro.message : 'Nao foi possivel regenerar a voz.');
+    } finally {
+      setGerando(false);
+    }
+  };
+
 const gerarVoz = async () => {
     const textoDigitado = texto.trim()
 
@@ -1137,6 +1198,7 @@ const gerarVoz = async () => {
       const urlAudio =
         URL.createObjectURL(audioBlob)
 
+      setUltimaGeracao({ texto: textoFinal, voiceId: vozAtual.id, estilo: estiloSelecionado, instrucaoPersonalizada: instrucaoPersonalizada.trim(), reverb: reverbAtivo, volumeReverb })
       setAudioUrl(urlAudio)
       setAudioOriginalUrl(urlAudio)
       setMixAudioUrl('')
@@ -3698,6 +3760,17 @@ fontWeight: 400
                       }}
                     >
                       {baixandoAudio ? 'Preparando download...' : 'Baixar audio'}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="botao-trilha"
+                      style={{ background: 'linear-gradient(135deg, #6d28d9, #4c1d95)', border: '1px solid #a855f7' }}
+                      disabled={gerando || regeneracoes <= 0 || !ultimaGeracao}
+                      onClick={() => void regenerarVoz()}
+                      title={"Regeneracoes disponiveis: " + regeneracoes}
+                    >
+                      {gerando ? 'Regenerando...' : 'Regenerar voz (' + regeneracoes + ')'}
                     </button>
 
                     <button

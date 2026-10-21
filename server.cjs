@@ -1302,6 +1302,38 @@ async function autenticarUsuario(req) {
   return user;
 }
 
+async function consumirRegeneracao(userId) {
+  const { data, error } = await supabaseAdmin.rpc(
+    "consumir_regeneracao",
+    { p_user_id: userId }
+  );
+
+  if (error) {
+    console.error("ERRO AO CONSUMIR REGENERACAO:", error);
+    throw new Error("N?o foi poss?vel consumir a regenera??o.");
+  }
+
+  if (data !== true) {
+    throw new Error("Voc? n?o possui regenera??es dispon?veis.");
+  }
+
+  return true;
+}
+
+async function devolverRegeneracao(userId) {
+  const { data, error } = await supabaseAdmin.rpc(
+    "devolver_regeneracao",
+    { p_user_id: userId }
+  );
+
+  if (error) {
+    console.error("ERRO AO DEVOLVER REGENERACAO:", error);
+    throw new Error("N?o foi poss?vel devolver a regenera??o.");
+  }
+
+  return data;
+}
+
 async function consumirCreditos(userId, quantidade) {
   const { data, error } = await supabaseAdmin.rpc(
     "consumir_creditos",
@@ -1357,6 +1389,7 @@ app.post(
   async (req, res) => {
     let usuarioId = null;
     let creditosConsumidos = 0;
+    let regeneracaoConsumida = false;
 
     try {
       const {
@@ -1368,6 +1401,7 @@ app.post(
         reverb,
         volumeReverb,
         instrucaoPersonalizada,
+        regenerar = false,
       } = req.body;
 
       console.log("ESTILO RECEBIDO:", estilo);
@@ -1464,17 +1498,19 @@ app.post(
       // etc.
       // =====================================================
 
-      await consumirCreditos(
-        usuarioId,
-        creditosNecessarios
-      );
+      if (regenerar === true) {
+        await consumirRegeneracao(usuarioId);
+        regeneracaoConsumida = true;
+        console.log("Uma regeneracao foi consumida.");
+      } else {
+        await consumirCreditos(
+          usuarioId,
+          creditosNecessarios
+        );
 
-      creditosConsumidos = creditosNecessarios;
-
-      console.log(
-        "CrÃƒÆ’Ã‚Â©ditos consumidos:",
-        creditosConsumidos
-      );
+        creditosConsumidos = creditosNecessarios;
+        console.log("Creditos consumidos:", creditosConsumidos);
+      }
 
       console.log("Voice ID:", voiceId);
       console.log("Texto:", textoLimpo);
@@ -1747,6 +1783,15 @@ Regras:
       // =====================================================
       // DEVOLVER CRÃƒÆ’Ã¢â‚¬Â°DITOS SE A GERAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O FALHAR
       // =====================================================
+
+      if (usuarioId && regeneracaoConsumida) {
+        try {
+          await devolverRegeneracao(usuarioId);
+          console.log("Regeneracao devolvida apos falha na geracao.");
+        } catch (erroDevolucao) {
+          console.error("ERRO AO DEVOLVER REGENERACAO:", erroDevolucao);
+        }
+      }
 
       if (
         usuarioId &&
