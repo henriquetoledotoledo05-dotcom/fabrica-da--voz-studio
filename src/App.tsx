@@ -2620,15 +2620,7 @@ const gerarVoz = async () => {
           <button type="button" onClick={() => setMostrarFabricaStudio(false)} style={{ border: '1px solid rgba(216,180,254,0.35)', borderRadius: '12px', padding: '10px 15px', color: '#e9d5ff', background: '#21152c', cursor: 'pointer', marginBottom: '22px', fontWeight: 700 }}>
             Voltar ao menu
           </button>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '22px', marginBottom: '24px', borderRadius: '20px', border: '1px solid rgba(192,132,252,0.35)', background: 'linear-gradient(120deg, rgba(74,29,105,0.65), rgba(18,12,27,0.95))', boxShadow: '0 16px 40px rgba(0,0,0,0.25)' }}>
-            <div style={{ flexShrink: 0, width: '58px', height: '58px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, #a855f7, #6b21a8)', color: '#fff', fontSize: '30px', boxShadow: '0 0 24px rgba(168,85,247,0.25)' }}>&#9835;</div>
-            <div>
-              <div style={{ color: '#facc15', fontSize: '11px', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '5px' }}>ESTÚDIO DE PRODUÇÃO DE ÁUDIO</div>
-              <div style={{ color: '#f3e8ff', fontSize: '14px', lineHeight: 1.6 }}>Prepare sua locução, escolha a trilha, ajuste os efeitos e gere seu MP3.</div>
-            </div>
-          </div>
-          <h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 46px)', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '8px', textShadow: '0 0 28px rgba(168,85,247,0.28)' }}>FÁBRICA <span style={{ color: '#d8b4fe' }}>STUDIO</span></h1>
+<h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 46px)', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '8px', textShadow: '0 0 28px rgba(168,85,247,0.28)' }}>FÁBRICA <span style={{ color: '#d8b4fe' }}>STUDIO</span></h1>
           <p style={{ color: '#e9d5ff', marginTop: 0 }}>Seu estúdio de áudio online</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '22px', marginTop: '32px' }}>
