@@ -900,12 +900,19 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
       foto: '/andré-foto.png',
       demonstrativo: '/vozes/andré-voz.mp3',
       especialidade: 'Impacto'
+    },
+    {
+      id: 'Gxi5hLxJ4skjTWK8XHBJ',
+      nome: 'Toledo',
+      foto: '/toledo-foto.png',
+      demonstrativo: '/vozes/toledo-voz.mp3',
+      especialidade: 'Comercial'
     }
   ]
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel', 'Marcos', 'André', 'Rodrigo', 'Roger', 'Thiago'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel', 'Marcos', 'André', 'Rodrigo', 'Roger', 'Thiago', 'Toledo'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
