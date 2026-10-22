@@ -608,6 +608,43 @@ function obterDuracao(audioPath) {
 }
 
 // =====================================================
+
+async function aplicarEqualizacaoToledo(audioBuffer) {
+  return new Promise((resolve, reject) => {
+    const ffmpeg = spawn(ffmpegPath, [
+      "-hide_banner",
+      "-loglevel", "error",
+      "-i", "pipe:0",
+      "-af", "highpass=f=65,equalizer=f=140:width_type=h:width=1.0:g=2.0,equalizer=f=3000:width_type=h:width=1.0:g=2.0,alimiter=limit=0.95",
+      "-c:a", "libmp3lame",
+      "-b:a", "128k",
+      "-f", "mp3",
+      "pipe:1"
+    ]);
+
+    const partes = [];
+    let erro = "";
+
+    ffmpeg.stdout.on("data", parte => partes.push(parte));
+    ffmpeg.stderr.on("data", parte => { erro += parte.toString(); });
+    ffmpeg.on("error", reject);
+
+    ffmpeg.on("close", codigo => {
+      if (codigo === 0 && partes.length) {
+        resolve(Buffer.concat(partes));
+      } else {
+        reject(new Error(erro || "Falha na equaliza??o do Toledo."));
+      }
+    });
+
+    ffmpeg.stdin.on("error", erroEntrada => {
+      if (erroEntrada.code !== "EPIPE") reject(erroEntrada);
+    });
+
+    ffmpeg.stdin.end(audioBuffer);
+  });
+}
+
 // ALTERAR VELOCIDADE
 // =====================================================
 
@@ -1777,6 +1814,12 @@ Regras:
       );
 
       // =====================================================
+
+      if (voiceId === "Gxi5hLxJ4skjTWK8XHBJ") {
+        console.log("Aplicando equaliza??o exclusiva do Toledo.");
+        audio = await aplicarEqualizacaoToledo(audio);
+      }
+
       // VELOCIDADE OPCIONAL
       // =====================================================
 
