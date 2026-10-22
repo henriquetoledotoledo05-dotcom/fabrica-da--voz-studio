@@ -1,4 +1,4 @@
-const crypto = require("crypto");
+﻿const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -32,22 +32,22 @@ app.use(express.json());
 const PORT = Number(process.env.PORT) || 3010;
 const PACOTES_CREDITOS = {
   credito1: {
-    titulo: "1 crÃƒÆ’Ã‚Â©dito",
+    titulo: "1 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dito",
     creditos: 1,
     valor: 4.90,
   },
   credito10: {
-    titulo: "10 crÃƒÆ’Ã‚Â©ditos",
+    titulo: "10 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos",
     creditos: 10,
     valor: 19.90,
   },
   credito50: {
-    titulo: "50 crÃƒÆ’Ã‚Â©ditos",
+    titulo: "50 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos",
     creditos: 50,
     valor: 69.90,
   },
   credito100: {
-    titulo: "100 crÃƒÆ’Ã‚Â©ditos",
+    titulo: "100 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos",
     creditos: 100,
     valor: 119.90,
   },
@@ -60,7 +60,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
     if (!pacoteSelecionado) {
       return res.status(400).json({
-        erro: "Pacote de crÃƒÆ’Ã‚Â©ditos invÃƒÆ’Ã‚Â¡lido.",
+        erro: "Pacote de crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido.",
       });
     }
 
@@ -68,7 +68,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
     if (!authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        erro: "UsuÃƒÆ’Ã‚Â¡rio nÃƒÆ’Ã‚Â£o autenticado.",
+        erro: "UsuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o autenticado.",
       });
     }
 
@@ -81,7 +81,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
 
     if (erroUsuario || !user) {
       return res.status(401).json({
-        erro: "SessÃƒÆ’Ã‚Â£o do usuÃƒÆ’Ã‚Â¡rio invÃƒÆ’Ã‚Â¡lida.",
+        erro: "SessÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o do usuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lida.",
       });
     }
 
@@ -114,7 +114,7 @@ app.post("/api/criar-pagamento", async (req, res) => {
     console.error("Erro ao criar pagamento:", erro);
 
     return res.status(500).json({
-      erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel criar o pagamento.",
+      erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel criar o pagamento.",
     });
   }
 });
@@ -122,11 +122,11 @@ app.post("/api/criar-pagamento", async (req, res) => {
 // =====================================================
 // WEBHOOK MERCADO PAGO - PAYMENT + ORDER
 // =====================================================
-// Esta aplicaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o usa Checkout Pro pela API de PreferÃƒÆ’Ã‚Âªncias
+// Esta aplicaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o usa Checkout Pro pela API de PreferÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªncias
 // (/checkout/preferences). Para esse fluxo, o evento correto
-// ÃƒÆ’Ã‚Â© "Pagamentos" (tÃƒÆ’Ã‚Â³pico payment). Mantemos suporte a "order"
-// tambÃƒÆ’Ã‚Â©m para compatibilidade futura.
-// O mesmo pagamento nÃƒÆ’Ã‚Â£o pode gerar crÃƒÆ’Ã‚Â©ditos duas vezes porque
+// ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© "Pagamentos" (tÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³pico payment). Mantemos suporte a "order"
+// tambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©m para compatibilidade futura.
+// O mesmo pagamento nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o pode gerar crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos duas vezes porque
 // o Supabase controla mercado_pago_id como UNIQUE.
 
 function extrairAssinaturaMercadoPago(xSignature) {
@@ -155,7 +155,7 @@ function validarAssinaturaMercadoPago(req, dataId) {
 
   if (!secret) {
     throw new Error(
-      "MERCADOPAGO_WEBHOOK_SECRET nÃƒÆ’Ã‚Â£o configurada no servidor."
+      "MERCADOPAGO_WEBHOOK_SECRET nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o configurada no servidor."
     );
   }
 
@@ -173,7 +173,7 @@ function validarAssinaturaMercadoPago(req, dataId) {
   }
 
   // Manifesto oficial do Mercado Pago.
-  // O data.id ÃƒÆ’Ã‚Â© usado em minÃƒÆ’Ã‚Âºsculas no cÃƒÆ’Ã‚Â¡lculo da assinatura.
+  // O data.id ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© usado em minÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºsculas no cÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lculo da assinatura.
   const manifest =
     `id:${String(dataId).toLowerCase()};request-id:${xRequestId};ts:${ts};`;
 
@@ -217,19 +217,19 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
     if (!dataId) {
       console.error("Webhook recebido sem data.id.");
       return res.status(400).json({
-        erro: "ID do recurso nÃƒÆ’Ã‚Â£o informado.",
+        erro: "ID do recurso nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o informado.",
       });
     }
 
     if (!validarAssinaturaMercadoPago(req, dataId)) {
-      console.error("Webhook Mercado Pago rejeitado: assinatura invÃƒÆ’Ã‚Â¡lida.");
+      console.error("Webhook Mercado Pago rejeitado: assinatura invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lida.");
       return res.status(401).json({
-        erro: "Assinatura do webhook invÃƒÆ’Ã‚Â¡lida.",
+        erro: "Assinatura do webhook invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lida.",
       });
     }
 
     if (tipo !== "payment" && tipo !== "order") {
-      console.log("Webhook ignorado: tipo nÃƒÆ’Ã‚Â£o suportado:", tipo);
+      console.log("Webhook ignorado: tipo nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o suportado:", tipo);
       return res.status(200).json({
         recebido: true,
         processado: false,
@@ -238,7 +238,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
       throw new Error(
-        "MERCADOPAGO_ACCESS_TOKEN nÃƒÆ’Ã‚Â£o configurado."
+        "MERCADOPAGO_ACCESS_TOKEN nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o configurado."
       );
     }
 
@@ -270,7 +270,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
           detalhes
         );
         return res.status(502).json({
-          erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel consultar o pagamento no Mercado Pago.",
+          erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel consultar o pagamento no Mercado Pago.",
         });
       }
 
@@ -311,7 +311,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
           detalhes
         );
         return res.status(502).json({
-          erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel consultar a order no Mercado Pago.",
+          erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel consultar a order no Mercado Pago.",
         });
       }
 
@@ -336,7 +336,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (!statusAprovado) {
       console.log(
-        "Pagamento ainda nÃƒÆ’Ã‚Â£o estÃƒÆ’Ã‚Â¡ aprovado/acreditado. Nenhum crÃƒÆ’Ã‚Â©dito serÃƒÆ’Ã‚Â¡ adicionado."
+        "Pagamento ainda nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o estÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ aprovado/acreditado. Nenhum crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dito serÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ adicionado."
       );
 
       return res.status(200).json({
@@ -358,7 +358,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       pacote = externalReference.slice(separador + 1).trim();
     }
 
-    // Fallback para metadata caso a referÃƒÆ’Ã‚Âªncia externa nÃƒÆ’Ã‚Â£o esteja disponÃƒÆ’Ã‚Â­vel.
+    // Fallback para metadata caso a referÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªncia externa nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o esteja disponÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel.
     if ((!userId || !pacote) && metadata) {
       userId = String(metadata.user_id || "").trim();
       pacote = String(metadata.pacote || "").trim();
@@ -366,7 +366,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 
     if (!userId || !pacote) {
       console.error(
-        "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel identificar usuÃƒÆ’Ã‚Â¡rio/pacote do pagamento.",
+        "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel identificar usuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio/pacote do pagamento.",
         {
           externalReference,
           metadata,
@@ -374,16 +374,16 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       );
 
       return res.status(400).json({
-        erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel identificar o usuÃƒÆ’Ã‚Â¡rio e o pacote do pagamento.",
+        erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel identificar o usuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio e o pacote do pagamento.",
       });
     }
 
     const pacoteSelecionado = PACOTES_CREDITOS[pacote];
 
     if (!pacoteSelecionado) {
-      console.error("Pacote nÃƒÆ’Ã‚Â£o encontrado:", pacote);
+      console.error("Pacote nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrado:", pacote);
       return res.status(400).json({
-        erro: "Pacote de crÃƒÆ’Ã‚Â©ditos nÃƒÆ’Ã‚Â£o encontrado.",
+        erro: "Pacote de crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrado.",
       });
     }
 
@@ -403,7 +403,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       );
 
       return res.status(400).json({
-        erro: "Valor do pagamento nÃƒÆ’Ã‚Â£o corresponde ao pacote.",
+        erro: "Valor do pagamento nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o corresponde ao pacote.",
       });
     }
 
@@ -425,13 +425,13 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
       );
 
       return res.status(500).json({
-        erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel registrar o pagamento no Supabase.",
+        erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel registrar o pagamento no Supabase.",
       });
     }
 
     console.log("Pagamento processado pelo Supabase:", data);
     console.log(
-      "CrÃƒÆ’Ã‚Â©ditos adicionados:",
+      "CrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos adicionados:",
       pacoteSelecionado.creditos
     );
 
@@ -451,7 +451,7 @@ app.post("/api/mercadopago/webhook", async (req, res) => {
 });
 
 // =====================================================
-// CONFIGURAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O
+// CONFIGURAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O
 // =====================================================
 
 const allowedOrigins = [
@@ -466,14 +466,14 @@ app.use(
   cors({
     origin(origin, callback) {
       // Permite chamadas sem Origin (ex.: curl, health-checks)
-      // e os domÃƒÆ’Ã‚Â­nios oficiais da FÃƒÆ’Ã‚Â¡brica da Voz.
+      // e os domÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­nios oficiais da FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡brica da Voz.
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
         return;
       }
 
-      // NÃƒÆ’Ã‚Â£o bloqueia o navegador por CORS; a aplicaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o continua
-      // protegida pelo prÃƒÆ’Ã‚Â³prio domÃƒÆ’Ã‚Â­nio/rota.
+      // NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o bloqueia o navegador por CORS; a aplicaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o continua
+      // protegida pelo prÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³prio domÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­nio/rota.
       callback(null, true);
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -490,8 +490,8 @@ app.use(
   })
 );
 
-// A geraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o tambÃƒÆ’Ã‚Â©m aceita JSON enviado como text/plain.
-// Isso evita o preflight OPTIONS que o proxy do domÃƒÆ’Ã‚Â­nio estava redirecionando.
+// A geraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o tambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©m aceita JSON enviado como text/plain.
+// Isso evita o preflight OPTIONS que o proxy do domÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­nio estava redirecionando.
 app.use(
   express.text({
     type: ["text/plain", "text/plain;charset=UTF-8"],
@@ -522,7 +522,7 @@ app.use(
 
 if (!ffmpegPath) {
   console.error("");
-  console.error("ERRO: FFmpeg nÃƒÆ’Ã‚Â£o encontrado.");
+  console.error("ERRO: FFmpeg nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrado.");
   console.error("");
   process.exit(1);
 }
@@ -532,7 +532,7 @@ console.log("FFmpeg encontrado:");
 console.log(ffmpegPath);
 
 // =====================================================
-// UTILITÃƒÆ’Ã‚ÂRIOS
+// UTILITÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂRIOS
 // =====================================================
 
 function limparBase64(valor) {
@@ -559,7 +559,7 @@ function base64ParaBuffer(valor) {
 }
 
 // =====================================================
-// PEGAR DURAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O DO ÃƒÆ’Ã‚ÂUDIO
+// PEGAR DURAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O DO ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂUDIO
 // =====================================================
 
 function obterDuracao(audioPath) {
@@ -588,7 +588,7 @@ function obterDuracao(audioPath) {
       if (!resultado) {
         reject(
           new Error(
-            "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel descobrir a duraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o do ÃƒÆ’Ã‚Â¡udio."
+            "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel descobrir a duraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o do ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udio."
           )
         );
         return;
@@ -615,7 +615,7 @@ async function aplicarEqualizacaoToledo(audioBuffer) {
       "-hide_banner",
       "-loglevel", "error",
       "-i", "pipe:0",
-      "-af", "highpass=f=65,equalizer=f=180:width_type=h:width=1.0:g=2.0,equalizer=f=4500:width_type=h:width=1.0:g=-1.0,deesser=i=0.45:m=0.6:f=0.5:s=o,alimiter=limit=0.95",
+      "-af", "highpass=f=65,equalizer=f=180:width_type=h:width=1.0:g=1.0,deesser=i=0.25:m=0.4:f=0.5:s=o,alimiter=limit=0.95",
       "-c:a", "libmp3lame",
       "-b:a", "128k",
       "-f", "mp3",
@@ -776,7 +776,7 @@ async function aplicarEfeitoDJ(audioBuffer, estilo) {
   const filtro = filtros[estilo];
 
   if (!audioBuffer || !audioBuffer.length || !filtro) {
-    throw new Error("Estilo de efeito DJ invÃƒÂ¡lido ou ÃƒÂ¡udio vazio.");
+    throw new Error("Estilo de efeito DJ invÃƒÆ’Ã‚Â¡lido ou ÃƒÆ’Ã‚Â¡udio vazio.");
   }
 
   return new Promise((resolve, reject) => {
@@ -822,7 +822,7 @@ async function adicionarLaserDJ(audioBuffer) {
   const laserPath = path.join(__dirname, "public", "efeitos", "Laser.mp3");
 
   if (!fs.existsSync(laserPath)) {
-    throw new Error("Arquivo Laser.mp3 nÃ£o encontrado.");
+    throw new Error("Arquivo Laser.mp3 nÃƒÂ£o encontrado.");
   }
 
   return new Promise((resolve, reject) => {
@@ -897,7 +897,7 @@ async function adicionarEcoFinalDJ(audioBuffer) {
     });
   }
 
-  // Consulta a duração a partir de um arquivo temporário.
+  // Consulta a duraÃ§Ã£o a partir de um arquivo temporÃ¡rio.
   const arquivoTemporario = path.join(
     __dirname,
     ".dj-eco-" + process.pid + "-" + Date.now() + ".mp3"
@@ -932,15 +932,15 @@ async function adicionarEcoFinalDJ(audioBuffer) {
   );
 
   if (!correspondencia) {
-    console.error("DJ EXPRESS - informação de duração:", String(textoInfo).slice(0, 1500));
-    throw new Error("Não foi possível identificar a duração do áudio para o eco final.");
+    console.error("DJ EXPRESS - informaÃ§Ã£o de duraÃ§Ã£o:", String(textoInfo).slice(0, 1500));
+    throw new Error("NÃ£o foi possÃ­vel identificar a duraÃ§Ã£o do Ã¡udio para o eco final.");
   }
 
   const duracao =
     Number(correspondencia[1]) * 3600 +
     Number(correspondencia[2]) * 60 +
     Number(correspondencia[3]);
-  // Processa apenas os Ãºltimos 1,4 segundos, preservando o restante da fala.
+  // Processa apenas os ÃƒÂºltimos 1,4 segundos, preservando o restante da fala.
   const inicioCauda = Math.max(0, duracao - 0.8).toFixed(3);
 
   const resultado = await executarFFmpeg([
@@ -1061,7 +1061,7 @@ async function mixarAudio(
       inicio
     );
     console.log(
-      "DuraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o da voz:",
+      "DuraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o da voz:",
       duracaoVoz
     );
     console.log(
@@ -1069,13 +1069,13 @@ async function mixarAudio(
       final
     );
     console.log(
-      "DuraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o final:",
+      "DuraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o final:",
       duracaoTotal
     );
     console.log(
       "Fade final:",
       inicioFade,
-      "atÃƒÆ’Ã‚Â©",
+      "atÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©",
       duracaoTotal
     );
     console.log(
@@ -1107,13 +1107,13 @@ async function mixarAudio(
       "-filter_complex",
 
       // Voz:
-      // comeÃƒÆ’Ã‚Â§a apÃƒÆ’Ã‚Â³s os segundos iniciais
-      // e recebe silÃƒÆ’Ã‚Âªncio depois.
+      // comeÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§a apÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³s os segundos iniciais
+      // e recebe silÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªncio depois.
       `[0:a]adelay=${delayMs}|${delayMs},` + (reverb && Number(volumeReverb ?? 0) > 0 ? `asplit=2[vozOriginal][reverbEntrada];[reverbEntrada]aecho=0.8:0.9:90|180|300:0.7|0.55|0.4,volume=${Math.max(0, Math.min(1, Number(volumeReverb ?? 0) / 100))}[reverbSom];[vozOriginal][reverbSom]amix=inputs=2:duration=longest:dropout_transition=0:weights=1 1,` : "") + `apad=pad_dur=${final}[voz];` +
 
       // Trilha:
-      // 20% de volume, duraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o final exata
-      // e fade out nos ÃƒÆ’Ã‚Âºltimos 2 segundos.
+      // 20% de volume, duraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o final exata
+      // e fade out nos ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºltimos 2 segundos.
       `[1:a]volume=0.20,` +
       `atrim=duration=${duracaoTotal},` +
       `afade=t=out:st=${inicioFade}:d=2[trilha];` +
@@ -1163,7 +1163,7 @@ async function mixarAudio(
     console.log(
       "================================="
     );
-    console.log("MIXAGEM CONCLUÃƒÆ’Ã‚ÂDA");
+    console.log("MIXAGEM CONCLUÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂDA");
     console.log(
       "Tamanho:",
       resultado.length,
@@ -1264,27 +1264,27 @@ app.post("/api/corrigir-texto", async (req, res) => {
     const resposta = await openai.responses.create({
       model: "gpt-5.6-luna",
       instructions: `
-VocÃƒÂª ÃƒÂ© um revisor especializado em textos para locuÃƒÂ§ÃƒÂ£o de rÃƒÂ¡dio em portuguÃƒÂªs do Brasil.
+VocÃƒÆ’Ã‚Âª ÃƒÆ’Ã‚Â© um revisor especializado em textos para locuÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o de rÃƒÆ’Ã‚Â¡dio em portuguÃƒÆ’Ã‚Âªs do Brasil.
 
 Corrija:
 - erros de ortografia;
-- acentuaÃƒÂ§ÃƒÂ£o;
-- pontuaÃƒÂ§ÃƒÂ£o;
-- concordÃƒÂ¢ncia;
+- acentuaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o;
+- pontuaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o;
+- concordÃƒÆ’Ã‚Â¢ncia;
 - palavras digitadas incorretamente;
 - frases pouco naturais para serem faladas.
 
-Deixe o texto natural, claro e agradÃƒÂ¡vel para uma locuÃƒÂ§ÃƒÂ£o.
+Deixe o texto natural, claro e agradÃƒÆ’Ã‚Â¡vel para uma locuÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o.
 
 MUITO IMPORTANTE:
-- NÃƒÂ£o invente informaÃƒÂ§ÃƒÂµes.
-- NÃƒÂ£o altere nomes de pessoas, empresas ou lugares.
-- NÃƒÂ£o altere nÃƒÂºmeros de telefone.
-- NÃƒÂ£o altere preÃƒÂ§os.
-- NÃƒÂ£o altere datas ou horÃƒÂ¡rios.
-- NÃƒÂ£o altere endereÃƒÂ§os.
-- Preserve as informaÃƒÂ§ÃƒÂµes e o sentido original.
-- Retorne SOMENTE o texto corrigido, sem explicaÃƒÂ§ÃƒÂµes, aspas ou comentÃƒÂ¡rios.
+- NÃƒÆ’Ã‚Â£o invente informaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes.
+- NÃƒÆ’Ã‚Â£o altere nomes de pessoas, empresas ou lugares.
+- NÃƒÆ’Ã‚Â£o altere nÃƒÆ’Ã‚Âºmeros de telefone.
+- NÃƒÆ’Ã‚Â£o altere preÃƒÆ’Ã‚Â§os.
+- NÃƒÆ’Ã‚Â£o altere datas ou horÃƒÆ’Ã‚Â¡rios.
+- NÃƒÆ’Ã‚Â£o altere endereÃƒÆ’Ã‚Â§os.
+- Preserve as informaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes e o sentido original.
+- Retorne SOMENTE o texto corrigido, sem explicaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes, aspas ou comentÃƒÆ’Ã‚Â¡rios.
       `,
       input: texto.trim(),
     });
@@ -1304,27 +1304,27 @@ MUITO IMPORTANTE:
     console.error("ERRO AO CORRIGIR TEXTO:", erro);
 
     res.status(500).json({
-      erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel corrigir o texto.",
+      erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel corrigir o texto.",
       detalhes: erro?.message || "Erro desconhecido",
     });
   }
 });
 
 // =====================================================
-// AUTENTICAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O E CRÃƒÆ’Ã¢â‚¬Â°DITOS
+// AUTENTICAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O E CRÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°DITOS
 // =====================================================
 
 async function autenticarUsuario(req) {
   const authHeader = req.headers.authorization || "";
 
   if (!authHeader.startsWith("Bearer ")) {
-    throw new Error("UsuÃƒÆ’Ã‚Â¡rio nÃƒÆ’Ã‚Â£o autenticado.");
+    throw new Error("UsuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o autenticado.");
   }
 
   const accessToken = authHeader.replace("Bearer ", "").trim();
 
   if (!accessToken) {
-    throw new Error("Token de autenticaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o nÃƒÆ’Ã‚Â£o informado.");
+    throw new Error("Token de autenticaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o informado.");
   }
 
   const {
@@ -1333,7 +1333,7 @@ async function autenticarUsuario(req) {
   } = await supabaseAdmin.auth.getUser(accessToken);
 
   if (error || !user) {
-    throw new Error("SessÃƒÆ’Ã‚Â£o do usuÃƒÆ’Ã‚Â¡rio invÃƒÆ’Ã‚Â¡lida.");
+    throw new Error("SessÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o do usuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rio invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lida.");
   }
 
   return user;
@@ -1381,9 +1381,9 @@ async function consumirCreditos(userId, quantidade) {
   );
 
   if (error) {
-    console.error("ERRO AO CONSUMIR CRÃƒÆ’Ã¢â‚¬Â°DITOS:", error);
+    console.error("ERRO AO CONSUMIR CRÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°DITOS:", error);
     throw new Error(
-      error.message || "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel consumir os crÃƒÆ’Ã‚Â©ditos."
+      error.message || "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel consumir os crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos."
     );
   }
 
@@ -1400,7 +1400,7 @@ async function devolverCreditos(userId, quantidade) {
   );
 
   if (error) {
-    console.error("ERRO AO DEVOLVER CRÃƒÆ’Ã¢â‚¬Â°DITOS:", error);
+    console.error("ERRO AO DEVOLVER CRÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°DITOS:", error);
     return null;
   }
 
@@ -1532,7 +1532,7 @@ app.post(
       if (!process.env.ELEVENLABS_API_KEY) {
         return res.status(500).json({
           erro:
-            "ELEVENLABS_API_KEY nÃƒÆ’Ã‚Â£o configurada no arquivo .env.",
+            "ELEVENLABS_API_KEY nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o configurada no arquivo .env.",
         });
       }
 
@@ -1567,21 +1567,21 @@ app.post(
         calcularCreditosNecessarios(textoLimpo);
 
       console.log("Quantidade de caracteres:", quantidadeCaracteres);
-      console.log("CrÃƒÆ’Ã‚Â©ditos necessÃƒÆ’Ã‚Â¡rios:", creditosNecessarios);
+      console.log("CrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos necessÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡rios:", creditosNecessarios);
 
       // =====================================================
-      // AUTENTICAR USUÃƒÆ’Ã‚ÂRIO
+      // AUTENTICAR USUÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂRIO
       // =====================================================
 
       const usuario = await autenticarUsuario(req);
       usuarioId = usuario.id;
 
       // =====================================================
-      // CONSUMIR CRÃƒÆ’Ã¢â‚¬Â°DITOS
+      // CONSUMIR CRÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°DITOS
       //
-      // 1 a 800       = 1 crÃƒÆ’Ã‚Â©dito
-      // 801 a 1600    = 2 crÃƒÆ’Ã‚Â©ditos
-      // 1601 a 2400   = 3 crÃƒÆ’Ã‚Â©ditos
+      // 1 a 800       = 1 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dito
+      // 801 a 1600    = 2 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos
+      // 1601 a 2400   = 3 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos
       // etc.
       // =====================================================
 
@@ -1624,7 +1624,7 @@ app.post(
       console.log("Texto:", textoLimpo);
 
       // =====================================================
-      // ESTILOS DE LOCUÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O - ELEVEN V3
+      // ESTILOS DE LOCUÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O - ELEVEN V3
       // =====================================================
 
       let textoParaVoz = textoLimpo;
@@ -1667,7 +1667,7 @@ if (estilo === "animado") {
   estabilidadeEstilo = 0.42;
 }
 
-      // INSTRUÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O PERSONALIZADA - INTERPRETAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O COM IA
+      // INSTRUÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O PERSONALIZADA - INTERPRETAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O COM IA
       // =====================================================
 
       if (
@@ -1676,14 +1676,14 @@ if (estilo === "animado") {
         instrucaoPersonalizada.trim()
       ) {
         try {
-          console.log("INSTRUÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O PERSONALIZADA:", instrucaoPersonalizada);
+          console.log("INSTRUÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O PERSONALIZADA:", instrucaoPersonalizada);
 
           const interpretacao = await openai.responses.create({
             model: "gpt-5.6-luna",
             instructions: `
-VocÃƒÆ’Ã‚Âª ÃƒÆ’Ã‚Â© um diretor de voz para locuÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes profissionais em portuguÃƒÆ’Ã‚Âªs do Brasil.
+VocÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âª ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© um diretor de voz para locuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âµes profissionais em portuguÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âªs do Brasil.
 
-Receba a instruÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o do cliente e transforme-a SOMENTE em uma combinaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o de tags de interpretaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o compatÃƒÆ’Ã‚Â­veis com o ElevenLabs V3.
+Receba a instruÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o do cliente e transforme-a SOMENTE em uma combinaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o de tags de interpretaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o compatÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­veis com o ElevenLabs V3.
 
 Tags permitidas:
 [excited]
@@ -1693,17 +1693,17 @@ Tags permitidas:
 [calm]
 
 Regras:
-- Entenda o sentido completo da instruÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o.
-- "locutor de rÃƒÆ’Ã‚Â¡dio", "rÃƒÆ’Ã‚Â¡dio", "chamada de rÃƒÆ’Ã‚Â¡dio" normalmente indica [excited].
-- "futebol", "narraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o de gol", "narrador esportivo" pode usar [excited] [shouts].
+- Entenda o sentido completo da instruÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o.
+- "locutor de rÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡dio", "rÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡dio", "chamada de rÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡dio" normalmente indica [excited].
+- "futebol", "narraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o de gol", "narrador esportivo" pode usar [excited] [shouts].
 - "muito animado", "empolgado", "muita energia" pode usar [excited] [happily].
-- "forte", "impactante", "chamando atenÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o" pode usar [shouts].
-- "sÃƒÆ’Ã‚Â©rio", "institucional", "autoridade", "profissional" pode usar [serious].
+- "forte", "impactante", "chamando atenÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o" pode usar [shouts].
+- "sÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rio", "institucional", "autoridade", "profissional" pode usar [serious].
 - "calmo", "tranquilo", "emocional" pode usar [calm].
 - Combine tags quando fizer sentido.
 - Nunca invente tags.
-- Nunca escreva explicaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes.
-- Retorne SOMENTE as tags, separadas por espaÃƒÆ’Ã‚Â§o.
+- Nunca escreva explicaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âµes.
+- Retorne SOMENTE as tags, separadas por espaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§o.
 - Se nenhuma tag for adequada, retorne [calm].
             `,
             input: instrucaoPersonalizada.trim(),
@@ -1727,18 +1727,18 @@ Regras:
             );
           } else {
             console.log(
-              "IA nÃƒÆ’Ã‚Â£o retornou tags vÃƒÆ’Ã‚Â¡lidas. Mantendo estilo selecionado."
+              "IA nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o retornou tags vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lidas. Mantendo estilo selecionado."
             );
           }
 
         } catch (erroInstrucao) {
           console.error(
-            "ERRO AO INTERPRETAR INSTRUÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O PERSONALIZADA:",
+            "ERRO AO INTERPRETAR INSTRUÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O PERSONALIZADA:",
             erroInstrucao.message
           );
 
           console.log(
-            "Continuando geraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o com o estilo selecionado."
+            "Continuando geraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o com o estilo selecionado."
           );
         }
       }
@@ -1803,12 +1803,12 @@ Regras:
 
       if (!audio.length) {
         throw new Error(
-          "A ElevenLabs retornou um ÃƒÆ’Ã‚Â¡udio vazio."
+          "A ElevenLabs retornou um ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udio vazio."
         );
       }
 
       console.log(
-        "ÃƒÆ’Ã‚Âudio recebido:",
+        "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio recebido:",
         audio.length,
         "bytes"
       );
@@ -1837,7 +1837,7 @@ Regras:
 
       if (!audio.length) {
         throw new Error(
-          "O ÃƒÆ’Ã‚Â¡udio ficou vazio apÃƒÆ’Ã‚Â³s o processamento."
+          "O ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udio ficou vazio apÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³s o processamento."
         );
       }
 
@@ -1851,7 +1851,7 @@ Regras:
         "Cache-Control":
           "no-store",
 
-        // Informa ao frontend quantos crÃƒÆ’Ã‚Â©ditos foram usados.
+        // Informa ao frontend quantos crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos foram usados.
         "X-Creditos-Consumidos":
           creditosConsumidos.toString(),
       });
@@ -1909,7 +1909,7 @@ Regras:
       console.error(erro);
 
       // =====================================================
-      // DEVOLVER CRÃƒÆ’Ã¢â‚¬Â°DITOS SE A GERAÃƒÆ’Ã¢â‚¬Â¡ÃƒÆ’Ã†â€™O FALHAR
+      // DEVOLVER CRÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°DITOS SE A GERAÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O FALHAR
       // =====================================================
 
       if (usuarioId && regeneracaoConsumida) {
@@ -1931,25 +1931,25 @@ Regras:
         );
 
         console.log(
-          "CrÃƒÆ’Ã‚Â©ditos devolvidos:",
+          "CrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos devolvidos:",
           creditosConsumidos
         );
       }
 
       const mensagem =
         erro?.message ||
-        "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel gerar a voz.";
+        "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel gerar a voz.";
 
       const semCreditos =
         mensagem.toLowerCase().includes(
-          "crÃƒÆ’Ã‚Â©ditos insuficientes"
+          "crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos insuficientes"
         );
 
       res.status(
         semCreditos ? 402 : 500
       ).json({
         erro: semCreditos
-          ? "VocÃƒÆ’Ã‚Âª nÃƒÆ’Ã‚Â£o possui crÃƒÆ’Ã‚Â©ditos suficientes para gerar essa locuÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o."
+          ? "VocÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âª nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o possui crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos suficientes para gerar essa locuÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o."
           : mensagem,
       });
     }
@@ -1958,7 +1958,7 @@ Regras:
 
 
 // =====================================================
-// MIXAGEM COM TRILHA DA FÃƒÆ’Ã‚ÂBRICA
+// MIXAGEM COM TRILHA DA FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂBRICA
 //
 // O frontend envia:
 // - audioBase64
@@ -2174,7 +2174,7 @@ app.post("/api/gerar-jingle-dj", async (req, res) => {
     const mensagem =
       erro?.message || "Nao foi possivel gerar o jingle DJ.";
 
-    const semCreditos = /cr[eÃ©]ditos insuficientes/i.test(mensagem);
+    const semCreditos = /cr[eÃƒÂ©]ditos insuficientes/i.test(mensagem);
 
     return res.status(semCreditos ? 402 : 500).json({
       erro: semCreditos
@@ -2199,7 +2199,7 @@ app.post(
         "================================="
       );
       console.log(
-        "MIXAGEM - TRILHA DA FÃƒÆ’Ã‚ÂBRICA"
+        "MIXAGEM - TRILHA DA FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂBRICA"
       );
       console.log(
         "================================="
@@ -2208,7 +2208,7 @@ app.post(
       if (!audioBase64) {
         return res.status(400).json({
           erro:
-            "ÃƒÆ’Ã‚Âudio da voz nÃƒÆ’Ã‚Â£o informado.",
+            "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio da voz nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o informado.",
         });
       }
 
@@ -2227,7 +2227,7 @@ app.post(
       if (!vozBuffer) {
         return res.status(400).json({
           erro:
-            "ÃƒÆ’Ã‚Âudio da voz vazio ou invÃƒÆ’Ã‚Â¡lido.",
+            "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio da voz vazio ou invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido.",
         });
       }
 
@@ -2255,13 +2255,13 @@ app.post(
         )
       ) {
         console.error(
-          "Trilha nÃƒÆ’Ã‚Â£o encontrada:",
+          "Trilha nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrada:",
           trilhaPath
         );
 
         return res.status(404).json({
           erro:
-            `Trilha nÃƒÆ’Ã‚Â£o encontrada: ${nomeTrilha}`,
+            `Trilha nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrada: ${nomeTrilha}`,
         });
       }
 
@@ -2307,7 +2307,7 @@ app.post(
       res.status(500).json({
         erro:
           erro.message ||
-          "Erro ao mixar os ÃƒÆ’Ã‚Â¡udios.",
+          "Erro ao mixar os ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udios.",
       });
     }
   }
@@ -2348,14 +2348,14 @@ app.post(
       if (!audioBase64) {
         return res.status(400).json({
           erro:
-            "ÃƒÆ’Ã‚Âudio da voz nÃƒÆ’Ã‚Â£o informado.",
+            "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio da voz nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o informado.",
         });
       }
 
       if (!trilhaBase64) {
         return res.status(400).json({
           erro:
-            "A trilha enviada pelo cliente nÃƒÆ’Ã‚Â£o foi encontrada.",
+            "A trilha enviada pelo cliente nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi encontrada.",
         });
       }
 
@@ -2372,14 +2372,14 @@ app.post(
       if (!vozBuffer) {
         return res.status(400).json({
           erro:
-            "ÃƒÆ’Ã‚Âudio da voz vazio ou invÃƒÆ’Ã‚Â¡lido.",
+            "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio da voz vazio ou invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido.",
         });
       }
 
       if (!trilhaBuffer) {
         return res.status(400).json({
           erro:
-            "ÃƒÆ’Ã‚Âudio da trilha vazio ou invÃƒÆ’Ã‚Â¡lido.",
+            "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio da trilha vazio ou invÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lido.",
         });
       }
 
@@ -2392,7 +2392,7 @@ app.post(
         );
 
       console.log(
-        "Mixagem da trilha do cliente concluÃƒÆ’Ã‚Â­da."
+        "Mixagem da trilha do cliente concluÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­da."
       );
 
       res.set({
@@ -2420,7 +2420,7 @@ app.post(
       res.status(500).json({
         erro:
           erro.message ||
-          "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel mixar a trilha enviada.",
+          "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel mixar a trilha enviada.",
       });
     }
   }
@@ -2446,7 +2446,7 @@ app.post(
         if (!wavBuffer.length) {
           return res.status(400).json({
             erro:
-              "ÃƒÆ’Ã‚Âudio WAV nÃƒÆ’Ã‚Â£o informado.",
+              "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio WAV nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o informado.",
           });
         }
 
@@ -2518,7 +2518,7 @@ app.post(
           (codigo) => {
             if (codigo !== 0) {
               console.error(
-                "FFmpeg conversÃƒÆ’Ã‚Â£o:",
+                "FFmpeg conversÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o:",
                 erro
               );
 
@@ -2526,7 +2526,7 @@ app.post(
                 res.status(500).json({
                   erro:
                     erro ||
-                    "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel converter o ÃƒÆ’Ã‚Â¡udio para MP3.",
+                    "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel converter o ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udio para MP3.",
                 });
               }
 
@@ -2560,7 +2560,7 @@ app.post(
       });
     } catch (erro) {
       console.error(
-        "ERRO NA CONVERSÃƒÆ’Ã†â€™O PARA MP3:",
+        "ERRO NA CONVERSÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢O PARA MP3:",
         erro
       );
 
@@ -2585,7 +2585,7 @@ app.post("/api/masterizar-audio", (req, res) => {
     total += chunk.length;
     if (total > limite) {
       excedeuLimite = true;
-      res.status(413).json({ erro: "ÃƒÆ’Ã‚Âudio maior que 100 MB." });
+      res.status(413).json({ erro: "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio maior que 100 MB." });
       req.destroy();
       return;
     }
@@ -2596,7 +2596,7 @@ app.post("/api/masterizar-audio", (req, res) => {
     if (excedeuLimite || res.headersSent) return;
     const entrada = Buffer.concat(chunks);
     if (!entrada.length) {
-      return res.status(400).json({ erro: "Nenhum ÃƒÆ’Ã‚Â¡udio enviado." });
+      return res.status(400).json({ erro: "Nenhum ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udio enviado." });
     }
 
     const ffmpeg = spawn(ffmpegPath, [
@@ -2625,7 +2625,7 @@ app.post("/api/masterizar-audio", (req, res) => {
       const audio = Buffer.concat(saida);
       if (codigo !== 0 || !audio.length) {
         console.error("[MASTERIZACAO]", erros);
-        if (!res.headersSent) res.status(500).json({ erro: "NÃƒÆ’Ã‚Â£o foi possÃƒÆ’Ã‚Â­vel masterizar." });
+        if (!res.headersSent) res.status(500).json({ erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel masterizar." });
         return;
       }
       res.set({
@@ -2649,7 +2649,7 @@ app.post("/api/masterizar-audio", (req, res) => {
 app.get("/api/health", (req, res) => {
   res.json({
     ok: true,
-    servidor: "FÃƒÆ’Ã‚Â¡brica da Voz",
+    servidor: "FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡brica da Voz",
     porta: PORT,
     ffmpeg: !!ffmpegPath,
     geracaoVoz: true,
@@ -2669,7 +2669,7 @@ app.get(
       funcionando: true,
 
       servidor:
-        "FÃƒÆ’Ã‚Â¡brica da Voz",
+        "FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡brica da Voz",
 
       porta:
         PORT,
@@ -2699,7 +2699,7 @@ app.get(
 // FRONTEND VITE / REACT
 //
 // O Render precisa executar `npm run build` para criar a
-// pasta dist. Depois o prÃƒÆ’Ã‚Â³prio Express entrega essa pasta.
+// pasta dist. Depois o prÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³prio Express entrega essa pasta.
 // As rotas /api/* continuam sendo atendidas acima.
 // =====================================================
 
@@ -2712,7 +2712,7 @@ if (fs.existsSync(distPath)) {
     res.sendFile(path.join(distPath, "central-demonstrativos.html"));
   });
 
-  // SPA: qualquer rota que nÃƒÆ’Ã‚Â£o seja /api/* recebe o index.html.
+  // SPA: qualquer rota que nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o seja /api/* recebe o index.html.
   app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
     const indexPath = path.join(distPath, "index.html");
 
@@ -2722,17 +2722,17 @@ if (fs.existsSync(distPath)) {
     }
 
     res.status(500).send(
-      "Frontend nÃƒÆ’Ã‚Â£o encontrado. Execute npm run build no deploy."
+      "Frontend nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrado. Execute npm run build no deploy."
     );
   });
 } else {
   console.warn(
-    "AVISO: pasta dist nÃƒÆ’Ã‚Â£o encontrada. O frontend nÃƒÆ’Ã‚Â£o serÃƒÆ’Ã‚Â¡ exibido atÃƒÆ’Ã‚Â© o build do Vite ser executado."
+    "AVISO: pasta dist nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o encontrada. O frontend nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o serÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡ exibido atÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© o build do Vite ser executado."
   );
 
   app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
     res.status(503).send(
-      "FÃƒÆ’Ã‚Â¡brica da Voz: frontend ainda nÃƒÆ’Ã‚Â£o foi compilado. Execute npm run build."
+      "FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡brica da Voz: frontend ainda nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi compilado. Execute npm run build."
     );
   });
 }
@@ -2774,7 +2774,7 @@ const server =
         "================================="
       );
       console.log(
-        "        FÃƒÆ’Ã‚ÂBRICA DA VOZ"
+        "        FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂBRICA DA VOZ"
       );
       console.log(
         "================================="
@@ -2783,7 +2783,7 @@ const server =
         `Servidor: http://localhost:${PORT}`
       );
       console.log(
-        "GeraÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o de voz: ATIVADA"
+        "GeraÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â§ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o de voz: ATIVADA"
       );
       console.log(
         "Segundos antes/depois: ATIVADOS"
@@ -2792,7 +2792,7 @@ const server =
         "Fade final: 2 segundos"
       );
       console.log(
-        "Trilha da fÃƒÆ’Ã‚Â¡brica: ATIVADA"
+        "Trilha da fÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡brica: ATIVADA"
       );
       console.log(
         "Trilha do cliente: ATIVADA"
@@ -2832,6 +2832,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 
