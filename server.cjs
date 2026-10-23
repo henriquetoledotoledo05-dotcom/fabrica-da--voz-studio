@@ -615,7 +615,7 @@ async function aplicarEqualizacaoToledo(audioBuffer) {
       "-hide_banner",
       "-loglevel", "error",
       "-i", "pipe:0",
-      "-af", "highpass=f=65,equalizer=f=180:width_type=h:width=1.0:g=1.0,equalizer=f=3500:width_type=h:width=1.0:g=-1.0,equalizer=f=6500:width_type=h:width=1.0:g=-1.5,alimiter=limit=0.95",
+      "-af", "highpass=f=65,equalizer=f=180:width_type=h:width=1.0:g=1.0,equalizer=f=4500:width_type=h:width=1.0:g=-2.0,equalizer=f=7000:width_type=h:width=1.0:g=-2.5,alimiter=limit=0.95",
       "-c:a", "libmp3lame",
       "-b:a", "128k",
       "-f", "mp3",
@@ -2832,6 +2832,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 
