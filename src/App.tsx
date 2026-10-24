@@ -948,15 +948,23 @@ const vozesInfantis = vozes.filter(
   setCorrigindoTexto(true)
 
   try {
+    const { data: sessaoCorrecao } = await supabase.auth.getSession()
+    const tokenCorrecao = sessaoCorrecao.session?.access_token
+
+    if (!tokenCorrecao) {
+      throw new Error('Sua sessao expirou. Entre novamente.')
+    }
+
     const resposta = await fetch('/api/corrigir-texto', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${tokenCorrecao}`
       },
       body: JSON.stringify({
-        texto: textoDigitado
+    texto: textoDigitado
       })
-    })
+})
 
     const dados = await resposta.json()
 
@@ -2091,12 +2099,17 @@ const gerarVoz = async () => {
 
       const wavBlob = audioBufferParaWav(renderizado)
 
+      const { data: sessaoConversaoMix } = await supabase.auth.getSession()
+      const tokenConversaoMix = sessaoConversaoMix.session?.access_token
+      if (!tokenConversaoMix) throw new Error("Sua sessao expirou. Entre novamente.")
+
       const respostaMix = await fetch(
         '/api/converter-mp3',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'audio/wav',
+            'Authorization': `Bearer ${tokenConversaoMix}`,
           },
           body: wavBlob,
         }
@@ -2313,9 +2326,16 @@ const gerarVoz = async () => {
       const renderizado = await offline.startRendering()
       const wavBlob = audioBufferParaWav(renderizado)
 
+      const { data: sessaoConversaoStudio } = await supabase.auth.getSession()
+      const tokenConversaoStudio = sessaoConversaoStudio.session?.access_token
+      if (!tokenConversaoStudio) throw new Error("Sua sessao expirou. Entre novamente.")
+
       const resposta = await fetch('/api/converter-mp3', {
         method: 'POST',
-        headers: { 'Content-Type': 'audio/wav' },
+        headers: {
+          'Content-Type': 'audio/wav',
+          'Authorization': `Bearer ${tokenConversaoStudio}`,
+        },
         body: wavBlob
       })
 
@@ -2363,10 +2383,15 @@ const gerarVoz = async () => {
 
       const arquivoOriginal = await respostaOriginal.blob();
 
+      const { data: sessaoMasterizacao } = await supabase.auth.getSession();
+      const tokenMasterizacao = sessaoMasterizacao.session?.access_token;
+      if (!tokenMasterizacao) throw new Error("Sua sessao expirou. Entre novamente.");
+
       const resposta = await fetch("/api/masterizar-audio", {
         method: "POST",
         headers: {
           "Content-Type": "audio/mpeg",
+          "Authorization": `Bearer ${tokenMasterizacao}`,
         },
         body: arquivoOriginal,
       });

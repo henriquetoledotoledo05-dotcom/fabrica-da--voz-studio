@@ -1253,6 +1253,12 @@ function executarFfmpeg(
 
 app.post("/api/corrigir-texto", async (req, res) => {
   try {
+    try {
+      await autenticarUsuario(req);
+    } catch (erroAuth) {
+      return res.status(401).json({ erro: "Sessao invalida ou expirada. Entre novamente." });
+    }
+
     const { texto } = req.body;
 
     if (!texto || !texto.trim()) {
@@ -1305,7 +1311,6 @@ MUITO IMPORTANTE:
 
     res.status(500).json({
       erro: "NÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o foi possÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­vel corrigir o texto.",
-      detalhes: erro?.message || "Erro desconhecido",
     });
   }
 });
@@ -2433,13 +2438,31 @@ app.post(
   "/api/converter-mp3",
   async (req, res) => {
     try {
+      try {
+        await autenticarUsuario(req);
+      } catch (erroAuth) {
+        return res.status(401).json({ erro: "Sessao invalida ou expirada. Entre novamente." });
+      }
+
       const partes = [];
+      const limiteAudio = 100 * 1024 * 1024;
+      let totalAudio = 0;
+      let excedeuLimite = false;
 
       req.on("data", (parte) => {
+        if (excedeuLimite) return;
+        totalAudio += parte.length;
+        if (totalAudio > limiteAudio) {
+          excedeuLimite = true;
+          partes.length = 0;
+          if (!res.headersSent) res.status(413).json({ erro: "Audio maior que 100 MB." });
+          return;
+        }
         partes.push(parte);
       });
 
       req.on("end", () => {
+        if (excedeuLimite || res.headersSent) return;
         const wavBuffer =
           Buffer.concat(partes);
 
@@ -2575,7 +2598,13 @@ app.post(
 // =====================================================
 // ROTA DE MASTERIZACAO
 
-app.post("/api/masterizar-audio", (req, res) => {
+app.post("/api/masterizar-audio", async (req, res) => {
+  try {
+    await autenticarUsuario(req);
+  } catch (erroAuth) {
+    return res.status(401).json({ erro: "Sessao invalida ou expirada. Entre novamente." });
+  }
+
   const chunks = [];
   let total = 0;
   let excedeuLimite = false;
