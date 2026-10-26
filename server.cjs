@@ -1485,7 +1485,7 @@ async function adicionarCaudaSilencio(audioBuffer, segundos = 0.5) {
       "-hide_banner",
       "-loglevel", "error",
       "-i", "pipe:0",
-      "-af", "areverse,afade=t=in:st=0:d=0.2,areverse,apad=pad_dur=${segundos}",
+      "-af", `areverse,afade=t=in:st=0:d=0.2,areverse,apad=pad_dur=${segundos}`,
       "-c:a", "libmp3lame",
       "-b:a", "128k",
       "-f", "mp3",
