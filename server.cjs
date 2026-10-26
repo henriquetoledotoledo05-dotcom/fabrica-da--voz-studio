@@ -1,4 +1,4 @@
-﻿const crypto = require("crypto");
+const crypto = require("crypto");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -1476,6 +1476,49 @@ function calcularCreditosNecessarios(texto) {
 // GERAR VOZ - ELEVENLABS
 // =====================================================
 
+
+// Acrescenta uma sobra natural ao final da locução.
+// Usa o FFmpeg já configurado no servidor.
+async function adicionarCaudaSilencio(audioBuffer, segundos = 0.5) {
+  return new Promise((resolve, reject) => {
+    const processo = spawn(ffmpegPath, [
+      "-hide_banner",
+      "-loglevel", "error",
+      "-i", "pipe:0",
+      "-af", `apad=pad_dur=${segundos}`,
+      "-c:a", "libmp3lame",
+      "-b:a", "128k",
+      "-f", "mp3",
+      "pipe:1"
+    ]);
+
+    const partes = [];
+    const erros = [];
+
+    processo.stdout.on("data", parte => partes.push(parte));
+    processo.stderr.on("data", parte => erros.push(parte));
+    processo.on("error", reject);
+
+    processo.on("close", codigo => {
+      if (codigo === 0 && partes.length) {
+        resolve(Buffer.concat(partes));
+      } else {
+        reject(new Error(
+          "Falha ao adicionar silêncio: " +
+          Buffer.concat(erros).toString()
+        ));
+      }
+    });
+
+    processo.stdin.on("error", erro => {
+      if (erro.code !== "EPIPE") {
+        console.error("Erro ao enviar áudio ao FFmpeg:", erro.message);
+      }
+    });
+
+    processo.stdin.end(audioBuffer);
+  });
+}
 app.post(
   "/api/gerar-voz",
   async (req, res) => {
@@ -1905,6 +1948,8 @@ Regras:
         }
       }
 
+      audio = await adicionarCaudaSilencio(audio, 0.5);
+      res.set("Content-Length", audio.length.toString());
       res.send(audio);
     } catch (erro) {
       console.error("");
