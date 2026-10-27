@@ -270,6 +270,7 @@ const [studioPontoTrilha, setStudioPontoTrilha] = useState(0)
 const [studioSegundosFinais, setStudioSegundosFinais] = useState(3)
 const [studioMixando, setStudioMixando] = useState(false)
 const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
+const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   const [nomeDJ, setNomeDJ] = useState('')
   const [vozDJSelecionada, setVozDJSelecionada] = useState('rz25pon9uanPpUGOW98Y')
   const [estiloDJ, setEstiloDJ] = useState('pancadao')
@@ -2763,13 +2764,26 @@ const gerarVoz = async () => {
                   audio.load();
                 }
               }} style={{ width: '100%', color: '#fff', margin: '10px 0' }} />
-              <audio id="studio-trilha" controls style={{ width: '100%', marginTop: '10px' }} />
+              <audio id="studio-trilha" controls onLoadedMetadata={(e) => { const duracao = e.currentTarget.duration; if (Number.isFinite(duracao) && duracao > 0) { setStudioDuracaoTrilha(Math.floor(duracao)); setStudioPontoTrilha((ponto) => Math.min(ponto, Math.max(0, Math.floor(duracao) - 1))); } }} style={{ width: '100%', marginTop: '10px' }} />
               <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', border: '1px solid rgba(250,204,21,0.3)', background: 'rgba(15,10,22,0.65)' }}>
-                <label htmlFor="studio-ponto-trilha" style={{ display: 'block', color: '#facc15', fontWeight: 700 }}>Ponto inicial da trilha (segundos)</label>
-                <p style={{ color: '#e9d5ff', fontSize: '13px', margin: '6px 0 10px' }}>Escolha de qual segundo da música a mixagem deve começar.</p>
-                <input id="studio-ponto-trilha" type="number" min="0" max="3600" step="1" value={studioPontoTrilha} onChange={(e) => setStudioPontoTrilha(Math.max(0, Number(e.target.value) || 0))} style={{ display: 'block', width: '100%', padding: '10px', borderRadius: '8px', background: '#171020', color: '#fff', border: '1px solid rgba(216,180,254,0.35)', boxSizing: 'border-box' }} />
-              </div>
-            </section>
+  <label htmlFor="studio-ponto-trilha" style={{ display: 'block', color: '#facc15', fontWeight: 700 }}>
+    Início da música: {Math.floor(studioPontoTrilha / 60).toString().padStart(2, '0')}:{Math.floor(studioPontoTrilha % 60).toString().padStart(2, '0')}
+  </label>
+  <p style={{ color: '#e9d5ff', fontSize: '13px', margin: '6px 0 10px' }}>
+    Arraste para escolher o trecho da música que começará na mixagem.
+  </p>
+  <input
+    id="studio-ponto-trilha"
+    type="range"
+    min="0"
+    max={Math.max(1, Math.floor(studioDuracaoTrilha))}
+    step="1"
+    value={Math.min(studioPontoTrilha, Math.max(0, Math.floor(studioDuracaoTrilha)))}
+    onChange={(e) => setStudioPontoTrilha(Number(e.target.value))}
+    style={{ display: 'block', width: '100%', cursor: 'pointer' }}
+  />
+</div>
+</section>
           </div>
 
           <section style={{ border: '1px solid rgba(216,180,254,0.25)', borderRadius: '18px', padding: '22px', marginTop: '18px', background: 'rgba(48,33,61,0.72)' }}>
