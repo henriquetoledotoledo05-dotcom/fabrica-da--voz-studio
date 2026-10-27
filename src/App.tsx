@@ -555,6 +555,27 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
             <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
             <h2 style={{ margin: '0 0 8px' }}>Criar sua conta</h2>
             <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a Fábrica da Voz.</p>
+            <section style={{ marginBottom: '24px', textAlign: 'left' }}>
+              <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd' }}>Ouça nossas demonstrações</h3>
+              <p style={{ textAlign: 'center', opacity: 0.75, fontSize: '14px', margin: '0 0 16px' }}>Conheça alguns exemplos de locuções produzidas com a Fábrica da Voz.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+                {[
+                  { nome: 'Igreja', arquivo: '/demo-igreja.mp3' },
+                  { nome: 'Loja', arquivo: '/demo-loja.mp3' },
+                  { nome: 'Pet shop', arquivo: '/demo-petshop.mp3' },
+                  { nome: 'Supermercado', arquivo: '/demo-supermercado.mp3' },
+                  { nome: 'Veículos', arquivo: '/demo-veiculos.mp3' },
+                  { nome: 'Vinheta de rádio', arquivo: '/demo-vinheta-radio.mp3' },
+                ].map((demo) => (
+                  <div key={demo.arquivo} style={{ padding: '12px', borderRadius: '12px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.25)', minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '8px' }}>{demo.nome}</div>
+                    <audio controls preload="none" src={demo.arquivo} style={{ display: 'block', width: '100%', height: '38px' }}>
+                      Seu navegador não suporta áudio.
+                    </audio>
+                  </div>
+                ))}
+              </div>
+            </section>
             <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
               <label style={{ fontWeight: 700 }}>Nome</label>
               <input type="text" value={nomeCadastro} onChange={(e) => { setNomeCadastro(e.target.value); setErroCadastro('') }} placeholder="Seu nome" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
