@@ -626,6 +626,28 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
             <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
           </div>
           {erroAcesso && <p style={{ color: '#ff6b6b', marginTop: '14px', fontWeight: 600 }}>{erroAcesso}</p>}
+          {/* Demonstrações na tela inicial */}
+          <section style={{ margin: '24px 0', textAlign: 'left' }}>
+            <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd' }}>Ouça nossas demonstrações</h3>
+            <p style={{ textAlign: 'center', opacity: 0.75, fontSize: '14px', margin: '0 0 16px' }}>Conheça exemplos de locuções produzidas com a Fábrica da Voz.</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
+              {[
+                { nome: 'Igreja', arquivo: '/demo-igreja.mp3' },
+                { nome: 'Loja', arquivo: '/demo-loja.mp3' },
+                { nome: 'Pet shop', arquivo: '/demo-petshop.mp3' },
+                { nome: 'Supermercado', arquivo: '/demo-supermercado.mp3' },
+                { nome: 'Veículos', arquivo: '/demo-veiculos.mp3' },
+                { nome: 'Vinheta de rádio', arquivo: '/demo-vinheta-radio.mp3' },
+              ].map((demo) => (
+                <div key={demo.arquivo} style={{ padding: '12px', borderRadius: '12px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.25)', minWidth: 0 }}>
+                  <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '8px' }}>{demo.nome}</div>
+                  <audio controls preload="none" src={demo.arquivo} style={{ display: 'block', width: '100%', height: '38px' }}>
+                    Seu navegador não suporta áudio.
+                  </audio>
+                </div>
+              ))}
+            </div>
+          </section>
           <a
             href="https://wa.me/5512991581880"
             target="_blank"
