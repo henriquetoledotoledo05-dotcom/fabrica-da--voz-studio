@@ -626,6 +626,26 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
             <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
           </div>
           {erroAcesso && <p style={{ color: '#ff6b6b', marginTop: '14px', fontWeight: 600 }}>{erroAcesso}</p>}
+          {/* Criar minha conta — botão amarelo após entrar */}
+          <button
+            type="button"
+            onClick={() => { setMostrarCadastro(true); setErroCadastro('') }}
+            style={{
+              width: '100%',
+              padding: '14px',
+              marginTop: '16px',
+              border: '1px solid #facc15',
+              borderRadius: '11px',
+              cursor: 'pointer',
+              fontWeight: 800,
+              fontSize: '16px',
+              color: '#241800',
+              background: 'linear-gradient(135deg, #fde047, #facc15)',
+              boxShadow: '0 4px 14px rgba(250,204,21,0.22)'
+            }}
+          >
+            Criar minha conta
+          </button>
           {/* Demonstrações na tela inicial */}
           <section style={{ margin: '24px 0', textAlign: 'left' }}>
             <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd' }}>Ouça nossas demonstrações</h3>
@@ -685,7 +705,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
           <div style={{ margin: '26px 0', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
           <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda não tem uma conta?</p>
-          <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: '#171020' }}>Criar minha conta</button>
+          <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid #facc15', borderRadius: '11px', cursor: 'pointer', fontWeight: 800, fontSize: '16px', color: '#241800', background: 'linear-gradient(135deg, #fde047, #facc15)', boxShadow: '0 4px 14px rgba(250,204,21,0.22)' }}>Criar minha conta</button>
           <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>💳 Depois do cadastro, você poderá comprar créditos para gerar suas locuções.</p>
         </div>
       </div>
