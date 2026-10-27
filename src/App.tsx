@@ -649,6 +649,23 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
           {/* Demonstrações na tela inicial */}
           <section style={{ margin: '24px 0', textAlign: 'left' }}>
             <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd' }}>Ouça nossas demonstrações</h3>
+            <div style={{ textAlign: 'center', margin: '0 0 12px' }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  display: 'inline-block',
+                  fontSize: '32px',
+                  lineHeight: 1.2,
+                  animation: 'maozinhaApontando 0.8s ease-in-out infinite alternate'
+                }}
+              >
+                👇
+              </span>
+              <style>{`@keyframes maozinhaApontando {
+                from { transform: translateY(-2px); }
+                to { transform: translateY(7px); }
+              }`}</style>
+            </div>
             <p style={{ textAlign: 'center', opacity: 0.75, fontSize: '14px', margin: '0 0 16px' }}>Conheça exemplos de locuções produzidas com a Fábrica da Voz.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
               {[
