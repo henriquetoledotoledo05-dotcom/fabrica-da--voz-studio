@@ -550,13 +550,13 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   if (!acessoLiberado) {
     if (mostrarCadastro) {
       return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'linear-gradient(rgba(5,3,10,0.72), rgba(5,3,10,0.86)), url(/fundo-estudio.png) center center / cover fixed', color: '#fff' }}>
-          <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(13,9,22,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'linear-gradient(rgba(5,3,10,0.35), rgba(5,3,10,0.50)), url(/fundo-estudio.png) center center / cover fixed', color: '#fff' }}>
+          <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(13,9,22,0.68)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
             <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
             <h2 style={{ margin: '0 0 8px' }}>Criar sua conta</h2>
             <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a Fábrica da Voz.</p>
             <section style={{ marginBottom: '24px', textAlign: 'left' }}>
-              <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd' }}>Ouça nossas demonstrações</h3>
+              <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd', fontSize: '18px' }}>Ouça nossos demonstrativos</h3>
               <p style={{ textAlign: 'center', opacity: 0.75, fontSize: '14px', margin: '0 0 16px' }}>Conheça alguns exemplos de locuções produzidas com a Fábrica da Voz.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
                 {[
@@ -595,10 +595,10 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     }
 
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'linear-gradient(rgba(5,3,10,0.72), rgba(5,3,10,0.86)), url(/fundo-estudio.png) center center / cover fixed', color: '#fff' }}>
-        <div style={{ width: '100%', maxWidth: '760px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(13,9,22,0.82)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'linear-gradient(rgba(5,3,10,0.35), rgba(5,3,10,0.50)), url(/fundo-estudio.png) center center / cover fixed', color: '#fff' }}>
+        <div style={{ width: '100%', maxWidth: '760px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(13,9,22,0.68)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
           <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
-          <h2 style={{ margin: '0 0 8px', color: '#ffffff', fontSize: '30px', fontWeight: 800, textShadow: '0 2px 18px rgba(139,92,246,0.45)' }}>Entre na Fábrica da Voz</h2>
+          <h2 style={{ margin: '0 0 8px', color: '#ffffff', fontSize: '24px', fontWeight: 800, whiteSpace: 'nowrap', textShadow: '0 2px 18px rgba(139,92,246,0.45)' }}>Entre na Fábrica da Voz</h2>
           <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Crie sua conta ou entre para usar seu saldo de créditos.</p>
           <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
             <label style={{ fontWeight: 700 }}>E-mail</label>
@@ -651,7 +651,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               Quer ouvir nossas vozes?
             </div>
             <div style={{ color: '#d8c4f5', fontSize: '13px', lineHeight: 1.5 }}>
-              Deslize para baixo e confira as demonstrações!
+              Deslize para baixo e ouça os demonstrativos!
             </div>
             <div style={{ color: '#c084fc', fontSize: '27px', lineHeight: 1.2, animation: 'indicacaoScrollVoz 1.2s ease-in-out infinite', marginTop: '5px' }} aria-hidden="true">
               ↓
@@ -696,8 +696,8 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               <path d="M150 81 Q180 105 210 81" fill="none" stroke="#9333ea" strokeWidth="4" strokeLinecap="round" />
             </svg>
 
-            <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#ffffff', fontSize: '25px', lineHeight: 1.2, fontWeight: 800 }}>
-              Ouça nossas demonstrações
+            <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd', fontSize: '19px', lineHeight: 1.3, fontWeight: 800 }}>
+              Ouça nossos demonstrativos
             </h3>
 
             <p style={{ color: '#d1c5e8', fontSize: '14px', lineHeight: 1.6, margin: '0 auto 18px', maxWidth: '420px' }}>
