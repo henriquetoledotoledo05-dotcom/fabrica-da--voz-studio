@@ -2968,6 +2968,22 @@ const gerarVoz = async () => {
               ))}
             </select>
 
+            {vozRadioIA !== 'auto' && (() => {
+              const vozDemo = vozes.find(voz => voz.id === vozRadioIA);
+              return vozDemo ? (
+                <div style={{ marginTop: '-8px', marginBottom: '22px', padding: '14px', borderRadius: '12px', background: 'rgba(125,211,252,0.08)', border: '1px solid rgba(125,211,252,0.25)' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '8px', color: '#bae6fd' }}>
+                    Ouça a demonstração de {vozDemo.nome
+                    }
+                  </div>
+                  <audio controls preload="none" src={vozDemo.demonstrativo} style={{ width: '100%' }} />
+                  <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '6px' }}>
+                    Demonstração gratuita — não consome créditos.
+                  </div>
+                </div>
+              ) : null;
+            })()}
+
             <button type="button" onClick={() => void gerarVinhetasRadioIA()} disabled={gerandoVinhetasRadioIA} style={{ width: '100%', padding: '15px', border: 0, borderRadius: '12px', background: gerandoVinhetasRadioIA ? '#334155' : '#0284c7', color: '#fff', fontWeight: 800, fontSize: '16px', cursor: gerandoVinhetasRadioIA ? 'wait' : 'pointer', opacity: gerandoVinhetasRadioIA ? 0.75 : 1 }}>
               {gerandoVinhetasRadioIA ? 'Gerando suas vinhetas...' : 'Gerar 5 vinhetas — 5 créditos'}
             </button>
