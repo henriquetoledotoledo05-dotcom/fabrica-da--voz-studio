@@ -2233,6 +2233,290 @@ app.post("/api/gerar-jingle-dj", async (req, res) => {
     });
   }
 });
+app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
+  let usuarioId = null;
+  let creditosReservados = 0;
+
+  try {
+    const {
+      nomeRadio,
+      slogan,
+      estilo,
+      voiceId
+    } = req.body || {};
+
+    const nome = typeof nomeRadio === "string" ? nomeRadio.trim() : "";
+    const assinatura = typeof slogan === "string" ? slogan.trim() : "";
+    const estilosPermitidos = [
+      "popular", "sertanejo", "jovem", "gospel", "adulta", "moderna"
+    ];
+
+    const vozesPermitidas = [
+      "rz25pon9uanPpUGOW98Y", "cxaKsaoZvZoce6kBBu0n",
+      "rpNe0HOx7heUulPiOEaG", "0utPdY4y5ppoXQxzubar",
+      "xyyAflT5WWJ3HeqszUn0", "xqmVsyH6TEc0qQYSNT8P",
+      "B7HqRIxroDpybJI9vXMj", "a5zGngtwpITbxmy3Sekk",
+      "DQRaZFBAlsnenMlFVe0R", "g2E836wHBXhsWq15NkoD",
+      "8Rw0UhFNLhw1t75pidLJ", "3T1fxRR4KTmnl9K43DtE",
+      "Tkf2paIF3z04RS9egsf2", "myEJoaX0UkuoJmX7w2Rf",
+      "qn85SVnJvSWg5wutkjZa", "u1vCfFgLgJ3YbJEqXmbf",
+      "exVv2CbwvTu1WNVuSWXs", "gyiJ08WU9Wi2LNY7nTcB",
+      "Oxtl4GQ22m0Q0rh8YGCI", "0Np4P6bO9DGhECZoT8Ls",
+      "qPAKBzRQkQs6EIhLSbMi", "UaeEQHfiDI8l58WWXiwS",
+      "oQL5kq26ctJzupM0mJot", "mmUpm90TBHi5276nYDJk",
+      "GiNbP6xPhrH6X8DJBD08", "g0iauLqQtYFe6LlIx8oy",
+      "QbKKWw1Bp1k0ycDNqoY7"
+    ];
+
+    if (!nome || nome.length > 60) {
+      return res.status(400).json({
+        erro: "Informe o nome da rádio, com no máximo 60 caracteres."
+      });
+    }
+
+    if (assinatura.length > 100) {
+      return res.status(400).json({
+        erro: "O slogan deve ter no máximo 100 caracteres."
+      });
+    }
+
+    if (!estilosPermitidos.includes(estilo)) {
+      return res.status(400).json({ erro: "Estilo de rádio inválido." });
+    }
+
+    if (voiceId !== "auto" &&
+        (typeof voiceId !== "string" || !vozesPermitidas.includes(voiceId))) {
+      return res.status(400).json({ erro: "Selecione uma voz válida." });
+    }
+
+    if (!openai || !process.env.ELEVENLABS_API_KEY) {
+      return res.status(503).json({
+        erro: "Serviço de geração indisponível. Nenhum crédito foi consumido."
+      });
+    }
+
+    const usuario = await autenticarUsuario(req);
+    usuarioId = usuario.id;
+
+    const verificacao = await openai.moderations.create({
+      model: "omni-moderation-latest",
+      input: nome + ". " + assinatura
+    });
+
+    if (verificacao.results?.[0]?.flagged) {
+      return res.status(400).json({
+        erro: "Os dados informados precisam ser revisados. Nenhum crédito foi consumido."
+      });
+    }
+
+    const respostaRoteiros = await openai.responses.create({
+      model: "gpt-5.6-luna",
+      instructions: [
+        "Você é diretor de criação de uma rádio brasileira.",
+        "Crie exatamente cinco chamadas de identificação de emissora.",
+        "Escreva em português brasileiro natural, para locução profissional.",
+        "Cada chamada deve ser curta, distinta e ter entre 8 e 14 palavras.",
+        "Use o nome da rádio em todas as chamadas.",
+        "Use o slogan quando fornecido, sem forçar sua inclusão em todas.",
+        "Não invente frequências, cidades, prêmios ou informações não fornecidas.",
+        "Adapte a linguagem ao estilo informado.",
+        "Retorne somente um array JSON com cinco strings, sem Markdown."
+      ].join(" "),
+      input: JSON.stringify({
+        radio: nome,
+        slogan: assinatura,
+        estilo
+      })
+    });
+
+    let roteiros;
+    try {
+      let textoJSON = respostaRoteiros.output_text?.trim() || "";
+      textoJSON = textoJSON
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/, "");
+      roteiros = JSON.parse(textoJSON);
+    } catch {
+      throw new Error("Não foi possível preparar os cinco roteiros. Tente novamente.");
+    }
+
+    if (
+      !Array.isArray(roteiros) ||
+      roteiros.length !== 5 ||
+      !roteiros.every(
+        item => typeof item === "string" &&
+          item.trim().length >= 5 &&
+          item.trim().length <= 180
+      )
+    ) {
+      throw new Error("A IA não retornou cinco roteiros válidos. Tente novamente.");
+    }
+
+
+    await consumirCreditos(usuarioId, 5);
+    creditosReservados = 5;
+
+    const vozEscolhida = voiceId === "auto"
+      ? vozesPermitidas[Math.floor(Math.random() * vozesPermitidas.length)]
+      : voiceId;
+
+    const titulos = [
+      "Assinatura da rádio",
+      "Identidade sonora",
+      "Chamada de programação",
+      "Vinheta de impacto",
+      "Encerramento da emissora"
+    ];
+
+    const vinhetas = [];
+    const falhas = [];
+
+    for (let i = 0; i < roteiros.length; i++) {
+      try {
+        const respostaAudio = await fetch(
+          "https://api.elevenlabs.io/v1/text-to-speech/" +
+            encodeURIComponent(vozEscolhida),
+          {
+            method: "POST",
+            headers: {
+              "xi-api-key": process.env.ELEVENLABS_API_KEY,
+              "Content-Type": "application/json",
+              "Accept": "audio/mpeg"
+            },
+            body: JSON.stringify({
+              text: roteiros[i].trim(),
+              model_id: "eleven_v3",
+              language_code: "pt",
+              voice_settings: {
+                stability: 0.42,
+                style: 0
+              },
+              output_format: "mp3_44100_128"
+            })
+          }
+        );
+
+        if (!respostaAudio.ok) {
+          const detalhe = (await respostaAudio.text()).slice(0, 300);
+          console.error("VINHETAS RADIO IA - erro ElevenLabs:", detalhe);
+          throw new Error("Falha na geração do áudio.");
+        }
+
+        let audio = Buffer.from(await respostaAudio.arrayBuffer());
+
+        if (!audio.length) {
+          throw new Error("Áudio vazio.");
+        }
+
+        // Efeito sutil e independente dos efeitos exclusivos do DJ Express.
+        try {
+          audio = await aplicarReverbDireto(audio, 15);
+        } catch (erroEfeito) {
+          console.warn("VINHETAS RADIO IA - reverb ignorado:", erroEfeito.message);
+        }
+
+        try {
+          audio = await adicionarCaudaSilencio(audio, 0.25);
+        } catch (erroCauda) {
+          console.warn("VINHETAS RADIO IA - cauda ignorada:", erroCauda.message);
+        }
+
+        vinhetas.push({
+          titulo: titulos[i],
+          texto: roteiros[i].trim(),
+          audioBase64: audio.toString("base64")
+        });
+      } catch (erroAudio) {
+        console.error(
+          `VINHETAS RADIO IA - falha no áudio ${i + 1}:`,
+          erroAudio.message
+        );
+        falhas.push(i + 1);
+      }
+    }
+
+    const creditosADevolver = 5 - vinhetas.length;
+    let devolucaoConfirmada = creditosADevolver === 0;
+
+    if (creditosADevolver > 0) {
+      const saldoDevolucao = await devolverCreditos(
+        usuarioId,
+        creditosADevolver
+      );
+
+      devolucaoConfirmada =
+        typeof saldoDevolucao === "number" &&
+        Number.isFinite(saldoDevolucao);
+
+      if (!devolucaoConfirmada) {
+        console.error(
+          "VINHETAS RADIO IA - ATENÇÃO: não foi possível confirmar a devolução.",
+          { usuarioId, creditosADevolver }
+        );
+      }
+    }
+
+    // Impede uma segunda devolução no bloco catch.
+    creditosReservados = 0;
+
+    if (vinhetas.length === 0) {
+      return res.status(500).json({
+        erro: devolucaoConfirmada
+          ? "Nenhuma vinheta foi gerada. Os cinco créditos foram devolvidos."
+          : "Nenhuma vinheta foi gerada. Não foi possível confirmar a devolução automática; entre em contato com o suporte.",
+        creditosConsumidos: 0,
+        creditosDevolvidos: devolucaoConfirmada ? 5 : 0
+      });
+    }
+
+    return res.json({
+      vinhetas,
+      creditosConsumidos: vinhetas.length,
+      creditosDevolvidos: devolucaoConfirmada ? creditosADevolver : 0,
+      devolucaoConfirmada,
+      aviso: !devolucaoConfirmada
+        ? "A devolução dos créditos dos áudios que falharam precisa ser conferida pelo suporte."
+        : undefined
+    });
+  } catch (erro) {
+    console.error("VINHETAS RADIO IA - falha na operação:", erro);
+
+    if (usuarioId && creditosReservados > 0) {
+      try {
+        const saldoDevolucao = await devolverCreditos(
+          usuarioId,
+          creditosReservados
+        );
+
+        if (typeof saldoDevolucao === "number" &&
+            Number.isFinite(saldoDevolucao)) {
+          creditosReservados = 0;
+        } else {
+          console.error(
+            "VINHETAS RADIO IA - ATENÇÃO: devolução não confirmada.",
+            saldoDevolucao
+          );
+        }
+      } catch (erroDevolucao) {
+        console.error(
+          "VINHETAS RADIO IA - falha na devolução:",
+          erroDevolucao
+        );
+      }
+    }
+
+    if (res.headersSent) return;
+
+    const mensagem = erro?.message || "Não foi possível gerar as vinhetas.";
+    const semCreditos = /cr[eé]ditos insuficientes/i.test(mensagem);
+
+    return res.status(semCreditos ? 402 : 500).json({
+      erro: semCreditos
+        ? "Você não possui cinco créditos disponíveis para este pacote."
+        : mensagem
+    });
+  }
+});
 app.post(
   "/api/mixar-voz",
   async (req, res) => {

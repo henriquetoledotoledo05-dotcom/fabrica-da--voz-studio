@@ -248,6 +248,13 @@ function App() {
 }
 
 
+  const [mostrarVinhetasRadioIA, setMostrarVinhetasRadioIA] = useState(false)
+  const [nomeRadioIA, setNomeRadioIA] = useState('')
+  const [sloganRadioIA, setSloganRadioIA] = useState('')
+  const [estiloRadioIA, setEstiloRadioIA] = useState('popular')
+  const [vozRadioIA, setVozRadioIA] = useState('auto')
+  const [gerandoVinhetasRadioIA, setGerandoVinhetasRadioIA] = useState(false)
+  const [vinhetasRadioIA, setVinhetasRadioIA] = useState<Array<{ titulo: string; texto: string; audioUrl: string }>>([])
   const [mostrarDJExpress, setMostrarDJExpress] = useState(false)
   const [mostrarFabricaStudio, setMostrarFabricaStudio] = useState(false)
 const [studioVozArquivo, setStudioVozArquivo] = useState<File | null>(null)
@@ -1436,6 +1443,104 @@ const gerarVoz = async () => {
     }
   }
   // =====================================================
+  const gerarVinhetasRadioIA = async () => {
+    const nomeLimpo = nomeRadioIA.trim();
+    const sloganLimpo = sloganRadioIA.trim();
+
+    if (!nomeLimpo) {
+      alert("Digite o nome da rádio.");
+      return;
+    }
+
+    if (nomeLimpo.length > 60 || sloganLimpo.length > 100) {
+      alert("Confira os limites do nome e do slogan.");
+      return;
+    }
+
+    if (gerandoVinhetasRadioIA) return;
+
+    setGerandoVinhetasRadioIA(true);
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        throw new Error("Faça login para gerar as vinhetas.");
+      }
+
+      const resposta = await fetch("/api/gerar-vinhetas-radio-ia", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          nomeRadio: nomeLimpo,
+          slogan: sloganLimpo,
+          estilo: estiloRadioIA,
+          voiceId: vozRadioIA,
+        }),
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        await carregarCreditos();
+        throw new Error(dados.erro || "Não foi possível gerar as vinhetas.");
+      }
+
+      if (!Array.isArray(dados.vinhetas) || dados.vinhetas.length === 0) {
+        await carregarCreditos();
+        throw new Error("O servidor não retornou nenhum áudio.");
+      }
+
+      const novasVinhetas = dados.vinhetas.map(
+        (item: { titulo: string; texto: string; audioBase64: string }) => {
+          const binario = atob(item.audioBase64);
+          const bytes = new Uint8Array(binario.length);
+
+          for (let i = 0; i < binario.length; i++) {
+            bytes[i] = binario.charCodeAt(i);
+          }
+
+          const blob = new Blob([bytes], { type: "audio/mpeg" });
+
+          return {
+            titulo: item.titulo,
+            texto: item.texto,
+            audioUrl: URL.createObjectURL(blob),
+          };
+        }
+      );
+
+      setVinhetasRadioIA((anteriores) => {
+        anteriores.forEach((item) => URL.revokeObjectURL(item.audioUrl));
+        return novasVinhetas;
+      });
+
+      await carregarCreditos();
+
+      if (dados.aviso) {
+        alert(dados.aviso);
+      } else {
+        alert(
+          `Foram entregues ${novasVinhetas.length} vinheta(s). ` +
+          `Créditos consumidos: ${dados.creditosConsumidos}.`
+        );
+      }
+    } catch (erro) {
+      console.error("Erro ao gerar vinhetas de rádio IA:", erro);
+
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível gerar as vinhetas."
+      );
+    } finally {
+      setGerandoVinhetasRadioIA(false);
+    }
+  };
   // TRILHAS POR ESTILO
   // =====================================================
 
@@ -2823,6 +2928,72 @@ const gerarVoz = async () => {
   }
   // =====================================================
   // =====================================================
+  if (mostrarVinhetasRadioIA) {
+    return (
+      <div style={{ minHeight: '100vh', padding: '32px 20px 48px', boxSizing: 'border-box', background: 'radial-gradient(ellipse at top, #102338 0%, #100b16 48%, #08080c 100%)', color: '#fff' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <button type="button" onClick={() => setMostrarVinhetasRadioIA(false)} style={{ border: '1px solid rgba(125,211,252,0.35)', borderRadius: '12px', padding: '10px 15px', color: '#bae6fd', background: '#102338', cursor: 'pointer', marginBottom: '22px', fontWeight: 700 }}>
+            Voltar ao menu
+          </button>
+
+          <h1 style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 900, marginBottom: '8px' }}>
+            VINHETAS DE <span style={{ color: '#7dd3fc' }}>RÁDIO IA</span>
+          </h1>
+          <p style={{ color: '#cbd5e1', marginTop: 0, lineHeight: 1.6 }}>
+            Crie cinco vinhetas curtas para identificar e destacar sua rádio.
+          </p>
+
+          <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(16,35,56,0.95), rgba(18,14,25,0.98))' }}>
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="nome-radio-ia">Nome da rádio *</label>
+            <input id="nome-radio-ia" value={nomeRadioIA} onChange={e => setNomeRadioIA(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="slogan-radio-ia">Slogan (opcional)</label>
+            <input id="slogan-radio-ia" value={sloganRadioIA} onChange={e => setSloganRadioIA(e.target.value)} maxLength={100} placeholder="Ex.: A rádio que é sucesso!" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="estilo-radio-ia">Estilo da rádio</label>
+            <select id="estilo-radio-ia" value={estiloRadioIA} onChange={e => setEstiloRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
+              <option value="popular">Popular / comercial</option>
+              <option value="sertanejo">Sertanejo</option>
+              <option value="jovem">Jovem / pop</option>
+              <option value="gospel">Gospel</option>
+              <option value="adulta">Adulto / elegante</option>
+              <option value="moderna">Moderna / energética</option>
+            </select>
+
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="voz-radio-ia">Voz do locutor</label>
+            <select id="voz-radio-ia" value={vozRadioIA} onChange={e => setVozRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '22px' }}>
+              <option value="auto">Escolha automática</option>
+              {vozes.map(voz => (
+                <option key={voz.id} value={voz.id}>{voz.nome}</option>
+              ))}
+            </select>
+
+            <button type="button" onClick={() => void gerarVinhetasRadioIA()} disabled={gerandoVinhetasRadioIA} style={{ width: '100%', padding: '15px', border: 0, borderRadius: '12px', background: gerandoVinhetasRadioIA ? '#334155' : '#0284c7', color: '#fff', fontWeight: 800, fontSize: '16px', cursor: gerandoVinhetasRadioIA ? 'wait' : 'pointer', opacity: gerandoVinhetasRadioIA ? 0.75 : 1 }}>
+              {gerandoVinhetasRadioIA ? 'Gerando suas vinhetas...' : 'Gerar 5 vinhetas — 5 créditos'}
+            </button>
+
+            <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.6, marginBottom: 0 }}>
+              Pacote planejado: 5 vinhetas por 5 créditos. Você só deverá pagar pelas vinhetas entregues.
+            </p>
+          </div>
+
+          {vinhetasRadioIA.length > 0 && (
+            <div style={{ marginTop: '24px' }}>
+              <h2>Suas vinhetas</h2>
+              {vinhetasRadioIA.map((vinheta, indice) => (
+                <div key={`${vinheta.titulo}-${indice}`} style={{ marginTop: '14px', padding: '16px', borderRadius: '12px', background: '#111827', border: '1px solid #334155' }}>
+                  <h3>{vinheta.titulo}</h3>
+                  <p>{vinheta.texto}</p>
+                  <audio controls src={vinheta.audioUrl} style={{ width: '100%' }} />
+                  <a href={vinheta.audioUrl} download={`${vinheta.titulo}.mp3`} style={{ display: 'inline-block', marginTop: '10px', color: '#7dd3fc' }}>Baixar MP3</a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
   // FABRICA_STUDIO_TELA
   if (mostrarFabricaStudio) {
     return (
@@ -3493,6 +3664,26 @@ const gerarVoz = async () => {
 
       </button>
 
+      <button type="button" onClick={() => { setMostrarVinhetasRadioIA(true); }} style={{
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
+        border: '1px solid #0ea5e9',
+        background: 'linear-gradient(145deg, #102338, #09070d)',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
+      }}>
+        <span style={{
+          width: '46px', height: '46px', flex: '0 0 46px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '13px', background: '#163653',
+          color: '#7dd3fc', fontSize: '24px'
+        }}>&#128251;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Vinhetas de Rádio IA<span style={{background: "#7dd3fc", color: "#102338", fontSize: "11px", fontWeight: 900, padding: "4px 7px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie 5 vinhetas para sua rádio.</span>
+        </span>
+      </button>
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
