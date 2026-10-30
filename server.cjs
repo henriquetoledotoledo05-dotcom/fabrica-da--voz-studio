@@ -2019,12 +2019,13 @@ Regras:
 
 // =====================================================
 // DJ EXPRESS - GERACAO DE JINGLES COM EFEITOS
-// Custo fixo: 2 creditos por jingle
+// Custo: 1 credito a cada 100 caracteres
 // =====================================================
 
 app.post("/api/gerar-jingle-dj", async (req, res) => {
   let usuarioId = null;
   let creditosConsumidos = 0;
+  let custoDJ = 1;
 
   try {
     const { texto, nomeDJ, voiceId, estilo } = req.body || {};
@@ -2131,9 +2132,16 @@ app.post("/api/gerar-jingle-dj", async (req, res) => {
     const usuario = await autenticarUsuario(req);
     usuarioId = usuario.id;
 
-    const CUSTO_DJ = 2;
-    await consumirCreditos(usuarioId, CUSTO_DJ);
-    creditosConsumidos = CUSTO_DJ;
+    custoDJ = Math.ceil(textoLimpo.length / 100);
+    await consumirCreditos(usuarioId, custoDJ);
+    creditosConsumidos = custoDJ;
+
+    console.log(
+      "DJ EXPRESS - caracteres:",
+      textoLimpo.length,
+      "| creditos cobrados:",
+      custoDJ
+    );
 
     const textoParaVoz = "[excited] " + nomeLimpo + "! " + textoLimpo;
 
@@ -2228,7 +2236,7 @@ app.post("/api/gerar-jingle-dj", async (req, res) => {
 
     return res.status(semCreditos ? 402 : 500).json({
       erro: semCreditos
-        ? "Voce nao possui creditos suficientes. Sao necessarios 2 creditos."
+        ? `Voce nao possui creditos suficientes. Sao necessarios ${custoDJ} creditos.`
         : mensagem
     });
   }

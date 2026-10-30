@@ -2674,13 +2674,15 @@ const gerarVoz = async () => {
 
   if (mostrarDJExpress) {
     const estilosDJ = [
-      { id: 'pancadao', nome: 'Pancadão', descricao: 'Voz forte e impacto curto', simbolo: '💥' },
-      { id: 'reiDaPista', nome: 'Rei da Pista', descricao: 'Voz poderosa e final marcante', simbolo: '👑' },
-      { id: 'fantasma', nome: 'Fantasma', descricao: 'Eco longo e misterioso', simbolo: '👻' },
-      { id: 'explosao', nome: 'Explosão', descricao: 'Impacto no começo e no fim', simbolo: '⚡' },
-      { id: 'assinaturaDJ', nome: 'Assinatura DJ', descricao: 'Destaque para o nome artístico', simbolo: '🎧' },
-      { id: 'alerta', nome: 'Alerta', descricao: 'Chamada intensa e vibrante', simbolo: '🚨' },
+      { id: 'pancadao', nome: 'Pancadão', descricao: 'Voz forte e impacto curto', simbolo: '💥', arquivo: 'pancadão.mp3' },
+      { id: 'reiDaPista', nome: 'Rei da Pista', descricao: 'Voz poderosa e final marcante', simbolo: '👑', arquivo: 'rei das pistas.mp3' },
+      { id: 'fantasma', nome: 'Fantasma', descricao: 'Eco longo e misterioso', simbolo: '👻', arquivo: 'fantasma.mp3' },
+      { id: 'explosao', nome: 'Explosão', descricao: 'Impacto no começo e no fim', simbolo: '⚡', arquivo: 'explosão.mp3' },
+      { id: 'assinaturaDJ', nome: 'Assinatura DJ', descricao: 'Destaque para o nome artístico', simbolo: '🎧', arquivo: 'assinatura dj.mp3' },
+      { id: 'alerta', nome: 'Alerta', descricao: 'Chamada intensa e vibrante', simbolo: '🚨', arquivo: 'alerta.mp3' },
     ]
+
+    const creditosDJ = Math.max(1, Math.ceil(textoDJ.trim().length / 100))
 
     return (
       <div style={{
@@ -2731,7 +2733,7 @@ const gerarVoz = async () => {
               Crie sua vinheta com efeitos exclusivos
             </p>
             <p style={{ color: '#facc15', fontWeight: 800, marginBottom: 0 }}>
-              2 créditos por geração · Até 800 caracteres
+              {creditosDJ} crédito(s) por geração · 1 crédito a cada 100 caracteres
             </p>
           </div>
 
@@ -2822,27 +2824,57 @@ const gerarVoz = async () => {
                 {estilosDJ.map((estilo) => {
                   const selecionado = estiloDJ === estilo.id
                   return (
-                    <button
+                    <div
                       key={estilo.id}
-                      type="button"
-                      onClick={() => setEstiloDJ(estilo.id)}
                       style={{
-                        minWidth: 0,
-                        textAlign: 'left',
-                        padding: '14px',
+                        display: 'grid',
+                        gap: '9px',
+                        padding: '10px',
                         borderRadius: '14px',
                         border: selecionado ? '2px solid #facc15' : '1px solid #5b3a70',
                         background: selecionado ? '#43205b' : '#191120',
-                        color: '#fff',
-                        cursor: 'pointer',
                       }}
                     >
-                      <span style={{ fontSize: '22px' }}>{estilo.simbolo}</span>
-                      <div style={{ fontWeight: 800, marginTop: '5px' }}>{estilo.nome}</div>
-                      <div style={{ color: '#d8c8e5', fontSize: '13px', marginTop: '4px' }}>
-                        {estilo.descricao}
+                      <button
+                        type="button"
+                        onClick={() => setEstiloDJ(estilo.id)}
+                        style={{
+                          minWidth: 0,
+                          textAlign: 'left',
+                          padding: '6px',
+                          border: 0,
+                          background: 'transparent',
+                          color: '#fff',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <span style={{ fontSize: '22px' }}>{estilo.simbolo}</span>
+                        <div style={{ fontWeight: 800, marginTop: '5px' }}>
+                          {estilo.nome}
+                        </div>
+                        <div style={{ color: '#d8c8e5', fontSize: '13px', marginTop: '4px' }}>
+                          {estilo.descricao}
+                        </div>
+                        <div style={{
+                          color: selecionado ? '#facc15' : '#c4b5d0',
+                          fontSize: '12px',
+                          marginTop: '7px',
+                          fontWeight: 800,
+                        }}>
+                          {selecionado ? '✓ EFEITO SELECIONADO' : 'SELECIONAR EFEITO'}
+                        </div>
+                      </button>
+
+                      <div style={{ color: '#d8b4fe', fontSize: '12px', fontWeight: 700 }}>
+                        OUÇA COMO FICA:
                       </div>
-                    </button>
+                      <audio
+                        controls
+                        preload="none"
+                        src={`/dj%20express/${encodeURIComponent(estilo.arquivo)}`}
+                        style={{ width: '100%', height: '36px' }}
+                      />
+                    </div>
                   )
                 })}
               </div>
@@ -2891,7 +2923,7 @@ const gerarVoz = async () => {
                 opacity: gerandoDJ ? 0.75 : 1,
               }}
             >
-              {gerandoDJ ? 'GERANDO SUA VINHETA...' : '🎙️ GERAR VINHETA · 2 CRÉDITOS'}
+              {gerandoDJ ? 'GERANDO SUA VINHETA...' : `🎙️ GERAR VINHETA · ${creditosDJ} CRÉDITO(S)`}
             </button>
 
             {audioDJUrl && (
