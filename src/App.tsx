@@ -254,6 +254,8 @@ function App() {
   const [temaRadioIA, setTemaRadioIA] = useState('')
   const [estiloRadioIA, setEstiloRadioIA] = useState('popular')
   const [vozRadioIA, setVozRadioIA] = useState('auto')
+  const [quantidadeRadioIA, setQuantidadeRadioIA] = useState(5)
+  const [modoAudioRadioIA, setModoAudioRadioIA] = useState('completo')
   const [gerandoVinhetasRadioIA, setGerandoVinhetasRadioIA] = useState(false)
   const [vinhetasRadioIA, setVinhetasRadioIA] = useState<Array<{ titulo: string; texto: string; audioUrl: string }>>([])
   const [mostrarDJExpress, setMostrarDJExpress] = useState(false)
@@ -1482,6 +1484,8 @@ const gerarVoz = async () => {
           tema: temaRadioIA.trim(),
           estilo: estiloRadioIA,
           voiceId: vozRadioIA,
+          quantidade: quantidadeRadioIA,
+          modoAudio: modoAudioRadioIA,
         }),
       });
 
@@ -2942,11 +2946,11 @@ const gerarVoz = async () => {
             VINHETAS DE <span style={{ color: '#7dd3fc' }}>RÁDIO IA</span>
           </h1>
           <p style={{ color: '#cbd5e1', marginTop: 0, lineHeight: 1.6 }}>
-            Crie cinco vinhetas curtas para identificar e destacar sua rádio.
+            Crie de 1 a 5 vinhetas curtas para identificar e destacar sua rádio.
           </p>
 
           <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(16,35,56,0.95), rgba(18,14,25,0.98))' }}>
-            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="nome-radio-ia">Nome da rádio *</label>
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="nome-radio-ia">Nome da rádio</label>
             <input id="nome-radio-ia" value={nomeRadioIA} onChange={e => setNomeRadioIA(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="slogan-radio-ia">Slogan (opcional)</label>
@@ -2963,6 +2967,17 @@ const gerarVoz = async () => {
               <option value="gospel">Gospel</option>
               <option value="adulta">Adulto / elegante</option>
               <option value="moderna">Moderna / energética</option>
+            </select>
+
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Quantidade de vinhetas</label>
+            <select value={quantidadeRadioIA} onChange={e => setQuantidadeRadioIA(Number(e.target.value))} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
+              {[1, 2, 3, 4, 5].map(qtd => <option key={qtd} value={qtd}>{qtd} {qtd === 1 ? 'vinheta' : 'vinhetas'}</option>)}
+            </select>
+
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Tipo de áudio</label>
+            <select value={modoAudioRadioIA} onChange={e => setModoAudioRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
+              <option value="completo">Mixagem completa com música e efeitos</option>
+              <option value="off">Somente OFF - voz sem música e efeitos</option>
             </select>
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="voz-radio-ia">Voz do locutor</label>
@@ -2989,12 +3004,15 @@ const gerarVoz = async () => {
               ) : null;
             })()}
 
+            <p style={{ color: "#bae6fd", fontWeight: 800, textAlign: "center", marginBottom: "12px" }}>
+              Você selecionou {quantidadeRadioIA} {quantidadeRadioIA === 1 ? "vinheta" : "vinhetas"} — {quantidadeRadioIA} {quantidadeRadioIA === 1 ? "crédito" : "créditos"}.
+            </p>
             <button type="button" onClick={() => void gerarVinhetasRadioIA()} disabled={gerandoVinhetasRadioIA} style={{ width: '100%', padding: '15px', border: 0, borderRadius: '12px', background: gerandoVinhetasRadioIA ? '#334155' : '#0284c7', color: '#fff', fontWeight: 800, fontSize: '16px', cursor: gerandoVinhetasRadioIA ? 'wait' : 'pointer', opacity: gerandoVinhetasRadioIA ? 0.75 : 1 }}>
-              {gerandoVinhetasRadioIA ? 'Gerando suas vinhetas...' : 'Gerar 5 vinhetas — 5 créditos'}
+              {gerandoVinhetasRadioIA ? 'Gerando suas vinhetas...' : 'GERAR VINHETAS AGORA'}
             </button>
 
             <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.6, marginBottom: 0 }}>
-              Pacote planejado: 5 vinhetas por 5 créditos. Você só deverá pagar pelas vinhetas entregues.
+              Cada vinheta entregue custa 1 crédito. Você só paga pelos áudios gerados com sucesso.
             </p>
           </div>
 

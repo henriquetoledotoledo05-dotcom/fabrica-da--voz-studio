@@ -2352,7 +2352,9 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
   let creditosReservados = 0;
 
   try {
-    const { nomeRadio, slogan, tema, estilo, voiceId } = req.body || {};
+    const { nomeRadio, slogan, tema, estilo, voiceId, quantidade, modoAudio } = req.body || {};
+    const quantidadeSolicitada = Number(quantidade ?? 5);
+    const modoAudioEscolhido = modoAudio ?? "completo";
 
     const nome = typeof nomeRadio === "string" ? nomeRadio.trim() : "";
     const assinatura = typeof slogan === "string" ? slogan.trim() : "";
@@ -2374,8 +2376,18 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
       "qPAKBzRQkQs6EIhLSbMi", "UaeEQHfiDI8l58WWXiwS",
       "oQL5kq26ctJzupM0mJot", "mmUpm90TBHi5276nYDJk",
       "GiNbP6xPhrH6X8DJBD08", "g0iauLqQtYFe6LlIx8oy",
-      "QbKKWw1Bp1k0ycDNqoY7"
+      "QbKKWw1Bp1k0ycDNqoY7",
+      "5ZHkTB2DBtlPdKeuCgxu",
+      "Gxi5hLxJ4skjTWK8XHBJ"
     ];
+
+    if (!Number.isInteger(quantidadeSolicitada) || quantidadeSolicitada < 1 || quantidadeSolicitada > 5) {
+      return res.status(400).json({ erro: "Escolha de 1 a 5 vinhetas." });
+    }
+
+    if (!["off", "completo"].includes(modoAudioEscolhido)) {
+      return res.status(400).json({ erro: "Tipo de ?udio inv?lido." });
+    }
 
     if (!nome || nome.length > 60) {
       return res.status(400).json({
@@ -2422,17 +2434,17 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
       model: "gpt-5.6-luna",
       instructions: [
         "Você é diretor de criação de uma rádio brasileira.",
-        "Crie exatamente cinco chamadas de identificação de emissora.",
+        `Crie exatamente ${quantidadeSolicitada} chamadas de identifica??o de emissora.`,
         "Escreva em português brasileiro natural, para locução profissional.",
         "Cada chamada deve ser curta, distinta e ter entre 8 e 14 palavras.",
         "Use o nome da rádio em todas as chamadas.",
         "Use o slogan quando fornecido, sem forçar sua inclusão em todas.",
-        "Se o campo tema estiver preenchido, crie as cinco chamadas seguindo esse tema com criatividade e coerência.",
-        "As cinco chamadas devem ser diferentes entre si, sem repetir frases ou ideias.",
+        `Se o campo tema estiver preenchido, crie as ${quantidadeSolicitada} chamadas seguindo esse tema com criatividade e coer?ncia.`,
+        "As chamadas devem ser diferentes entre si, sem repetir frases ou ideias.",
         "Se o tema estiver vazio, crie identificações gerais da rádio, como no funcionamento original.",
         "Não invente frequências, cidades, prêmios ou informações não fornecidas.",
         "Adapte a linguagem ao estilo informado.",
-        "Retorne somente um array JSON com cinco strings, sem Markdown."
+        `Retorne somente um array JSON com ${quantidadeSolicitada} strings, sem Markdown.`
       ].join(" "),
       input: JSON.stringify({
         radio: nome,
@@ -2455,7 +2467,7 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
 
     if (
       !Array.isArray(roteiros) ||
-      roteiros.length !== 5 ||
+      roteiros.length !== quantidadeSolicitada ||
       !roteiros.every(
         item => typeof item === "string" &&
           item.trim().length >= 5 &&
@@ -2466,8 +2478,8 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
     }
 
 
-    await consumirCreditos(usuarioId, 5);
-    creditosReservados = 5;
+    await consumirCreditos(usuarioId, quantidadeSolicitada);
+    creditosReservados = quantidadeSolicitada;
 
     const vozEscolhida = voiceId === "auto"
       ? vozesPermitidas[Math.floor(Math.random() * vozesPermitidas.length)]
@@ -2487,7 +2499,7 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
     const trilhasRadioIAUsadas = new Set();
     const efeitosRadioIAUsados = new Set();
 
-    for (let i = 0; i < roteiros.length; i++) {
+    for (let i = 0; i < quantidadeSolicitada; i++) {
       try {
         const respostaAudio = await fetch(
           "https://api.elevenlabs.io/v1/text-to-speech/" +
@@ -2524,20 +2536,22 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
           throw new Error("Áudio vazio.");
         }
 
-        // Efeito sutil e independente dos efeitos exclusivos do DJ Express.
-        try {
-          audio = await aplicarReverbDireto(audio, 15);
-        } catch (erroEfeito) {
-          console.warn("VINHETAS RADIO IA - reverb ignorado:", erroEfeito.message);
-        }
+        if (modoAudioEscolhido === "completo") {
+          // Mixagem completa original, preservada.
+          try {
+            audio = await aplicarReverbDireto(audio, 15);
+          } catch (erroEfeito) {
+            console.warn("VINHETAS RADIO IA - reverb ignorado:", erroEfeito.message);
+          }
 
-        try {
-          audio = await adicionarCaudaSilencio(audio, 0.25);
-        } catch (erroCauda) {
-          console.warn("VINHETAS RADIO IA - cauda ignorada:", erroCauda.message);
-        }
+          try {
+            audio = await adicionarCaudaSilencio(audio, 0.25);
+          } catch (erroCauda) {
+            console.warn("VINHETAS RADIO IA - cauda ignorada:", erroCauda.message);
+          }
 
-        audio = await mixarVinhetaRadioIA(audio, estilo, trilhasRadioIAUsadas, efeitosRadioIAUsados);
+          audio = await mixarVinhetaRadioIA(audio, estilo, trilhasRadioIAUsadas, efeitosRadioIAUsados);
+        }
 
         vinhetas.push({
           titulo: titulos[i],
@@ -2553,7 +2567,7 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
       }
     }
 
-    const creditosADevolver = 5 - vinhetas.length;
+    const creditosADevolver = quantidadeSolicitada - vinhetas.length;
     let devolucaoConfirmada = creditosADevolver === 0;
 
     if (creditosADevolver > 0) {
@@ -2583,7 +2597,7 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
           ? "Nenhuma vinheta foi gerada. Os cinco créditos foram devolvidos."
           : "Nenhuma vinheta foi gerada. Não foi possível confirmar a devolução automática; entre em contato com o suporte.",
         creditosConsumidos: 0,
-        creditosDevolvidos: devolucaoConfirmada ? 5 : 0
+        creditosDevolvidos: devolucaoConfirmada ? quantidadeSolicitada : 0
       });
     }
 
