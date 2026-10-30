@@ -251,6 +251,7 @@ function App() {
   const [mostrarVinhetasRadioIA, setMostrarVinhetasRadioIA] = useState(false)
   const [nomeRadioIA, setNomeRadioIA] = useState('')
   const [sloganRadioIA, setSloganRadioIA] = useState('')
+  const [temaRadioIA, setTemaRadioIA] = useState('')
   const [estiloRadioIA, setEstiloRadioIA] = useState('popular')
   const [vozRadioIA, setVozRadioIA] = useState('auto')
   const [gerandoVinhetasRadioIA, setGerandoVinhetasRadioIA] = useState(false)
@@ -1478,6 +1479,7 @@ const gerarVoz = async () => {
         body: JSON.stringify({
           nomeRadio: nomeLimpo,
           slogan: sloganLimpo,
+          tema: temaRadioIA.trim(),
           estilo: estiloRadioIA,
           voiceId: vozRadioIA,
         }),
@@ -2949,6 +2951,9 @@ const gerarVoz = async () => {
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="slogan-radio-ia">Slogan (opcional)</label>
             <input id="slogan-radio-ia" value={sloganRadioIA} onChange={e => setSloganRadioIA(e.target.value)} maxLength={100} placeholder="Ex.: A rádio que é sucesso!" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="tema-radio-ia">Tema das vinhetas (opcional)</label>
+            <input id="tema-radio-ia" value={temaRadioIA} onChange={e => setTemaRadioIA(e.target.value)} maxLength={120} placeholder="Ex.: Bom dia, Boa noite, Carnaval, Natal..." style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="estilo-radio-ia">Estilo da rádio</label>
             <select id="estilo-radio-ia" value={estiloRadioIA} onChange={e => setEstiloRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>

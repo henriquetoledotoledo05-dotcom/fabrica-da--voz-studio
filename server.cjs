@@ -2233,17 +2233,126 @@ app.post("/api/gerar-jingle-dj", async (req, res) => {
     });
   }
 });
+async function mixarVinhetaRadioIA(audioBuffer, estilo, trilhasUsadas, efeitosUsados) {
+  const base = path.join(__dirname, "public", "radio ia");
+
+  const categoriasPorEstilo = {
+    popular: ["variado", "radio", "eletronica"],
+    sertanejo: ["sertanejo"],
+    jovem: ["eletronica"],
+    gospel: ["gospel"],
+    adulta: ["romantico", "radio"],
+    moderna: ["eletronica"]
+  };
+
+  const categorias = categoriasPorEstilo[estilo] || ["variado", "radio"];
+
+  const trilhas = categorias.flatMap(categoria => {
+    const pasta = path.join(base, categoria);
+    if (!fs.existsSync(pasta)) return [];
+
+    return fs.readdirSync(pasta)
+      .filter(nome => /\.mp3$/i.test(nome))
+      .map(nome => path.join(pasta, nome));
+  });
+
+  if (!trilhas.length) {
+    throw new Error("Nenhuma trilha encontrada para o estilo " + estilo);
+  }
+
+  const pastaEfeitos = path.join(base, "efeito");
+  const efeitos = fs.existsSync(pastaEfeitos)
+    ? fs.readdirSync(pastaEfeitos)
+        .filter(nome => /\.mp3$/i.test(nome))
+        .map(nome => path.join(pastaEfeitos, nome))
+    : [];
+
+  function sortear(arquivos, usados) {
+    let disponiveis = arquivos.filter(arquivo => !usados.has(arquivo));
+
+    if (!disponiveis.length) {
+      usados.clear();
+      disponiveis = arquivos;
+    }
+
+    const escolhido = disponiveis[Math.floor(Math.random() * disponiveis.length)];
+    usados.add(escolhido);
+    return escolhido;
+  }
+
+  const trilha = sortear(trilhas, trilhasUsadas);
+  const efeito = efeitos.length ? sortear(efeitos, efeitosUsados) : null;
+
+  const args = [
+    "-hide_banner", "-loglevel", "error",
+    "-i", "pipe:0",
+    "-stream_loop", "-1", "-i", trilha
+  ];
+
+  if (efeito) args.push("-i", efeito);
+
+  let filtro =
+    "[0:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo,adelay=delays=2000:all=1,apad=pad_dur=2[voz];" +
+    "[1:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=0.14[trilha];";
+
+  if (efeito) {
+    filtro +=
+      "[2:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo," +
+      "atrim=duration=1.8,asetpts=PTS-STARTPTS,adelay=250|250,volume=0.22[fx];" +
+      "[voz][trilha][fx]amix=inputs=3:duration=first:dropout_transition=0:normalize=0," +
+      "alimiter=limit=0.95,areverse,afade=t=in:d=2,areverse[out]";
+  } else {
+    filtro +=
+      "[voz][trilha]amix=inputs=2:duration=first:dropout_transition=0:normalize=0," +
+      "alimiter=limit=0.95,areverse,afade=t=in:d=2,areverse[out]";
+  }
+
+  args.push(
+    "-filter_complex", filtro,
+    "-map", "[out]",
+    "-c:a", "libmp3lame",
+    "-b:a", "192k",
+    "-ar", "44100",
+    "-ac", "2",
+    "-f", "mp3",
+    "pipe:1"
+  );
+
+  return new Promise((resolve, reject) => {
+    const processo = spawn(ffmpegPath, args);
+    const partes = [];
+    let stderr = "";
+
+    processo.stdout.on("data", parte => partes.push(parte));
+    processo.stderr.on("data", parte => {
+      stderr += parte.toString();
+    });
+
+    processo.on("error", reject);
+
+    processo.stdin.on("error", erro => {
+      if (erro.code !== "EPIPE") reject(erro);
+    });
+
+    processo.on("close", codigo => {
+      const resultado = Buffer.concat(partes);
+
+      if (codigo === 0 && resultado.length > 0) {
+        resolve(resultado);
+      } else {
+        reject(new Error(stderr || "Falha na mixagem da vinheta Rádio IA."));
+      }
+    });
+
+    processo.stdin.end(audioBuffer);
+  });
+}
 app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
   let usuarioId = null;
   let creditosReservados = 0;
 
   try {
-    const {
-      nomeRadio,
-      slogan,
-      estilo,
-      voiceId
-    } = req.body || {};
+    const { nomeRadio, slogan, tema, estilo, voiceId } = req.body || {};
 
     const nome = typeof nomeRadio === "string" ? nomeRadio.trim() : "";
     const assinatura = typeof slogan === "string" ? slogan.trim() : "";
@@ -2318,6 +2427,9 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
         "Cada chamada deve ser curta, distinta e ter entre 8 e 14 palavras.",
         "Use o nome da rádio em todas as chamadas.",
         "Use o slogan quando fornecido, sem forçar sua inclusão em todas.",
+        "Se o campo tema estiver preenchido, crie as cinco chamadas seguindo esse tema com criatividade e coerência.",
+        "As cinco chamadas devem ser diferentes entre si, sem repetir frases ou ideias.",
+        "Se o tema estiver vazio, crie identificações gerais da rádio, como no funcionamento original.",
         "Não invente frequências, cidades, prêmios ou informações não fornecidas.",
         "Adapte a linguagem ao estilo informado.",
         "Retorne somente um array JSON com cinco strings, sem Markdown."
@@ -2325,6 +2437,7 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
       input: JSON.stringify({
         radio: nome,
         slogan: assinatura,
+        tema: typeof tema === "string" ? tema.trim().slice(0, 120) : "",
         estilo
       })
     });
@@ -2370,6 +2483,9 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
 
     const vinhetas = [];
     const falhas = [];
+
+    const trilhasRadioIAUsadas = new Set();
+    const efeitosRadioIAUsados = new Set();
 
     for (let i = 0; i < roteiros.length; i++) {
       try {
@@ -2420,6 +2536,8 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
         } catch (erroCauda) {
           console.warn("VINHETAS RADIO IA - cauda ignorada:", erroCauda.message);
         }
+
+        audio = await mixarVinhetaRadioIA(audio, estilo, trilhasRadioIAUsadas, efeitosRadioIAUsados);
 
         vinhetas.push({
           titulo: titulos[i],
