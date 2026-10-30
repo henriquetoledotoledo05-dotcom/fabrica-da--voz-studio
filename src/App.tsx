@@ -2967,6 +2967,10 @@ const gerarVoz = async () => {
               <option value="gospel">Gospel</option>
               <option value="adulta">Adulto / elegante</option>
               <option value="moderna">Moderna / energética</option>
+              <option value="forro">Forró</option>
+              <option value="esporte">Esporte</option>
+              <option value="noticias">Notícias</option>
+              <option value="natal">Natal</option>
             </select>
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Quantidade de vinhetas</label>

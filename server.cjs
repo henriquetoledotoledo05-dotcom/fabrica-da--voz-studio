@@ -2242,7 +2242,11 @@ async function mixarVinhetaRadioIA(audioBuffer, estilo, trilhasUsadas, efeitosUs
     jovem: ["eletronica"],
     gospel: ["gospel"],
     adulta: ["romantico", "radio"],
-    moderna: ["eletronica"]
+    moderna: ["eletronica"],
+    forro: ["forró"],
+    esporte: ["esporte"],
+    noticias: ["noticias"],
+    natal: ["natal"]
   };
 
   const categorias = categoriasPorEstilo[estilo] || ["variado", "radio"];
@@ -2359,7 +2363,8 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
     const nome = typeof nomeRadio === "string" ? nomeRadio.trim() : "";
     const assinatura = typeof slogan === "string" ? slogan.trim() : "";
     const estilosPermitidos = [
-      "popular", "sertanejo", "jovem", "gospel", "adulta", "moderna"
+      "popular", "sertanejo", "jovem", "gospel", "adulta", "moderna",
+      "forro", "esporte", "noticias", "natal"
     ];
 
     const vozesPermitidas = [
