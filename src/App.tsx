@@ -463,7 +463,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   const salvarNoHistorico = async (
     blob: Blob,
     tipo: string
-  ) => {
+  ): Promise<boolean> => {
     try {
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession()
@@ -471,8 +471,9 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       const usuario = sessionData.session?.user
 
       if (sessionError || !usuario) {
-        console.error('Não foi possível identificar o usuário para salvar o histórico.')
-        return
+        console.error('Falha ao identificar usuario:', sessionError)
+        alert('O audio foi gerado, mas nao foi possivel salva-lo no historico. Verifique sua sessao.')
+        return false
       }
 
       const id = crypto.randomUUID()
@@ -486,8 +487,9 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         })
 
       if (uploadError) {
-        console.error('Erro ao salvar áudio no Storage:', uploadError)
-        return
+        console.error('Falha no upload do historico:', uploadError)
+        alert('O audio foi gerado, mas nao foi possivel salva-lo no historico.')
+        return false
       }
 
       const { error: insertError } = await supabase
@@ -495,7 +497,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         .insert({
           id,
           user_id: usuario.id,
-          texto: texto.trim() || 'Áudio gerado',
+          texto: texto.trim() || 'Audio gerado',
           nome_voz: vozAtual.nome,
           estilo: estiloSelecionado,
           arquivo_path: caminho,
@@ -507,19 +509,25 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         })
 
       if (insertError) {
-        console.error('Erro ao registrar histórico:', insertError)
-        await supabase.storage
-          .from('historico-vinhetas')
-          .remove([caminho])
-        return
+        console.error('Falha ao registrar historico:', {
+          erro: insertError,
+          usuarioId: usuario.id,
+          arquivo: caminho,
+          tipo
+        })
+
+        alert('O audio foi gerado, mas nao foi possivel registrar no historico. O arquivo foi preservado no armazenamento.')
+        return false
       }
 
       await carregarHistorico()
+      return true
     } catch (erro) {
-      console.error('Erro ao salvar histórico:', erro)
+      console.error('Erro inesperado ao salvar historico:', erro)
+      alert('O audio foi gerado, mas ocorreu um erro ao salva-lo no historico.')
+      return false
     }
   }
-
   const excluirDoHistorico = async (item: HistoricoVinheta) => {
     const { error: storageError } = await supabase.storage
       .from('historico-vinhetas')
