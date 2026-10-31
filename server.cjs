@@ -32,22 +32,22 @@ app.use(express.json());
 const PORT = Number(process.env.PORT) || 3010;
 const PACOTES_CREDITOS = {
   credito1: {
-    titulo: "1 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dito",
+    titulo: "1 cr\u00e9dito",
     creditos: 1,
     valor: 4.90,
   },
   credito10: {
-    titulo: "10 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos",
+    titulo: "10 cr\u00e9ditos",
     creditos: 10,
     valor: 19.90,
   },
   credito50: {
-    titulo: "50 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos",
+    titulo: "50 cr\u00e9ditos",
     creditos: 50,
     valor: 69.90,
   },
   credito100: {
-    titulo: "100 crÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©ditos",
+    titulo: "100 cr\u00e9ditos",
     creditos: 100,
     valor: 119.90,
   },
