@@ -2359,6 +2359,44 @@ async function mixarVinhetaRadioIA(audioBuffer, estilo, trilhasUsadas, efeitosUs
     processo.stdin.end(audioBuffer);
   });
 }
+async function masterizarVinhetaRadioIA(audioBuffer) {
+  return new Promise((resolve, reject) => {
+    const processo = spawn(ffmpegPath, [
+      "-hide_banner", "-loglevel", "error",
+      "-i", "pipe:0",
+      "-af", "loudnorm=I=-14:TP=-1.5:LRA=11,volume=2dB,alimiter=limit=0.891",
+      "-c:a", "libmp3lame",
+      "-b:a", "192k",
+      "-ar", "44100",
+      "-ac", "2",
+      "-f", "mp3",
+      "pipe:1"
+    ]);
+
+    const partes = [];
+    let stderr = "";
+
+    processo.stdout.on("data", parte => partes.push(parte));
+    processo.stderr.on("data", parte => {
+      stderr += parte.toString();
+    });
+    processo.on("error", reject);
+    processo.stdin.on("error", erro => {
+      if (erro.code !== "EPIPE") reject(erro);
+    });
+    processo.on("close", codigo => {
+      const resultado = Buffer.concat(partes);
+      if (codigo === 0 && resultado.length > 0) {
+        resolve(resultado);
+      } else {
+        reject(new Error(stderr || "Falha na masterizacao."));
+      }
+    });
+
+    processo.stdin.end(audioBuffer);
+  });
+}
+
 app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
   let usuarioId = null;
   let creditosReservados = 0;
@@ -2564,6 +2602,12 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
           }
 
           audio = await mixarVinhetaRadioIA(audio, estilo, trilhasRadioIAUsadas, efeitosRadioIAUsados);
+        }
+
+        try {
+          audio = await masterizarVinhetaRadioIA(audio);
+        } catch (erroMasterizacao) {
+          console.warn("VINHETAS RADIO IA - masterizacao ignorada:", erroMasterizacao.message);
         }
 
         vinhetas.push({
