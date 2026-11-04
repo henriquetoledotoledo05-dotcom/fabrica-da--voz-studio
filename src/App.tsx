@@ -1970,7 +1970,48 @@ const gerarVoz = async () => {
 
       contexto = new AudioContextClass()
 
-      const voz = await contexto.decodeAudioData(vozBuffer.slice(0))
+      const vozOriginal = await contexto.decodeAudioData(vozBuffer.slice(0))
+
+// Remove o silencio excedente do final da locucao.
+const blocoAnalise = Math.floor(vozOriginal.sampleRate * 0.02)
+const margemFinal = Math.floor(vozOriginal.sampleRate * 0.08)
+const limiteSilencio = 0.008
+let ultimoSom = -1
+
+for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
+  const dados = vozOriginal.getChannelData(canal)
+
+  for (let fimBloco = dados.length; fimBloco > 0; fimBloco -= blocoAnalise) {
+    const inicioBloco = Math.max(0, fimBloco - blocoAnalise)
+    let pico = 0
+
+    for (let i = inicioBloco; i < fimBloco; i++) {
+      pico = Math.max(pico, Math.abs(dados[i]))
+    }
+
+    if (pico >= limiteSilencio) {
+      ultimoSom = Math.max(ultimoSom, fimBloco - 1)
+      break
+    }
+  }
+}
+
+const totalFrames = ultimoSom < 0
+  ? vozOriginal.length
+  : Math.min(vozOriginal.length, ultimoSom + margemFinal + 1)
+
+const voz = contexto.createBuffer(
+  vozOriginal.numberOfChannels,
+  totalFrames,
+  vozOriginal.sampleRate
+)
+
+for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
+  voz.copyToChannel(
+    vozOriginal.getChannelData(canal).subarray(0, totalFrames),
+    canal
+  )
+}
       const trilha = await contexto.decodeAudioData(trilhaBuffer.slice(0))
 
       // -----------------------------------------------------
