@@ -1,4 +1,4 @@
-import logoFabrica from './assets/logo-fabrica.png'
+﻿import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -3856,7 +3856,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       marginTop: '24px', marginBottom: '22px'
     }}>
 
-      <button type="button" onClick={() => { setMostrarEditor(true); window.setTimeout(() => document.querySelector('.vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} style={{
+      <button type="button" onClick={() => { setMostrarEditor(true); window.setTimeout(() => document.querySelector('.galeria-vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
         border: '1px solid #a855f7',
