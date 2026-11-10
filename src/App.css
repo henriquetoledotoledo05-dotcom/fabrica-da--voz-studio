@@ -3696,32 +3696,237 @@ main button[style*="height: 88px"]:hover {
 /* ===== FIM DO VISUAL PREMIUM ===== */
 
 
-/* AJUSTE COMPACTO DA GALERIA DE LOCUTORES */
-.galeria-vozes-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  gap: 12px !important;
-}
+/* =========================================================
+   F�BRICA DA VOZ � LISTA COMPACTA DE TRILHAS
+   Ajuste isolado da sele��o de trilhas
+   ========================================================= */
 
-.cartao-voz {
-  min-height: 68px !important;
-  padding: 7px !important;
+.trilha-item {
+  padding: 12px 14px !important;
+  margin-top: 0 !important;
+  border-radius: 12px !important;
+  border: 1px solid #393047 !important;
+  background: #17131f !important;
+  display: flex;
+  flex-direction: column;
   gap: 8px !important;
 }
 
-.cartao-voz-foto {
-  width: 48px !important;
-  height: 48px !important;
-  flex: 0 0 48px !important;
+.trilha-item strong {
+  color: #ffffff !important;
+  font-size: 14px !important;
+  margin-bottom: 0;
 }
 
-@media (max-width: 700px) {
+.trilha-item audio {
+  width: 100%;
+  height: 34px !important;
+  margin-top: 0 !important;
+}
+
+.trilha-item .botao-trilha {
+  width: 100%;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  margin-top: 0 !important;
+  border-radius: 9px !important;
+  font-size: 13px !important;
+}
+
+
+/* LISTA PRINCIPAL DE TRILHAS */
+.lista-trilhas-principal {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px !important;
+  margin-top: 14px !important;
+}
+
+.trilha-item-principal {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.trilha-item-principal:has(.botao-trilha.ativo) {
+  border-color: rgba(65, 160, 255, 0.65);
+  background: rgba(65, 160, 255, 0.07);
+}
+
+.trilha-item-principal strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.trilha-item-principal audio {
+  display: block;
+  width: 100%;
+  height: 38px;
+  margin-top: 0 !important;
+}
+
+.trilha-item-principal .botao-trilha {
+  width: 100%;
+  margin-top: 0 !important;
+  min-height: 38px;
+}
+
+
+/* GALERIA DE LOCUTORES - CARTOES RETANGULARES */
+.galeria-vozes {
+  width: 100%;
+  max-width: 100%;
+  margin: 16px 0 24px;
+  box-sizing: border-box;
+}
+
+.galeria-vozes-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  width: 100%;
+}
+
+.cartao-voz {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 88px !important;
+  padding: 12px 16px !important;
+  gap: 14px !important;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #21152f, #171020);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.cartao-voz:hover {
+  border-color: #a855f7;
+  background: linear-gradient(135deg, #302044, #21152f);
+  transform: translateY(-2px);
+}
+
+.cartao-voz.selecionada {
+  border: 2px solid #a855f7;
+  background: linear-gradient(135deg, rgba(139,92,246,0.24), #21152f);
+}
+
+.cartao-voz-foto {
+  width: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px !important;
+  object-fit: cover;
+  border-radius: 11px;
+}
+
+.cartao-voz-info {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.cartao-voz-info strong {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.cartao-voz-info small {
+  color: #c4b5d0;
+  font-size: 12px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.cartao-voz-play {
+  width: 36px !important;
+  height: 36px !important;
+  flex: 0 0 36px !important;
+  padding: 0;
+  border: 1px solid #a855f7;
+  border-radius: 50%;
+  background: #3b2452;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cartao-voz-confirmacao {
+  top: 5px;
+  right: 7px;
+}
+
+@media (max-width: 650px) {
   .galeria-vozes-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  .cartao-voz {
+    min-height: 74px !important;
+    padding: 8px !important;
+    gap: 8px !important;
+    border-radius: 11px;
+  }
+
+  .cartao-voz-foto {
+    width: 42px !important;
+    height: 42px !important;
+    flex-basis: 42px !important;
+    border-radius: 8px;
+  }
+
+  .cartao-voz-info strong {
+    font-size: 12px;
+  }
+
+  .cartao-voz-info small {
+    font-size: 10px;
+  }
+
+  .cartao-voz-play {
+    width: 29px !important;
+    height: 29px !important;
+    flex-basis: 29px !important;
   }
 }
 
-@media (max-width: 420px) {
-  .galeria-vozes-grid {
-    grid-template-columns: 1fr !important;
-  }
+/* BOTAO TROCAR LOCUTOR */
+.locutor-escolhido button {
+  padding: 13px 20px;
+  min-height: 46px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ffd84d, #ffb800);
+  color: #241800;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 184, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.locutor-escolhido button:hover {
+  background: linear-gradient(135deg, #ffe680, #ffc928);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 184, 0, 0.35);
 }
