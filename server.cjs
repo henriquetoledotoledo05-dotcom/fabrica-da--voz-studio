@@ -3190,6 +3190,86 @@ app.post("/api/masterizar-audio", async (req, res) => {
   });
 });
 
+// =====================================================
+// ALTERAR VELOCIDADE DO AUDIO GERADO
+// =====================================================
+
+app.post("/api/alterar-velocidade", async (req, res) => {
+  try {
+    await autenticarUsuario(req);
+  } catch (erroAuth) {
+    return res.status(401).json({
+      erro: "Sessao invalida ou expirada. Entre novamente."
+    });
+  }
+
+  const chunks = [];
+  let total = 0;
+  const limite = 100 * 1024 * 1024;
+  let excedeuLimite = false;
+
+  const speed = Number(req.headers["x-audio-speed"]);
+
+  if (!Number.isFinite(speed) || speed < 0.5 || speed > 2) {
+    return res.status(400).json({
+      erro: "Velocidade invalida."
+    });
+  }
+
+  req.on("data", chunk => {
+    total += chunk.length;
+
+    if (total > limite) {
+      excedeuLimite = true;
+      res.status(413).json({
+        erro: "Audio maior que 100 MB."
+      });
+      req.destroy();
+      return;
+    }
+
+    chunks.push(chunk);
+  });
+
+  req.on("end", async () => {
+    if (excedeuLimite || res.headersSent) return;
+
+    try {
+      const entrada = Buffer.concat(chunks);
+
+      if (!entrada.length) {
+        return res.status(400).json({
+          erro: "Nenhum audio enviado."
+        });
+      }
+
+      const audio = await alterarVelocidade(entrada, speed);
+
+      res.set({
+        "Content-Type": "audio/mpeg",
+        "Content-Length": String(audio.length),
+        "Content-Disposition": 'attachment; filename="fabrica-da-voz-velocidade.mp3"',
+        "Cache-Control": "no-store"
+      });
+
+      res.send(audio);
+    } catch (erro) {
+      console.error("[ALTERAR VELOCIDADE]", erro);
+
+      if (!res.headersSent) {
+        res.status(500).json({
+          erro: "Nao foi possivel alterar a velocidade do audio."
+        });
+      }
+    }
+  });
+
+  req.on("error", erro => {
+    console.error("[ALTERAR VELOCIDADE - ENTRADA]", erro);
+  });
+});
+
+// =====================================================
 // HEALTH CHECK
 // =====================================================
 
