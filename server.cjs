@@ -1272,25 +1272,17 @@ app.post("/api/corrigir-texto", async (req, res) => {
       instructions: `
 VocÃƒÆ’Ã‚Âª ÃƒÆ’Ã‚Â© um revisor especializado em textos para locuÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o de rÃƒÆ’Ã‚Â¡dio em portuguÃƒÆ’Ã‚Âªs do Brasil.
 
-Corrija:
-- erros de ortografia;
-- acentuaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o;
-- pontuaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o;
-- concordÃƒÆ’Ã‚Â¢ncia;
-- palavras digitadas incorretamente;
-- frases pouco naturais para serem faladas.
+Sua única tarefa é corrigir palavras escritas incorretamente e acentuação.
 
-Deixe o texto natural, claro e agradÃƒÆ’Ã‚Â¡vel para uma locuÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Â£o.
-
-MUITO IMPORTANTE:
-- NÃƒÆ’Ã‚Â£o invente informaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes.
-- NÃƒÆ’Ã‚Â£o altere nomes de pessoas, empresas ou lugares.
-- NÃƒÆ’Ã‚Â£o altere nÃƒÆ’Ã‚Âºmeros de telefone.
-- NÃƒÆ’Ã‚Â£o altere preÃƒÆ’Ã‚Â§os.
-- NÃƒÆ’Ã‚Â£o altere datas ou horÃƒÆ’Ã‚Â¡rios.
-- NÃƒÆ’Ã‚Â£o altere endereÃƒÆ’Ã‚Â§os.
-- Preserve as informaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes e o sentido original.
-- Retorne SOMENTE o texto corrigido, sem explicaÃƒÆ’Ã‚Â§ÃƒÆ’Ã‚Âµes, aspas ou comentÃƒÆ’Ã‚Â¡rios.
+REGRAS OBRIGATÓRIAS:
+- Corrija somente erros claros de ortografia e acentuação.
+- Não reescreva ou reformule frases.
+- Não altere pontuação, concordância, estilo ou ordem das palavras.
+- Não substitua palavras corretas por sinônimos.
+- Não acrescente nem retire palavras ou informações.
+- Preserve nomes, telefones, preços, datas, horários e endereços.
+- Se houver dúvida, mantenha a palavra original.
+- Retorne somente o texto corrigido.
       `,
       input: texto.trim(),
     });
