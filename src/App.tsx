@@ -1,5 +1,5 @@
 import logoFabrica from './assets/logo-fabrica.png'
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
 
@@ -283,12 +283,15 @@ const [studioMixAudioUrl, setStudioMixAudioUrl] = useState('')
 const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   const [nomeDJ, setNomeDJ] = useState('')
   const [vozDJSelecionada, setVozDJSelecionada] = useState('rz25pon9uanPpUGOW98Y')
+  const audioDemonstrativoRef = useRef<HTMLAudioElement | null>(null)
+  const [vozDemoTocandoId, setVozDemoTocandoId] = useState<string | null>(null)
   const [estiloDJ, setEstiloDJ] = useState('pancadao')
   const [textoDJ, setTextoDJ] = useState('')
   const [gerandoDJ, setGerandoDJ] = useState(false)
   const [audioDJUrl, setAudioDJUrl] = useState('')
   const [vozSelecionada, setVozSelecionada] =
     useState('rz25pon9uanPpUGOW98Y')
+  const [mostrarGaleriaVozes, setMostrarGaleriaVozes] = useState(true)
 
   const [estiloSelecionado, setEstiloSelecionado] = useState('normal')
 
@@ -322,6 +325,10 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     const [audioOriginalUrl, setAudioOriginalUrl] =
   useState('')
 
+  const [velocidadePosGeracao, setVelocidadePosGeracao] = useState('normal')
+  const [alterandoVelocidade, setAlterandoVelocidade] = useState(false)
+  const [erroVelocidade, setErroVelocidade] = useState('')
+
   const [gerando, setGerando] =
     useState(false)
 
@@ -344,7 +351,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     useState('')
 
   const [estiloTrilhaSelecionado, setEstiloTrilhaSelecionado] =
-    useState('comercial')
+    useState('')
 
   const [trilhaArquivo, setTrilhaArquivo] =
     useState<File | null>(null)
@@ -1069,6 +1076,32 @@ const vozesInfantis = vozes.filter(
     ) || vozes[0]
 
   // =====================================================
+  const tocarDemonstrativo = (voz: Voz) => {
+    if (audioDemonstrativoRef.current) {
+      audioDemonstrativoRef.current.pause()
+      audioDemonstrativoRef.current.currentTime = 0
+
+      if (vozDemoTocandoId === voz.id) {
+        audioDemonstrativoRef.current = null
+        setVozDemoTocandoId(null)
+        return
+      }
+    }
+
+    const audio = new Audio(voz.demonstrativo)
+    audioDemonstrativoRef.current = audio
+    setVozDemoTocandoId(voz.id)
+
+    audio.onended = () => {
+      setVozDemoTocandoId(null)
+      audioDemonstrativoRef.current = null
+    }
+
+    audio.play().catch(() => {
+      setVozDemoTocandoId(null)
+      audioDemonstrativoRef.current = null
+    })
+  }
   // GERAR VOZ
   // =====================================================
 
@@ -1227,7 +1260,10 @@ const regenerarVoz = async () => {
 
       const urlAudio = URL.createObjectURL(audioBlob);
       setAudioUrl(urlAudio);
-      setAudioOriginalUrl(urlAudio);
+      setAudioOriginalUrl(urlAudio);
+      setVelocidadePosGeracao('normal');
+      setErroVelocidade('');
+
       setMixAudioUrl('');
       await salvarNoHistorico(audioBlob, 'locucao');
       await carregarCreditos();
@@ -1341,7 +1377,9 @@ const gerarVoz = async () => {
       const urlAudio =
         URL.createObjectURL(audioBlob)
 
-      setUltimaGeracao({ texto: textoFinal, voiceId: vozAtual.id, estilo: estiloSelecionado, instrucaoPersonalizada: instrucaoPersonalizada.trim(), reverb: reverbAtivo, volumeReverb })
+      setUltimaGeracao({ texto: textoFinal, voiceId: vozAtual.id, estilo: estiloSelecionado, instrucaoPersonalizada: instrucaoPersonalizada.trim(), reverb: reverbAtivo, volumeReverb })
+      setVelocidadePosGeracao('normal');
+      setErroVelocidade('');
       setAudioUrl(urlAudio)
       setAudioOriginalUrl(urlAudio)
       setMixAudioUrl('')
@@ -1367,6 +1405,97 @@ const gerarVoz = async () => {
   // =====================================================
   // GERADOR EXCLUSIVO DJ EXPRESS
   // =====================================================
+
+  // =====================================================
+  // ALTERAR VELOCIDADE DA LOCUCAO JA GERADA
+  // =====================================================
+
+  const alterarVelocidadePosGeracao = async (opcao: string) => {
+    if (!audioOriginalUrl || alterandoVelocidade) return
+
+    const multiplicadores: Record<string, number> = {
+      normal: 1,
+      rapido: 1.25,
+      super: 1.45,
+    }
+
+    const multiplicador = multiplicadores[opcao]
+    if (!multiplicador) return
+
+    setAlterandoVelocidade(true)
+    setErroVelocidade('')
+
+    try {
+      if (opcao === 'normal') {
+        setAudioUrl(audioOriginalUrl)
+        setVelocidadePosGeracao('normal')
+        setMixAudioUrl('')
+        return
+      }
+
+      const { data: sessaoVelocidade, error: erroSessao } =
+        await supabase.auth.getSession()
+
+      const tokenVelocidade = sessaoVelocidade.session?.access_token
+
+      if (erroSessao || !tokenVelocidade) {
+        throw new Error('Sua sessão expirou. Entre novamente.')
+      }
+
+      const respostaOriginal = await fetch(audioOriginalUrl)
+
+      if (!respostaOriginal.ok) {
+        throw new Error('Não foi possível acessar o áudio original.')
+      }
+
+      const arquivoOriginal = await respostaOriginal.blob()
+
+      const resposta = await fetch('/api/alterar-velocidade', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${tokenVelocidade}`,
+          'Content-Type': 'audio/mpeg',
+          'x-audio-speed': String(multiplicador),
+        },
+        body: arquivoOriginal,
+      })
+
+      if (!resposta.ok) {
+        let mensagem = 'Não foi possível alterar a velocidade.'
+
+        try {
+          const dadosErro = await resposta.json()
+          mensagem = dadosErro.erro || mensagem
+        } catch {
+          // Mantém a mensagem padrão.
+        }
+
+        throw new Error(mensagem)
+      }
+
+      const audioProcessado = await resposta.blob()
+
+      if (!audioProcessado.size) {
+        throw new Error('O servidor retornou um áudio vazio.')
+      }
+
+      const novaUrl = URL.createObjectURL(audioProcessado)
+
+      setAudioUrl(novaUrl)
+      setVelocidadePosGeracao(opcao)
+      setMixAudioUrl('')
+    } catch (erro) {
+      console.error('Erro ao alterar velocidade:', erro)
+
+      setErroVelocidade(
+        erro instanceof Error
+          ? erro.message
+          : 'Erro ao alterar velocidade do áudio.'
+      )
+    } finally {
+      setAlterandoVelocidade(false)
+    }
+  }
 
   const gerarJingleDJ = async () => {
     const nomeLimpo = nomeDJ.trim()
@@ -1961,7 +2090,7 @@ const gerarVoz = async () => {
     let contexto: AudioContext | null = null
 
     try {
-      const vozResponse = await fetch(audioOriginalUrl)
+      const vozResponse = await fetch(audioUrl)
 
       if (!vozResponse.ok) {
         throw new Error('Não foi possível acessar o áudio da voz.')
@@ -3916,59 +4045,89 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     &#8592; Voltar ao menu
   </button>
 </div>
-<div className="vozes vozes-compactas">
-                <label htmlFor="seletorLocutor">Escolha o locutor</label>
+{mostrarGaleriaVozes ? (
+<div className="galeria-vozes">
+  <label>Escolha seu locutor</label>
 
-                <select
-                  id="seletorLocutor"
-                  className="seletor-locutor-compacto"
-                  value={vozSelecionada}
-                  onChange={(e) => setVozSelecionada(e.target.value)}
-                >
-                  <optgroup label="Masculino">
-                    {vozesMasculinas.map((voz) => (
-                      <option key={voz.id} value={voz.id}>
-                        {voz.nome}{voz.especialidade ? " - " + voz.especialidade : ""}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Feminino">
-                    {vozesFemininas.map((voz) => (
-                      <option key={voz.id} value={voz.id}>
-                        {voz.nome}{voz.especialidade ? " - " + voz.especialidade : ""}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Infantil">
-                    {vozesInfantis.map((voz) => (
-                      <option key={voz.id} value={voz.id}>
-                        {voz.nome}{voz.especialidade ? " - " + voz.especialidade : ""}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
+  {[
+    { titulo: 'Masculino', lista: vozesMasculinas },
+    { titulo: 'Feminino', lista: vozesFemininas },
+    { titulo: 'Infantil', lista: vozesInfantis },
+  ].map((grupo) => (
+    <section className="galeria-vozes-categoria" key={grupo.titulo}>
+      <h3>{grupo.titulo}</h3>
 
-                <div className="voz-demo-compacto">
-                  <div className="voz-demo-identificacao">
-                    <img src={vozAtual.foto} alt={vozAtual.nome} />
-                    <div className="voz-demo-nome">
-                      <strong>{vozAtual.nome}</strong>
-                      {vozAtual.especialidade && (
-                        <small className="voz-especialidade">
-                          {vozAtual.especialidade}
-                        </small>
-                      )}
-                    </div>
-                  </div>
-                  <audio
-                    className="audio-demo-compacto"
-                    controls
-                    preload="metadata"
-                    src={vozAtual.demonstrativo}
-                  />
-                </div>
+      <div className="galeria-vozes-grid">
+        {grupo.lista.map((voz) => (
+          <div
+            key={voz.id}
+            className={`cartao-voz ${vozSelecionada === voz.id ? 'selecionada' : ''}`}
+            role="button"
+            tabIndex={0}
+            aria-pressed={vozSelecionada === voz.id}
+            onClick={() => { setVozSelecionada(voz.id); setMostrarGaleriaVozes(false) }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setVozSelecionada(voz.id)
+                setMostrarGaleriaVozes(false)
+              }
+            }}
+          >
+            <img className="cartao-voz-foto" src={voz.foto} alt={voz.nome} />
 
-{/* =================================================
+            <div className="cartao-voz-info">
+              <strong>{voz.nome}</strong>
+              {voz.especialidade && <small>{voz.especialidade}</small>}
+            </div>
+
+            <button
+              type="button"
+              className="cartao-voz-play"
+              aria-label={`Ouvir demonstrativo de ${voz.nome}`}
+              onClick={(e) => {
+                e.stopPropagation()
+                tocarDemonstrativo(voz)
+              }}
+            >
+              {vozDemoTocandoId === voz.id ? 'Ⅱ' : '▶'}
+            </button>
+
+            {vozSelecionada === voz.id && (
+              <span className="cartao-voz-confirmacao">✓</span>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  ))}
+</div>
+) : (
+  <div className="locutor-escolhido" style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    padding: '12px',
+    margin: '12px 0',
+    background: '#171020',
+    border: '1px solid #a855f7',
+    borderRadius: '12px'
+  }}>
+    <img src={vozAtual.foto} alt={vozAtual.nome} style={{
+      width: '56px',
+      height: '56px',
+      objectFit: 'cover',
+      borderRadius: '9px'
+    }} />
+    <div style={{ flex: 1 }}>
+      <strong>{vozAtual.nome}</strong>
+      <div style={{ fontSize: '12px', color: '#c4b5d0' }}>Locutor selecionado</div>
+    </div>
+    <button type="button" onClick={() => setMostrarGaleriaVozes(true)}>
+      Trocar locutor
+    </button>
+  </div>
+)}{/* =================================================
                   ESTILOS
               ================================================= */}
 
@@ -4135,78 +4294,7 @@ fontWeight: 400
               </div>
 
 
-              </div>
 {/* =================================================
-                  VELOCIDADE
-              ================================================= */}
-
-              <div className="opcoes-velocidade">
-
-                <label>
-                  Velocidade
-                </label>
-
-                <button
-                  type="button"
-                  className={
-                    velocidade ===
-                    'normal'
-                      ? 'velocidade ativo'
-                      : 'velocidade'
-                  }
-                  onClick={() =>
-                    setVelocidade(
-                      'normal'
-                    )
-                  }
-                >
-                  Normal
-                </button>
-
-                <button
-                  type="button"
-                  className={
-                    velocidade ===
-                    'rapido'
-                      ? 'velocidade ativo'
-                      : 'velocidade'
-                  }
-                  onClick={() =>
-                    setVelocidade(
-                      'rapido'
-                    )
-                  }
-                >
-                  Rápido
-                </button>
-
-                <button
-                  type="button"
-                  className={
-                    velocidade ===
-                    'superRapido'
-                      ? 'velocidade ativo'
-                      : 'velocidade'
-                  }
-                  onClick={() =>
-                    setVelocidade(
-                      'superRapido'
-                    )
-                  }
-                >
-                  Super rápido
-                </button>
-
-              </div>
-
-              <div
-                style={{
-                  height:
-                    '20px'
-                }}
-              />
-
-              {/* =================================================
                   GERAR
               ================================================= */}
 
@@ -4239,7 +4327,41 @@ fontWeight: 400
                     src={audioUrl}
                   />
 
-                  <div className="acoes-geracao">
+                                    <div style={{
+                    marginTop: '16px',
+                    marginBottom: '20px',
+                    padding: '14px',
+                    borderRadius: '12px',
+                    background: 'rgba(128,128,128,0.08)',
+                    textAlign: 'center'
+                  }}>
+                    <div style={{ fontWeight: 600, marginBottom: '10px' }}>
+                      Velocidade da locução
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center', margin: '0 auto', padding: '5px', borderRadius: '12px', background: 'rgba(128,128,128,0.10)', border: '1px solid rgba(128,128,128,0.18)', width: 'fit-content', maxWidth: '100%' }}>
+                      <button type="button" disabled={alterandoVelocidade} onClick={() => void alterarVelocidadePosGeracao('normal')} style={{ padding: '10px 16px', borderRadius: '9px', border: velocidadePosGeracao === 'normal' ? '1px solid #8b5cf6' : '1px solid transparent', background: velocidadePosGeracao === 'normal' ? 'rgba(139,92,246,0.22)' : 'transparent', color: 'inherit', fontWeight: velocidadePosGeracao === 'normal' ? 700 : 500, cursor: 'pointer' }}>
+                        1,0x · Normal
+                      </button>
+                      <button type="button" disabled={alterandoVelocidade} onClick={() => void alterarVelocidadePosGeracao('rapido')} style={{ padding: '10px 16px', borderRadius: '9px', border: velocidadePosGeracao === 'rapido' ? '1px solid #8b5cf6' : '1px solid transparent', background: velocidadePosGeracao === 'rapido' ? 'rgba(139,92,246,0.22)' : 'transparent', color: 'inherit', fontWeight: velocidadePosGeracao === 'rapido' ? 700 : 500, cursor: 'pointer' }}>
+                        1,25x · Rápido
+                      </button>
+                      <button type="button" disabled={alterandoVelocidade} onClick={() => void alterarVelocidadePosGeracao('super')} style={{ padding: '10px 16px', borderRadius: '9px', border: velocidadePosGeracao === 'super' ? '1px solid #8b5cf6' : '1px solid transparent', background: velocidadePosGeracao === 'super' ? 'rgba(139,92,246,0.22)' : 'transparent', color: 'inherit', fontWeight: velocidadePosGeracao === 'super' ? 700 : 500, cursor: 'pointer' }}>
+                        1,45x · Super rápido
+                      </button>
+                    </div>
+
+                    {alterandoVelocidade && (
+                      <p>Ajustando velocidade do áudio...</p>
+                    )}
+
+                    {erroVelocidade && (
+                      <p role="alert" style={{ color: '#dc2626' }}>
+                        {erroVelocidade}
+                      </p>
+                    )}
+                  </div>
+<div className="acoes-geracao">
 
                     <button
                       type="button"
@@ -4296,7 +4418,218 @@ fontWeight: 400
                         🎵 Escolha uma trilha
                       </h3>
 
+<div className="estilos" style={{ marginTop: '20px' }}>
+                        <label>
+                          🎵 Estilo da trilha
+                        </label>
+
+                        <select
+                          className="seletor-estilo"
+                          value={estiloTrilhaSelecionado}
+                          onChange={(e) => {
+                            setEstiloTrilhaSelecionado(e.target.value)
+                            setTrilhaSelecionada('')
+                            setTrilhaArquivo(null)
+                             setTrilhaArquivoUrl('')
+                            setNomeTrilhaArquivo('')
+                            setMixAudioUrl('')
+                            setInicioTrilha(0)
+                            setTrilhaEmPrevia('')
+                            setTempoPreviaTrilha(0)
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '15px 18px',
+                            borderRadius: '12px',
+                            border: '1px solid rgba(139, 92, 246, 0.55)',
+                            background: '#171020',
+                            color: '#ffffff',
+                            fontSize: '16px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            outline: 'none'
+                          }}
+                        >
+                          <option value="" disabled>Selecione um estilo de trilha</option>
+                          {estilosDeTrilha.map((estilo) => (
+                            <option key={estilo.valor} value={estilo.valor}>
+                              {estilo.nome}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {estiloTrilhaSelecionado && (
+                        <>
                       {/* =================================================
+                          TRILHA DO COMPUTADOR
+                      ================================================= */}
+
+                      <div className="trilha-item">
+
+                        <strong>
+                          📤 Enviar minha própria trilha
+                        </strong>
+
+                        <p>
+                          Escolha uma música ou trilha de áudio do seu computador.
+                        </p>
+
+                        <input
+                          type="file"
+                          accept="audio/*"
+                          onChange={selecionarTrilhaArquivo}
+                        />
+
+                        {nomeTrilhaArquivo && (
+                          <div
+                            style={{
+                              marginTop: '10px'
+                            }}
+                          >
+                            🎵{' '}
+                            <strong>
+                              {nomeTrilhaArquivo}
+                            </strong>
+                          </div>
+                        )}
+
+                        {trilhaArquivo && (
+                          <>
+                            <audio
+                              controls
+                              style={{
+                                width: '100%',
+                                marginTop: '10px'
+                              }}
+                              src={trilhaArquivoUrl}
+                              onTimeUpdate={(e) => {
+                                setTrilhaEmPrevia('__arquivo__')
+                                setTempoPreviaTrilha(e.currentTarget.currentTime)
+                              }}
+                            />
+
+                            <button
+                              type="button"
+                              className="botao-trilha"
+                              style={{
+                                marginTop: '10px',
+                                width: '100%'
+                              }}
+                              onClick={() => {
+                                setInicioTrilha(tempoPreviaTrilha)
+                                setTrilhaSelecionada('')
+                                setPontoTrilhaConfirmado(true)
+                                setMixAudioUrl('')
+                              }}
+                            >
+                              {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
+                                ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
+                                : `📍 Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                            </button>
+                          </>
+                        )}
+
+                      </div>
+
+                      {/* =================================================
+                          TRILHAS POR ESTILO
+                      ================================================= */}
+
+                      
+
+                      <div>
+                        {trilhaSelecionada && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTrilhaSelecionada('')
+                              setInicioTrilha(0)
+                              setPontoTrilhaConfirmado(false)
+                              setMixAudioUrl('')
+                            }}
+                            style={{
+                              width: '100%',
+                              marginTop: '14px',
+                              marginBottom: '10px'
+                            }}
+                          >
+                            Trocar trilha
+                          </button>
+                        )}
+
+                        <div className="lista-trilhas-principal"
+                        style={{
+                          display: 'grid',
+                          gap: '14px',
+                          marginTop: '18px'
+                        }}
+                      >
+                        {trilhasAtuais.filter((trilha) => !trilhaSelecionada || trilha.arquivo === trilhaSelecionada).map((trilha) => (
+                          <div className="trilha-item-principal" key={trilha.arquivo}>
+                            <strong>{trilha.nome}</strong>
+
+                            <audio
+                              controls
+                              preload="none"
+                              style={{
+                                width: '100%',
+                                marginTop: '10px'
+                              }}
+                              src={trilha.arquivo}
+                              onTimeUpdate={(e) => {
+                                setTrilhaEmPrevia(trilha.arquivo)
+                                setTempoPreviaTrilha(e.currentTarget.currentTime)
+                              }}
+                            />
+
+                            {trilhaSelecionada === trilha.arquivo ? (
+                              <button
+                                type="button"
+                                className="botao-trilha"
+                                onClick={() => {
+                                  setInicioTrilha(
+                                    trilhaEmPrevia === trilha.arquivo
+                                      ? tempoPreviaTrilha
+                                      : 0
+                                  )
+                                  setPontoTrilhaConfirmado(true)
+                                  setMixAudioUrl('')
+                                }}
+                              >
+                                {pontoTrilhaConfirmado
+                                  ? `Ponto confirmado (${Math.floor(inicioTrilha / 60).toString().padStart(2, "0")}:${Math.floor(inicioTrilha % 60).toString().padStart(2, "0")})`
+                                  : `Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, "0")}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, "0")})`}
+                              </button>
+                            ) : null}
+
+                            <button
+                              type="button"
+                              className={
+                                trilhaSelecionada === trilha.arquivo
+                                  ? "botao-trilha ativo"
+                                  : "botao-trilha"
+                              }
+                              onClick={() => {
+                                setTrilhaSelecionada(trilha.arquivo)
+                                setTrilhaArquivoUrl('')
+                                setMixAudioUrl('')
+                                setTrilhaArquivo(null)
+                                setNomeTrilhaArquivo('')
+                                setInicioTrilha(0)
+                                setPontoTrilhaConfirmado(false)
+                              }}
+                            >
+                              {trilhaSelecionada === trilha.arquivo
+                                ? "Trilha selecionada"
+                                : `Selecionar ${trilha.nome}`}
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      </div>
+
+{/* =================================================
                           EDITOR DE TEMPO
                       ================================================= */}
 
@@ -4384,198 +4717,7 @@ fontWeight: 400
 
                       </div>
 
-                      {/* =================================================
-                          TRILHA DO COMPUTADOR
-                      ================================================= */}
-
-                      <div className="trilha-item">
-
-                        <strong>
-                          📤 Enviar minha própria trilha
-                        </strong>
-
-                        <p>
-                          Escolha uma música ou trilha de áudio do seu computador.
-                        </p>
-
-                        <input
-                          type="file"
-                          accept="audio/*"
-                          onChange={selecionarTrilhaArquivo}
-                        />
-
-                        {nomeTrilhaArquivo && (
-                          <div
-                            style={{
-                              marginTop: '10px'
-                            }}
-                          >
-                            🎵{' '}
-                            <strong>
-                              {nomeTrilhaArquivo}
-                            </strong>
-                          </div>
-                        )}
-
-                        {trilhaArquivo && (
-                          <>
-                            <audio
-                              controls
-                              style={{
-                                width: '100%',
-                                marginTop: '10px'
-                              }}
-                              src={trilhaArquivoUrl}
-                              onTimeUpdate={(e) => {
-                                setTrilhaEmPrevia('__arquivo__')
-                                setTempoPreviaTrilha(e.currentTarget.currentTime)
-                              }}
-                            />
-
-                            <button
-                              type="button"
-                              className="botao-trilha"
-                              style={{
-                                marginTop: '10px',
-                                width: '100%'
-                              }}
-                              onClick={() => {
-                                setInicioTrilha(tempoPreviaTrilha)
-                                setTrilhaSelecionada('')
-                                setPontoTrilhaConfirmado(true)
-                                setMixAudioUrl('')
-                              }}
-                            >
-                              {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
-                                ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `📍 Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
-                            </button>
-                          </>
-                        )}
-
-                      </div>
-
-                      {/* =================================================
-                          TRILHAS POR ESTILO
-                      ================================================= */}
-
-                      <div className="estilos" style={{ marginTop: '20px' }}>
-                        <label>
-                          🎵 Estilo da trilha
-                        </label>
-
-                        <select
-                          className="seletor-estilo"
-                          value={estiloTrilhaSelecionado}
-                          onChange={(e) => {
-                            setEstiloTrilhaSelecionado(e.target.value)
-                            setTrilhaSelecionada('')
-                            setTrilhaArquivo(null)
-                             setTrilhaArquivoUrl('')
-                            setNomeTrilhaArquivo('')
-                            setMixAudioUrl('')
-                            setInicioTrilha(0)
-                            setTrilhaEmPrevia('')
-                            setTempoPreviaTrilha(0)
-                          }}
-                          style={{
-                            width: '100%',
-                            padding: '15px 18px',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(139, 92, 246, 0.55)',
-                            background: '#171020',
-                            color: '#ffffff',
-                            fontSize: '16px',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            outline: 'none'
-                          }}
-                        >
-                          {estilosDeTrilha.map((estilo) => (
-                            <option key={estilo.valor} value={estilo.valor}>
-                              {estilo.nome}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div
-                        style={{
-                          display: 'grid',
-                          gap: '14px',
-                          marginTop: '18px'
-                        }}
-                      >
-                        {trilhasAtuais.map((trilha) => (
-                          <div className="trilha-item" key={trilha.arquivo}>
-                            <strong>{trilha.nome}</strong>
-
-                            <audio
-                              controls
-                              preload="none"
-                              style={{
-                                width: '100%',
-                                marginTop: '10px'
-                              }}
-                              src={trilha.arquivo}
-                              onTimeUpdate={(e) => {
-                                setTrilhaEmPrevia(trilha.arquivo)
-                                setTempoPreviaTrilha(e.currentTarget.currentTime)
-                              }}
-                            />
-
-                            <button
-                              type="button"
-                              className="botao-trilha"
-                              style={{
-                                marginTop: '10px',
-                                width: '100%'
-                              }}
-                              onClick={() => {
-                                setTrilhaSelecionada(trilha.arquivo)
-                             setTrilhaArquivoUrl('')
-                                setTrilhaArquivo(null)
-                                setNomeTrilhaArquivo('')
-                                setInicioTrilha(
-                                  trilhaEmPrevia === trilha.arquivo
-                                    ? tempoPreviaTrilha
-                                    : 0
-                                )
-                                setPontoTrilhaConfirmado(true)
-                                setMixAudioUrl('')
-                              }}
-                            >
-                              {pontoTrilhaConfirmado && trilhaSelecionada === trilha.arquivo
-                                ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `📍 Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
-                            </button>
-
-                            <button
-                              type="button"
-                              className={
-                                trilhaSelecionada === trilha.arquivo
-                                  ? 'botao-trilha ativo'
-                                  : 'botao-trilha'
-                              }
-                              onClick={() => {
-                                setTrilhaSelecionada(trilha.arquivo)
-                             setTrilhaArquivoUrl('')
-                                setMixAudioUrl('')
-                                setTrilhaArquivo(null)
-                                setNomeTrilhaArquivo('')
-                                 setInicioTrilha(0)
-                                 setPontoTrilhaConfirmado(false)
-                              }}
-                            >
-                              {trilhaSelecionada === trilha.arquivo
-                                ? '✓ Trilha selecionada'
-                                : `✓ Usar ${trilha.nome}`}
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-
-                       {trilhaSelecionada || trilhaArquivo ? (
+                                             {trilhaSelecionada || trilhaArquivo ? (
                          <div
                            style={{
                              marginTop: '18px',
@@ -5078,8 +5220,10 @@ fontWeight: 400
 
                         </div>
                       )}
+                        </>
+                      )}
 
-                    </div>
+</div>
                   )}
 
                 </div>
@@ -5102,6 +5246,7 @@ fontWeight: 400
 }
 
 export default App
+
 
 
 
