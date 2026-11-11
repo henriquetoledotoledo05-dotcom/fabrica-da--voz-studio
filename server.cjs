@@ -10,6 +10,7 @@ const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const multer = require("multer");
 
 dotenv.config();
 
@@ -29,6 +30,17 @@ const openai = process.env.OPENAI_API_KEY
 
 const app = express();
 app.use(express.json());
+
+const uploadAudioClone = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 16 * 1024 * 1024, files: 2 },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === "clip" && file.mimetype?.startsWith("audio/")) return cb(null, true);
+    if (file.fieldname === "foto" && ["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) return cb(null, true);
+    cb(new Error("Formato de arquivo n?o permitido."));
+  },
+});
+
 const PORT = Number(process.env.PORT) || 3010;
 const PACOTES_CREDITOS = {
   credito1: {
@@ -1404,6 +1416,279 @@ async function devolverCreditos(userId, quantidade) {
   return data;
 }
 
+app.post(
+  "/api/clonar-voz",
+  (req, res, next) => {
+    uploadAudioClone.fields([{ name: "clip", maxCount: 1 }, { name: "foto", maxCount: 1 }])(req, res, (erro) => {
+      if (erro) {
+        return res.status(400).json({
+          erro: erro.message || "Arquivo de Ã¡udio invÃ¡lido."
+        });
+      }
+      next();
+    });
+  },
+  async (req, res) => {
+    let usuarioId = null;
+    let creditosConsumidos = false;
+    let cartesiaVoiceId = null;
+    let vozSalva = false;
+
+    try {
+      const usuario = await autenticarUsuario(req);
+      usuarioId = usuario.id;
+
+      if (!process.env.CARTESIA_API_KEY) {
+        throw new Error("CARTESIA_API_KEY nÃ£o configurada.");
+      }
+
+      const nome = String(req.body.nome || "").trim();
+
+      if (!nome || nome.length > 60) {
+        return res.status(400).json({
+          erro: "Informe um nome de 1 a 60 caracteres."
+        });
+      }
+
+      if (req.body.confirmacaoAudio !== "true") {
+        return res.status(400).json({
+          erro: "Confirme que possui autorizaÃ§Ã£o para clonar esta voz."
+        });
+      }
+
+      const arquivo = req.files?.clip?.[0];
+
+      if (!arquivo) {
+        return res.status(400).json({
+          erro: "Envie uma gravaÃ§Ã£o de Ã¡udio."
+        });
+      }
+
+      const extensao = path.extname(arquivo.originalname).toLowerCase();
+      const formatosPermitidos = [
+        ".mp3", ".mpeg", ".mpga", ".wav",
+        ".flac", ".oga", ".ogg", ".webm"
+      ];
+
+      if (!formatosPermitidos.includes(extensao)) {
+        return res.status(400).json({
+          erro: "Formato nÃ£o aceito. Use MP3, WAV, FLAC, OGG ou WEBM."
+        });
+      }
+
+      const foto = req.files?.foto?.[0];
+
+      if (foto && foto.size > 2 * 1024 * 1024) {
+        return res.status(400).json({
+          erro: "A foto deve ter no máximo 2 MB."
+        });
+      }
+
+      if (
+        foto &&
+        !["image/jpeg", "image/png", "image/webp"].includes(foto.mimetype)
+      ) {
+        return res.status(400).json({
+          erro: "A foto deve estar no formato JPG, PNG ou WebP."
+        });
+      }
+
+      await consumirCreditos(usuarioId, 5);
+      creditosConsumidos = true;
+
+      const formulario = new FormData();
+
+      formulario.append(
+        "clip",
+        new Blob([arquivo.buffer], {
+          type: arquivo.mimetype || "application/octet-stream"
+        }),
+        arquivo.originalname
+      );
+
+      formulario.append("name", nome);
+      formulario.append("language", "pt");
+      formulario.append("access", "private");
+
+      const resposta = await fetch(
+        "https://api.cartesia.ai/voices/clone",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.CARTESIA_API_KEY}`,
+            "Cartesia-Version": process.env.CARTESIA_API_VERSION || "2026-08-14"
+          },
+          body: formulario
+        }
+      );
+
+      const resultado = await resposta.json().catch(() => ({}));
+
+      if (!resposta.ok || !resultado.id) {
+        throw new Error(
+          resultado.message ||
+          resultado.error ||
+          "A Cartesia nÃ£o conseguiu criar a voz."
+        );
+      }
+
+      cartesiaVoiceId = resultado.id;
+
+      const { data, error } = await supabaseAdmin
+        .from("vozes_clonadas")
+        .insert({
+          user_id: usuarioId,
+          nome,
+          cartesia_voice_id: cartesiaVoiceId
+        })
+        .select("id, nome, created_at")
+        .single();
+
+      if (error) {
+        throw new Error("NÃ£o foi possÃ­vel salvar a voz no cadastro.");
+      }
+
+      vozSalva = true;
+
+      let caminhoFoto = null;
+      let avisoFoto = null;
+
+      if (foto) {
+        const extensoesFoto = {
+          "image/jpeg": "jpg",
+          "image/png": "png",
+          "image/webp": "webp"
+        };
+
+        const extensaoFoto = extensoesFoto[foto.mimetype];
+        caminhoFoto = `${usuarioId}/${data.id}.${extensaoFoto}`;
+
+        const { error: erroUploadFoto } = await supabaseAdmin
+          .storage
+          .from("fotos-vozes-clonadas")
+          .upload(caminhoFoto, foto.buffer, {
+            contentType: foto.mimetype,
+            upsert: false
+          });
+
+        if (erroUploadFoto) {
+          console.error("ERRO AO ENVIAR FOTO DA VOZ:", erroUploadFoto);
+          caminhoFoto = null;
+          avisoFoto = "A voz foi criada, mas não foi possível salvar a foto.";
+        } else {
+          const { error: erroAtualizarFoto } = await supabaseAdmin
+            .from("vozes_clonadas")
+            .update({ foto_path: caminhoFoto })
+            .eq("id", data.id)
+            .eq("user_id", usuarioId);
+
+          if (erroAtualizarFoto) {
+            console.error("ERRO AO VINCULAR FOTO À VOZ:", erroAtualizarFoto);
+            await supabaseAdmin.storage
+              .from("fotos-vozes-clonadas")
+              .remove([caminhoFoto]);
+            caminhoFoto = null;
+            avisoFoto = "A voz foi criada, mas não foi possível vincular a foto.";
+          }
+        }
+      }
+
+
+      return res.status(201).json({
+        sucesso: true,
+        voz: { ...data, foto_path: caminhoFoto },
+        avisoFoto,
+        creditosConsumidos: 5
+      });
+
+    } catch (erro) {
+      console.error("ERRO AO CLONAR VOZ:", erro.message);
+
+      if (cartesiaVoiceId && !vozSalva) {
+        try {
+          const exclusao = await fetch(
+            `https://api.cartesia.ai/voices/${encodeURIComponent(cartesiaVoiceId)}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Authorization": `Bearer ${process.env.CARTESIA_API_KEY}`,
+                "Cartesia-Version": process.env.CARTESIA_API_VERSION || "2026-08-14"
+              }
+            }
+          );
+
+          if (!exclusao.ok) {
+            console.error("NÃ£o foi possÃ­vel excluir o clone Ã³rfÃ£o.");
+          }
+        } catch (erroExclusao) {
+          console.error("Falha ao excluir clone:", erroExclusao.message);
+        }
+      }
+
+      if (usuarioId && creditosConsumidos) {
+        const devolucao = await devolverCreditos(usuarioId, 5);
+
+        if (devolucao === null) {
+          console.error("ATENÃ‡ÃƒO: FALHA NA DEVOLUÃ‡ÃƒO DOS 5 CRÃ‰DITOS.");
+        } else {
+          console.log("5 crÃ©ditos devolvidos apÃ³s falha na clonagem.");
+        }
+      }
+
+      const mensagem = erro.message || "NÃ£o foi possÃ­vel clonar a voz.";
+
+      return res.status(
+        mensagem.toLowerCase().includes("crÃ©ditos insuficientes") ? 402 : 500
+      ).json({ erro: mensagem });
+    }
+  }
+);
+app.get("/api/minhas-vozes-clonadas", async (req, res) => {
+  try {
+    const usuario = await autenticarUsuario(req);
+
+    const { data, error } = await supabaseAdmin
+      .from("vozes_clonadas")
+      .select("id, nome, created_at, foto_path")
+      .eq("user_id", usuario.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("ERRO AO BUSCAR VOZES CLONADAS:", error);
+      return res.status(500).json({
+        erro: "Não foi possível carregar suas vozes clonadas."
+      });
+    }
+
+    const vozesComFoto = await Promise.all(
+      (data || []).map(async (voz) => {
+        let foto_url = null;
+
+        if (voz.foto_path) {
+          const { data: foto, error: erroFoto } = await supabaseAdmin
+            .storage
+            .from("fotos-vozes-clonadas")
+            .createSignedUrl(voz.foto_path, 3600);
+
+          if (erroFoto) {
+            console.error("ERRO AO GERAR LINK DA FOTO:", erroFoto);
+          } else {
+            foto_url = foto?.signedUrl || null;
+          }
+        }
+
+        return { ...voz, foto_url };
+      })
+    );
+
+    return res.json({ vozes: vozesComFoto });
+
+  } catch (erro) {
+    return res.status(401).json({
+      erro: erro.message || "Usuário não autenticado."
+    });
+  }
+});
 function textosSaoSemelhantes(textoOriginal, textoNovo) {
   const normalizar = (texto) =>
     String(texto || "")
@@ -3424,6 +3709,74 @@ const server =
   );
 
 // =====================================================
+app.delete("/api/minhas-vozes-clonadas/:id", async (req, res) => {
+  try {
+    const usuario = await autenticarUsuario(req);
+    const vozId = req.params.id;
+
+    const { data: voz, error: erroBusca } = await supabaseAdmin
+      .from("vozes_clonadas")
+      .select("id, cartesia_voice_id, foto_path")
+      .eq("id", vozId)
+      .eq("user_id", usuario.id)
+      .single();
+
+    if (erroBusca || !voz) {
+      return res.status(404).json({
+        erro: "Voz clonada nÃ£o encontrada."
+      });
+    }
+
+    const respostaCartesia = await fetch(
+      `https://api.cartesia.ai/voices/${encodeURIComponent(voz.cartesia_voice_id)}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${process.env.CARTESIA_API_KEY}`,
+          "Cartesia-Version": process.env.CARTESIA_API_VERSION || "2026-08-14"
+        }
+      }
+    );
+
+    if (!respostaCartesia.ok) {
+      const detalhe = await respostaCartesia.text();
+      console.error("ERRO AO EXCLUIR VOZ NA CARTESIA:", detalhe);
+
+      return res.status(502).json({
+        erro: "NÃ£o foi possÃ­vel excluir a voz na Cartesia. O cadastro foi preservado."
+      });
+    }
+
+    const { error: erroExclusao } = await supabaseAdmin
+      .from("vozes_clonadas")
+      .delete()
+      .eq("id", vozId)
+      .eq("user_id", usuario.id);
+
+    if (erroExclusao) {
+      console.error("ERRO AO EXCLUIR CADASTRO DA VOZ:", erroExclusao);
+      return res.status(500).json({
+        erro: "A voz foi excluÃ­da na Cartesia, mas nÃ£o foi possÃ­vel remover o cadastro."
+      });
+    }
+
+    if (voz.foto_path) {
+      const { error: erroFoto } = await supabaseAdmin.storage
+        .from("fotos-vozes-clonadas")
+        .remove([voz.foto_path]);
+      if (erroFoto) console.error("ERRO AO EXCLUIR FOTO DA VOZ:", erroFoto);
+    }
+
+    return res.json({ sucesso: true });
+
+  } catch (erro) {
+    console.error("ERRO AO EXCLUIR VOZ CLONADA:", erro.message);
+    return res.status(401).json({
+      erro: erro.message || "UsuÃ¡rio nÃ£o autenticado."
+    });
+  }
+});
+
 // ENCERRAMENTO SEGURO
 // =====================================================
 
