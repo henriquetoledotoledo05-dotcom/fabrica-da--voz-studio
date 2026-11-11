@@ -2063,17 +2063,27 @@ Regras:
       // IDENTIFICAR PROVEDOR DA VOZ
       // =====================================================
 
-      const { data: vozClonada, error: erroVozClonada } =
-        await supabaseAdmin
+      const ehUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(voiceId));
+
+      let vozClonada = null;
+      let erroVozClonada = null;
+
+      if (ehUuid) {
+        const resultadoVozClonada = await supabaseAdmin
           .from("vozes_clonadas")
           .select("cartesia_voice_id")
           .eq("id", voiceId)
           .eq("user_id", usuarioId)
           .maybeSingle();
 
+        vozClonada = resultadoVozClonada.data;
+        erroVozClonada = resultadoVozClonada.error;
+      }
+
       if (erroVozClonada) {
-        console.error("ERRO AO IDENTIFICAR VOZ CLONADA:", erroVozClonada);
-        throw new Error("Não foi possível identificar a voz selecionada.");
+        console.error("ERRO AO IDENTIFICAR VOZ CLONADA:");
+        console.error(JSON.stringify(erroVozClonada, null, 2));
+        console.log("Continuando pelo fluxo ElevenLabs.");
       }
 
       let resposta;
