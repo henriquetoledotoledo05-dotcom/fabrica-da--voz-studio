@@ -1,4 +1,4 @@
-﻿import logoFabrica from './assets/logo-fabrica.png'
+﻿﻿﻿import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -4459,8 +4459,7 @@ fontWeight: 400
                         </select>
                       </div>
 
-                      {estiloTrilhaSelecionado && (
-                        <>
+
                       {/* =================================================
                           TRILHA DO COMPUTADOR
                       ================================================= */}
@@ -4532,6 +4531,8 @@ fontWeight: 400
 
                       </div>
 
+                      {estiloTrilhaSelecionado && (
+                        <>
                       {/* =================================================
                           TRILHAS POR ESTILO
                       ================================================= */}
