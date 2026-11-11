@@ -1,4 +1,4 @@
-﻿﻿﻿import logoFabrica from './assets/logo-fabrica.png'
+import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -17,6 +17,13 @@ type Voz = {  id: string
   foto: string
   demonstrativo: string
   especialidade?: string
+}
+
+type VozClonada = {
+  id: string
+  nome: string
+  created_at: string
+  foto_url?: string | null
 }
 
 type HistoricoVinheta = {
@@ -53,6 +60,7 @@ function App() {
   const [erroAcesso, setErroAcesso] = useState('')
   const [emailAcesso, setEmailAcesso] = useState('')
   const [creditos, setCreditos] = useState<number | null>(null)
+  const [vozesClonadas, setVozesClonadas] = useState<VozClonada[]>([])
   const [regeneracoes, setRegeneracoes] = useState(0)
   const [ultimaGeracao, setUltimaGeracao] = useState<{ texto: string; voiceId: string; estilo: string; instrucaoPersonalizada: string; reverb: boolean; volumeReverb: number } | null>(null)
   const [carregandoCreditos, setCarregandoCreditos] = useState(false)
@@ -116,10 +124,12 @@ function App() {
         sessionStorage.setItem('fabrica_acesso', 'liberado')
         await carregarCreditos()
         await carregarHistorico()
+        await carregarVozesClonadas()
       } else {
         sessionStorage.removeItem('fabrica_acesso')
         setCreditos(null)
         setHistorico([])
+        setVozesClonadas([])
       }
     }
 
@@ -136,11 +146,13 @@ function App() {
           setTimeout(() => {
             void carregarCreditos()
             void carregarHistorico()
+            void carregarVozesClonadas()
           }, 0)
         } else {
           sessionStorage.removeItem('fabrica_acesso')
           setCreditos(null)
           setHistorico([])
+          setVozesClonadas([])
         }
       }
     )
@@ -292,6 +304,13 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   const [vozSelecionada, setVozSelecionada] =
     useState('rz25pon9uanPpUGOW98Y')
   const [mostrarGaleriaVozes, setMostrarGaleriaVozes] = useState(true)
+  const [mostrarFormularioClone, setMostrarFormularioClone] = useState(false)
+  const [nomeNovaVoz, setNomeNovaVoz] = useState('')
+  const [arquivoNovaVoz, setArquivoNovaVoz] = useState<File | null>(null)
+  const [fotoNovaVoz, setFotoNovaVoz] = useState<File | null>(null)
+  const [confirmacaoAudioClone, setConfirmacaoAudioClone] = useState(false)
+  const [criandoVozClone, setCriandoVozClone] = useState(false)
+  const [mensagemClone, setMensagemClone] = useState('')
 
   const [estiloSelecionado, setEstiloSelecionado] = useState('normal')
 
@@ -391,6 +410,158 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   // HISTÓRICO DE VINHETAS — 3 DIAS
   // =====================================================
 
+  const carregarVozesClonadas = async () => {
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      if (sessionError || !sessionData.session) {
+        setVozesClonadas([])
+        return
+      }
+
+      const resposta = await fetch('/api/minhas-vozes-clonadas', {
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+      })
+
+      if (!resposta.ok) {
+        throw new Error('Não foi possível carregar suas vozes clonadas.')
+      }
+
+      const resultado = await resposta.json()
+      setVozesClonadas(resultado.vozes || [])
+    } catch (erro) {
+      console.error('Erro ao carregar vozes clonadas:', erro)
+      setVozesClonadas([])
+    }
+  }
+  const excluirVozClonada = async (voz: VozClonada) => {
+    if (!window.confirm(`Deseja realmente excluir a voz "${voz.nome}"? Essa ação não poderá ser desfeita.`)) return
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      if (sessionError || !sessionData.session) {
+        throw new Error('Faça login novamente para excluir sua voz.')
+      }
+
+      const resposta = await fetch(`/api/minhas-vozes-clonadas/${encodeURIComponent(voz.id)}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+      })
+
+      const resultado = await resposta.json().catch(() => ({}))
+
+      if (!resposta.ok || !resultado.sucesso) {
+        throw new Error(resultado.erro || 'Não foi possível excluir a voz.')
+      }
+
+      if (vozSelecionada === voz.id) {
+        setVozSelecionada('rz25pon9uanPpUGOW98Y')
+      }
+
+      await carregarVozesClonadas()
+      setMensagemClone('Voz excluída com sucesso!')
+    } catch (erro) {
+      setMensagemClone(
+        erro instanceof Error ? erro.message : 'Erro ao excluir a voz.'
+      )
+    }
+  }
+  const criarVozClonada = async () => {
+    if (!nomeNovaVoz.trim()) {
+      setMensagemClone('Digite um nome para sua voz.')
+      return
+    }
+
+    if (!arquivoNovaVoz) {
+      setMensagemClone('Selecione um arquivo de áudio.')
+      return
+    }
+
+    if (!confirmacaoAudioClone) {
+      setMensagemClone('Confirme que o áudio está limpo e que você tem autorização para clonar a voz.')
+      return
+    }
+
+    if (creditos === null) {
+      await carregarCreditos()
+      setMensagemClone('Não foi possível confirmar seu saldo. Tente novamente.')
+      return
+    }
+
+    if (creditos < 5) {
+      setMensagemClone('Você precisa de 5 créditos para criar uma voz clonada.')
+      return
+    }
+
+    setCriandoVozClone(true)
+    setMensagemClone('')
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession()
+
+      if (sessionError || !sessionData.session) {
+        throw new Error('Faça login novamente para criar sua voz.')
+      }
+
+      const formulario = new FormData()
+      formulario.append('clip', arquivoNovaVoz)
+      formulario.append('nome', nomeNovaVoz.trim())
+      formulario.append('confirmacaoAudio', 'true')
+
+      if (fotoNovaVoz) {
+        formulario.append('foto', fotoNovaVoz)
+      }
+
+      const resposta = await fetch('/api/clonar-voz', {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + sessionData.session.access_token,
+        },
+        body: formulario,
+      })
+
+      const resultado = await resposta.json().catch(() => ({}))
+
+      if (!resposta.ok || !resultado.sucesso || !resultado.voz?.id) {
+        throw new Error(
+          resultado.erro ||
+          resultado.message ||
+          'Não foi possível criar sua voz clonada.'
+        )
+      }
+
+      await carregarVozesClonadas()
+      await carregarCreditos()
+
+      setVozSelecionada(resultado.voz.id)
+      setMostrarFormularioClone(false)
+      setNomeNovaVoz('')
+      setArquivoNovaVoz(null)
+      setFotoNovaVoz(null)
+      setConfirmacaoAudioClone(false)
+      setMensagemClone(
+        resultado.avisoFoto ||
+        'Voz clonada criada com sucesso!'
+      )
+    } catch (erro) {
+      setMensagemClone(
+        erro instanceof Error
+          ? erro.message
+          : 'Não foi possível criar sua voz clonada.'
+      )
+      await carregarCreditos()
+    } finally {
+      setCriandoVozClone(false)
+    }
+  }
   const carregarHistorico = async () => {
     setCarregandoHistorico(true)
 
@@ -613,7 +784,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               <button type="button" onClick={validarCadastro} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Criar minha conta</button>
             </div>
             {erroCadastro && <p style={{ color: '#c084fc', marginTop: '14px', fontWeight: 600 }}>{erroCadastro}</p>}
-            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>← Voltar para entrar</button>
+            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>↝? Voltar para entrar</button>
           </div>
         </div>
       )
@@ -1069,11 +1240,18 @@ const vozesInfantis = vozes.filter(
   (voz) =>
     ['Flavinha', 'Aninha', 'Paulinho'].includes(voz.nome)
 )
-  const vozAtual =
-    vozes.find(
-      (voz) =>
-        voz.id === vozSelecionada
-    ) || vozes[0]
+  const vozClonadaAtual = vozesClonadas.find(
+    (voz) => voz.id === vozSelecionada
+  )
+
+  const vozAtual: Voz = vozes.find(
+    (voz) => voz.id === vozSelecionada
+  ) || (vozClonadaAtual ? {
+    id: vozClonadaAtual.id,
+    nome: vozClonadaAtual.nome,
+    foto: logoFabrica,
+    demonstrativo: ''
+  } : vozes[0])
 
   // =====================================================
   const tocarDemonstrativo = (voz: Voz) => {
@@ -1256,11 +1434,12 @@ const regenerarVoz = async () => {
       }
 
       const audioBlob = await resposta.blob();
-      if (!audioBlob.size) throw new Error('O servidor retornou um audio vazio.');
+        throw new Error('O servidor retornou um áudio vazio.')
 
       const urlAudio = URL.createObjectURL(audioBlob);
       setAudioUrl(urlAudio);
-      setAudioOriginalUrl(urlAudio);
+      setAudioOriginalUrl(urlAudio);
+
       setVelocidadePosGeracao('normal');
       setErroVelocidade('');
 
@@ -1377,7 +1556,7 @@ const gerarVoz = async () => {
       const urlAudio =
         URL.createObjectURL(audioBlob)
 
-      setUltimaGeracao({ texto: textoFinal, voiceId: vozAtual.id, estilo: estiloSelecionado, instrucaoPersonalizada: instrucaoPersonalizada.trim(), reverb: reverbAtivo, volumeReverb })
+      setUltimaGeracao({ texto: textoFinal, voiceId: vozAtual.id, estilo: estiloSelecionado, instrucaoPersonalizada: instrucaoPersonalizada.trim(), reverb: reverbAtivo, volumeReverb })
       setVelocidadePosGeracao('normal');
       setErroVelocidade('');
       setAudioUrl(urlAudio)
@@ -1467,7 +1646,7 @@ const gerarVoz = async () => {
           const dadosErro = await resposta.json()
           mensagem = dadosErro.erro || mensagem
         } catch {
-          // Mantém a mensagem padrão.
+          // Mantém a mensagem padrão se a resposta não for JSON.
         }
 
         throw new Error(mensagem)
@@ -3606,7 +3785,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   fontSize: '13px'
                 }}
               >
-                🔒 O pagamento será integrado depois. Esta tela já está pronta com os pacotes de créditos.
+                💳 O pagamento será integrado depois. Esta tela já está pronta com os pacotes de créditos.
               </div>
             </div>
           </div>
@@ -4048,6 +4227,267 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 {mostrarGaleriaVozes ? (
 <div className="galeria-vozes">
   <label>Escolha seu locutor</label>
+  <section style={{
+    margin: '18px 0',
+    padding: '16px',
+    background: '#171020',
+    border: '1px solid #8b5cf6',
+    borderRadius: '14px'
+  }}>
+    <h3 style={{ color: '#e9d5ff', marginTop: 0 }}>
+      🎙️ Minhas Vozes Clonadas
+    </h3>
+
+    <p style={{ color: '#c4b5d0', fontSize: '13px' }}>
+      Crie sua própria voz com inteligência artificial e utilize nas suas locuções.
+    </p>
+
+    <button
+      type="button"
+      onClick={() => {
+        setMostrarFormularioClone(!mostrarFormularioClone)
+        setMensagemClone('')
+      }}
+      style={{
+        padding: '12px 18px',
+        border: 0,
+        borderRadius: '9px',
+        background: '#7c3aed',
+        color: '#fff',
+        fontWeight: 800,
+        cursor: 'pointer'
+      }}
+    >
+      {mostrarFormularioClone ? 'Fechar formulário' : '+ Criar minha voz'}
+    </button>
+
+    {mostrarFormularioClone && (
+      <div style={{
+        marginTop: '16px',
+        display: 'grid',
+        gap: '12px'
+      }}>
+        <div style={{
+          padding: '12px',
+          background: '#3b2020',
+          border: '1px solid #b45309',
+          borderRadius: '9px',
+          color: '#fde68a',
+          fontSize: '13px'
+        }}>
+          Atenção! Envie uma gravação limpa, sem música, ruídos ou outras vozes.
+          Quanto melhor a gravação, melhor será o resultado da clonagem.
+          Utilize somente uma voz que você tenha autorização para clonar.
+        </div>
+
+        <label style={{ color: '#fff', fontWeight: 700 }}>
+          Nome da sua voz
+          <input
+            type="text"
+            value={nomeNovaVoz}
+            maxLength={60}
+            onChange={(e) => setNomeNovaVoz(e.currentTarget.value)}
+            placeholder="Ex.: Minha voz comercial"
+            style={{
+              display: 'block',
+              width: '100%',
+              boxSizing: 'border-box',
+              marginTop: '7px',
+              padding: '12px',
+              borderRadius: '8px',
+              border: '1px solid #6b5680',
+              background: '#0d0912',
+              color: '#fff'
+            }}
+          />
+        </label>
+
+        <label style={{ color: '#fff', fontWeight: 700 }}>
+          Envie sua gravação
+          <input
+            type="file"
+            accept="audio/*"
+            onChange={(e) => setArquivoNovaVoz(e.currentTarget.files?.[0] || null)}
+            style={{
+              display: 'block',
+              width: '100%',
+              marginTop: '8px',
+              color: '#fff'
+            }}
+          />
+        </label>
+
+        <label style={{ color: '#fff', fontWeight: 700 }}>
+          Foto da sua voz (opcional)
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => {
+              const foto = e.currentTarget.files?.[0] || null
+              if (foto && foto.size > 2 * 1024 * 1024) {
+                setMensagemClone('A foto deve ter no máximo 2 MB.')
+                e.currentTarget.value = ''
+                setFotoNovaVoz(null)
+                return
+              }
+              setFotoNovaVoz(foto)
+              setMensagemClone('')
+            }}
+            style={{
+              display: 'block',
+              width: '100%',
+              marginTop: '8px',
+              color: '#fff'
+            }}
+          />
+        </label>
+
+        {fotoNovaVoz && (
+          <small style={{ color: '#c4b5d0' }}>
+            Foto selecionada: {fotoNovaVoz.name}
+          </small>
+        )}
+
+        {arquivoNovaVoz && (
+          <small style={{ color: '#c4b5d0' }}>
+            Arquivo selecionado: {arquivoNovaVoz.name}
+          </small>
+        )}
+
+        <label style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '9px',
+          color: '#e9d5ff',
+          fontSize: '13px'
+        }}>
+          <input
+            type="checkbox"
+            checked={confirmacaoAudioClone}
+            onChange={(e) => setConfirmacaoAudioClone(e.currentTarget.checked)}
+            style={{ marginTop: '3px' }}
+          />
+          Confirmo que tenho autorização para clonar esta voz e que o áudio enviado é uma gravação limpa e adequada.
+        </label>
+
+        <div style={{
+          color: '#facc15',
+          fontWeight: 800,
+          fontSize: '14px'
+        }}>
+          Custo para criar sua voz: 5 créditos.
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void criarVozClonada()}
+          disabled={
+            criandoVozClone ||
+            !nomeNovaVoz.trim() ||
+            !arquivoNovaVoz ||
+            !confirmacaoAudioClone
+          }
+          style={{
+            padding: '14px',
+            border: 0,
+            borderRadius: '9px',
+            background: '#7c3aed',
+            color: '#fff',
+            fontWeight: 800,
+            cursor: criandoVozClone ? 'wait' : 'pointer',
+            opacity: (
+              criandoVozClone ||
+              !nomeNovaVoz.trim() ||
+              !arquivoNovaVoz ||
+              !confirmacaoAudioClone
+            ) ? 0.5 : 1
+          }}
+        >
+          {criandoVozClone ? 'CRIANDO SUA VOZ...' : 'CRIAR VOZ · 5 CRÉDITOS'}
+        </button>
+
+        {mensagemClone && (
+          <p role="status" style={{
+            color: mensagemClone.includes('sucesso') ? '#86efac' : '#fca5a5',
+            fontSize: '13px',
+            fontWeight: 700
+          }}>
+            {mensagemClone}
+          </p>
+        )}
+      </div>
+    )}
+
+    {vozesClonadas.length > 0 ? (
+      <>
+        <h4 style={{ color: '#fff', marginBottom: '10px' }}>
+          Suas vozes
+        </h4>
+
+        <div className="galeria-vozes-grid">
+          {vozesClonadas.map((voz) => (
+            <div
+              key={voz.id}
+              className={`cartao-voz ${vozSelecionada === voz.id ? 'selecionada' : ''}`}
+              role="button"
+              tabIndex={0}
+              aria-pressed={vozSelecionada === voz.id}
+              onClick={() => {
+                setVozSelecionada(voz.id)
+                setMostrarGaleriaVozes(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setVozSelecionada(voz.id)
+                  setMostrarGaleriaVozes(false)
+                }
+              }}
+            >
+              <img
+                className="cartao-voz-foto"
+                src={voz.foto_url || logoFabrica}
+                alt={voz.nome}
+              />
+              <div className="cartao-voz-info">
+                <strong>{voz.nome}</strong>
+                <small>Minha voz clonada</small>
+              </div>
+              {vozSelecionada === voz.id && (
+                <span className="cartao-voz-confirmacao">&#10003;</span>
+              )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  void excluirVozClonada(voz)
+                }}
+                onKeyDown={(e) => e.stopPropagation()}
+                style={{
+                  marginTop: '8px',
+                  padding: '7px 12px',
+                  border: '1px solid #ef4444',
+                  borderRadius: '7px',
+                  background: '#7f1d1d',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                EXCLUIR VOZ
+              </button>
+            </div>
+          ))}
+        </div>
+      </>
+    ) : (
+      <p style={{ color: '#a99ab8', fontSize: '13px' }}>
+        Você ainda não criou nenhuma voz clonada.
+      </p>
+    )}
+  </section>
+
 
   {[
     { titulo: 'Masculino', lista: vozesMasculinas },
@@ -4306,7 +4746,7 @@ fontWeight: 400
                 >
                   {gerando
                     ? '⏳ Gerando...'
-                    : '🔊 Gerar voz'}
+                    : '🎙️ Gerar voz'}
                 </button>
               </div>
 
@@ -4524,7 +4964,7 @@ fontWeight: 400
                             >
                               {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
                                 ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `📍 Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                                : `📝? Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
                             </button>
                           </>
                         )}
@@ -4637,7 +5077,7 @@ fontWeight: 400
                       <div className="editor-tempo">
 
                         <h3>
-                          ⏱️ Ajuste da trilha
+                          🎚️ Ajuste da trilha
                         </h3>
 
                         <p>
@@ -4649,7 +5089,7 @@ fontWeight: 400
                           <div className="tempo-campo">
 
                             <label>
-                              ⏮️ Trilha antes da voz
+                              🎵 Trilha antes da voz
                             </label>
 
                             <input
@@ -4679,7 +5119,7 @@ fontWeight: 400
                           <div className="tempo-campo">
 
                             <label>
-                              ⏭️ Trilha depois da voz
+                              🎵 Trilha depois da voz
                             </label>
 
                             <input
@@ -4735,7 +5175,7 @@ fontWeight: 400
                                   :
                                   {Math.floor(inicioTrilha % 60).toString().padStart(2, '0')}
                                 </>
-                              : <>📍 <strong>Início da trilha:</strong> 00:00</>}
+                              : <>📝? <strong>Início da trilha:</strong> 00:00</>}
                             <div
                               style={{
                                 marginTop: '6px',
@@ -4745,7 +5185,7 @@ fontWeight: 400
                             >
                               {pontoTrilhaConfirmado
                                 ? '✓ Ponto confirmado. Agora é só mixar a voz com a trilha.'
-                                : 'Ouça a trilha, posicione no trecho desejado e clique em “Usar este ponto”.'}
+                                : 'Ouça a trilha, posicione no trecho desejado e clique em “Usar este ponto”?.'}
                            </div>
                          </div>
                        ) : null}
@@ -4910,7 +5350,7 @@ fontWeight: 400
                                   marginBottom: '7px'
                                 }}
                               >
-                                🔊 Volume do Reverb: {volumeReverb}%
+                                🎚️ Volume do Reverb: {volumeReverb}%
                               </div>
 
                               <input
@@ -5247,6 +5687,10 @@ fontWeight: 400
 }
 
 export default App
+
+
+
+
 
 
 
