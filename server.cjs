@@ -1854,13 +1854,6 @@ app.post(
         });
       }
 
-      if (!process.env.ELEVENLABS_API_KEY) {
-        return res.status(500).json({
-          erro:
-            "ELEVENLABS_API_KEY nÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o configurada no arquivo .env.",
-        });
-      }
-
       const textoLimpo = texto.trim();
       // MODERACAO DE SEGURANCA ANTES DO CONSUMO DE CREDITOS
       if (!openai) {
@@ -2067,77 +2060,100 @@ Regras:
           );
         }
       }
-      // ELEVENLABS
+      // IDENTIFICAR PROVEDOR DA VOZ
       // =====================================================
 
-      const resposta = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(
-          voiceId
-        )}`,
-        {
-          method: "POST",
+      const { data: vozClonada, error: erroVozClonada } =
+        await supabaseAdmin
+          .from("vozes_clonadas")
+          .select("cartesia_voice_id")
+          .eq("id", voiceId)
+          .eq("user_id", usuarioId)
+          .maybeSingle();
 
-          headers: {
-            "xi-api-key":
-              process.env.ELEVENLABS_API_KEY,
+      if (erroVozClonada) {
+        console.error("ERRO AO IDENTIFICAR VOZ CLONADA:", erroVozClonada);
+        throw new Error("Não foi possível identificar a voz selecionada.");
+      }
 
-            "Content-Type":
-              "application/json",
+      let resposta;
 
-            "Accept":
-              "audio/mpeg",
-          },
-
-          body: JSON.stringify({
-            text: textoParaVoz,
-
-            model_id:
-              "eleven_v3",
-
-            language_code:
-              "pt",
-
-            voice_settings: {
-              stability: estabilidadeEstilo,
-              style: 0,
-            },
-
-            output_format:
-              "mp3_44100_128",
-          }),
+      if (vozClonada) {
+        if (!vozClonada.cartesia_voice_id) {
+          throw new Error("O identificador da voz Cartesia não está cadastrado.");
         }
-      );
+
+        if (!process.env.CARTESIA_API_KEY) {
+          throw new Error("CARTESIA_API_KEY não configurada.");
+        }
+
+        console.log("GERANDO COM CARTESIA. VOZ:", vozClonada.cartesia_voice_id);
+
+        resposta = await fetch("https://api.cartesia.ai/tts/bytes", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.CARTESIA_API_KEY}`,
+            "Cartesia-Version": process.env.CARTESIA_API_VERSION || "2026-08-14",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model_id: "sonic-3",
+            transcript: textoParaVoz,
+            voice: {
+              mode: "id",
+              id: vozClonada.cartesia_voice_id
+            },
+            language: "pt",
+            output_format: {
+              container: "mp3",
+              sample_rate: 44100,
+              bit_rate: 128000
+            }
+          })
+        });
+      } else {
+        if (!process.env.ELEVENLABS_API_KEY) {
+          throw new Error("ELEVENLABS_API_KEY não configurada.");
+        }
+
+        console.log("GERANDO COM ELEVENLABS. VOZ:", voiceId);
+
+        resposta = await fetch(
+          `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}`,
+          {
+            method: "POST",
+            headers: {
+              "xi-api-key": process.env.ELEVENLABS_API_KEY,
+              "Content-Type": "application/json",
+              "Accept": "audio/mpeg"
+            },
+            body: JSON.stringify({
+              text: textoParaVoz,
+              model_id: "eleven_v3",
+              language_code: "pt",
+              voice_settings: {
+                stability: estabilidadeEstilo,
+                style: 0
+              },
+              output_format: "mp3_44100_128"
+            })
+          }
+        );
+      }
 
       if (!resposta.ok) {
-        const erroApi =
-          await resposta.text();
-
-        console.error("ELEVENLABS ERRO:");
-        console.error(erroApi);
-
-        throw new Error(
-          erroApi ||
-          "Erro na ElevenLabs."
-        );
+        const erroApi = await resposta.text();
+        console.error("ERRO NO PROVEDOR DE VOZ:", erroApi);
+        throw new Error(erroApi || "Erro ao gerar áudio.");
       }
 
-      let audio =
-        Buffer.from(
-          await resposta.arrayBuffer()
-        );
+      let audio = Buffer.from(await resposta.arrayBuffer());
 
       if (!audio.length) {
-        throw new Error(
-          "A ElevenLabs retornou um ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡udio vazio."
-        );
+        throw new Error("O provedor retornou um áudio vazio.");
       }
 
-      console.log(
-        "ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âudio recebido:",
-        audio.length,
-        "bytes"
-      );
-
+      console.log("ÁUDIO RECEBIDO:", audio.length, "bytes");
       // =====================================================
 
       if (voiceId === "Gxi5hLxJ4skjTWK8XHBJ") {
