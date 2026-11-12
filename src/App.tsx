@@ -1,4 +1,4 @@
-﻿import logoFabrica from './assets/logo-fabrica.png'
+import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -90,7 +90,7 @@ function App() {
         .maybeSingle()
 
       if (error || !data) {
-        console.error('Erro ao carregar crÃ©ditos:', error)
+        console.error('Erro ao carregar créditos:', error)
 
         if (tentativa < 2) {
           await new Promise((resolve) => setTimeout(resolve, 500))
@@ -210,7 +210,7 @@ function App() {
   }
 
   if (!email.includes('@') || !email.includes('.')) {
-    setErroCadastro('Digite um e-mail vÃ¡lido.')
+    setErroCadastro('Digite um e-mail válido.')
     return
   }
 
@@ -220,7 +220,7 @@ function App() {
   }
 
   if (senhaCadastro !== confirmarSenhaCadastro) {
-    setErroCadastro('As senhas nÃ£o coincidem.')
+    setErroCadastro('As senhas não coincidem.')
     return
   }
 
@@ -253,7 +253,7 @@ function App() {
       await carregarCreditos()
     } else {
       setErroCadastro(
-        'âœ… Cadastro realizado! Enviamos um link de confirmaÃ§Ã£o para o seu e-mail. Abra seu e-mail e clique no link para confirmar sua conta. Depois, volte aqui e faÃ§a login.'
+        '✅ Cadastro realizado! Enviamos um link de confirmação para o seu e-mail. Abra seu e-mail e clique no link para confirmar sua conta. Depois, volte aqui e faça login.'
       )
     }
   }
@@ -311,10 +311,6 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   const [confirmacaoAudioClone, setConfirmacaoAudioClone] = useState(false)
   const [criandoVozClone, setCriandoVozClone] = useState(false)
   const [mensagemClone, setMensagemClone] = useState('')
-  const [audioPreviewCloneUrl, setAudioPreviewCloneUrl] = useState("");
-  const [audioPreviewCloneId, setAudioPreviewCloneId] = useState("");
-  const [gerandoPreviewClone, setGerandoPreviewClone] = useState(false);
-  const [mensagemPreviewClone, setMensagemPreviewClone] = useState("");
 
   const [estiloSelecionado, setEstiloSelecionado] = useState('normal')
 
@@ -411,7 +407,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
 
   // =====================================================
-  // HISTÃ“RICO DE VINHETAS â€” 3 DIAS
+  // HISTÓRICO DE VINHETAS — 3 DIAS
   // =====================================================
 
   const carregarVozesClonadas = async () => {
@@ -431,7 +427,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       })
 
       if (!resposta.ok) {
-        throw new Error('NÃ£o foi possÃ­vel carregar suas vozes clonadas.')
+        throw new Error('Não foi possível carregar suas vozes clonadas.')
       }
 
       const resultado = await resposta.json()
@@ -442,14 +438,14 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     }
   }
   const excluirVozClonada = async (voz: VozClonada) => {
-    if (!window.confirm(`Deseja realmente excluir a voz "${voz.nome}"? Essa aÃ§Ã£o nÃ£o poderÃ¡ ser desfeita.`)) return
+    if (!window.confirm(`Deseja realmente excluir a voz "${voz.nome}"? Essa ação não poderá ser desfeita.`)) return
 
     try {
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession()
 
       if (sessionError || !sessionData.session) {
-        throw new Error('FaÃ§a login novamente para excluir sua voz.')
+        throw new Error('Faça login novamente para excluir sua voz.')
       }
 
       const resposta = await fetch(`/api/minhas-vozes-clonadas/${encodeURIComponent(voz.id)}`, {
@@ -462,7 +458,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       const resultado = await resposta.json().catch(() => ({}))
 
       if (!resposta.ok || !resultado.sucesso) {
-        throw new Error(resultado.erro || 'NÃ£o foi possÃ­vel excluir a voz.')
+        throw new Error(resultado.erro || 'Não foi possível excluir a voz.')
       }
 
       if (vozSelecionada === voz.id) {
@@ -470,7 +466,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       }
 
       await carregarVozesClonadas()
-      setMensagemClone('Voz excluÃ­da com sucesso!')
+      setMensagemClone('Voz excluída com sucesso!')
     } catch (erro) {
       setMensagemClone(
         erro instanceof Error ? erro.message : 'Erro ao excluir a voz.'
@@ -484,23 +480,23 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     }
 
     if (!arquivoNovaVoz) {
-      setMensagemClone('Selecione um arquivo de Ã¡udio.')
+      setMensagemClone('Selecione um arquivo de áudio.')
       return
     }
 
     if (!confirmacaoAudioClone) {
-      setMensagemClone('Confirme que o Ã¡udio estÃ¡ limpo e que vocÃª tem autorizaÃ§Ã£o para clonar a voz.')
+      setMensagemClone('Confirme que o áudio está limpo e que você tem autorização para clonar a voz.')
       return
     }
 
     if (creditos === null) {
       await carregarCreditos()
-      setMensagemClone('NÃ£o foi possÃ­vel confirmar seu saldo. Tente novamente.')
+      setMensagemClone('Não foi possível confirmar seu saldo. Tente novamente.')
       return
     }
 
     if (creditos < 5) {
-      setMensagemClone('VocÃª precisa de 5 crÃ©ditos para criar uma voz clonada.')
+      setMensagemClone('Você precisa de 5 créditos para criar uma voz clonada.')
       return
     }
 
@@ -512,7 +508,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         await supabase.auth.getSession()
 
       if (sessionError || !sessionData.session) {
-        throw new Error('FaÃ§a login novamente para criar sua voz.')
+        throw new Error('Faça login novamente para criar sua voz.')
       }
 
       const formulario = new FormData()
@@ -538,7 +534,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         throw new Error(
           resultado.erro ||
           resultado.message ||
-          'NÃ£o foi possÃ­vel criar sua voz clonada.'
+          'Não foi possível criar sua voz clonada.'
         )
       }
 
@@ -559,59 +555,13 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       setMensagemClone(
         erro instanceof Error
           ? erro.message
-          : 'NÃ£o foi possÃ­vel criar sua voz clonada.'
+          : 'Não foi possível criar sua voz clonada.'
       )
       await carregarCreditos()
     } finally {
       setCriandoVozClone(false)
     }
   }
-
-  const ouvirPreviewClone = async (voiceId: string) => {
-
-    setGerandoPreviewClone(true);
-    setMensagemPreviewClone("");
-    setAudioPreviewCloneUrl("");
-
-    try {
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
-
-      if (sessionError || !sessionData.session) {
-        throw new Error("Faca login novamente para ouvir a previa.");
-      }
-
-      const resposta = await fetch("/api/preview-clone", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + sessionData.session.access_token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ voiceId })
-      });
-
-      if (!resposta.ok) {
-        const erro = await resposta.json().catch(() => ({}));
-        throw new Error(erro.erro || "Nao foi possivel gerar a previa.");
-      }
-
-      const blob = await resposta.blob();
-
-      if (!blob.size) {
-        throw new Error("O audio da previa veio vazio.");
-      }
-
-      setAudioPreviewCloneUrl(URL.createObjectURL(blob));
-      setAudioPreviewCloneId(voiceId);
-    } catch (erro) {
-      setMensagemPreviewClone(
-        erro instanceof Error ? erro.message : "Erro ao gerar previa."
-      );
-    } finally {
-      setGerandoPreviewClone(false);
-    }
-  };
-
   const carregarHistorico = async () => {
     setCarregandoHistorico(true)
 
@@ -660,7 +610,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         .order('criado_em', { ascending: false })
 
       if (error) {
-        console.error('Erro ao carregar histÃ³rico:', error)
+        console.error('Erro ao carregar histórico:', error)
         setHistorico([])
         return
       }
@@ -681,7 +631,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
       setHistorico(itens)
     } catch (erro) {
-      console.error('Erro ao carregar histÃ³rico:', erro)
+      console.error('Erro ao carregar histórico:', erro)
       setHistorico([])
     } finally {
       setCarregandoHistorico(false)
@@ -762,7 +712,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       .remove([item.arquivo_path])
 
     if (storageError) {
-      console.error('Erro ao excluir Ã¡udio:', storageError)
+      console.error('Erro ao excluir áudio:', storageError)
       return
     }
 
@@ -798,25 +748,25 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       return (
         <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'linear-gradient(rgba(5,3,10,0.35), rgba(5,3,10,0.50)), url(/fundo-estudio.png) center center / cover fixed', color: '#fff' }}>
           <div style={{ width: '100%', maxWidth: '460px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(13,9,22,0.68)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
-            <img src={logoFabrica} alt="FÃ¡brica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
+            <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
             <h2 style={{ margin: '0 0 8px' }}>Criar sua conta</h2>
-            <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a FÃ¡brica da Voz.</p>
+            <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Cadastre seus dados para acessar a Fábrica da Voz.</p>
             <section style={{ marginBottom: '24px', textAlign: 'left' }}>
-              <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd', fontSize: '18px' }}>OuÃ§a nossos demonstrativos</h3>
-              <p style={{ textAlign: 'center', opacity: 0.75, fontSize: '14px', margin: '0 0 16px' }}>ConheÃ§a alguns exemplos de locuÃ§Ãµes produzidas com a FÃ¡brica da Voz.</p>
+              <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd', fontSize: '18px' }}>Ouça nossos demonstrativos</h3>
+              <p style={{ textAlign: 'center', opacity: 0.75, fontSize: '14px', margin: '0 0 16px' }}>Conheça alguns exemplos de locuções produzidas com a Fábrica da Voz.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px' }}>
                 {[
                   { nome: 'Igreja', arquivo: '/demo-igreja.mp3' },
                   { nome: 'Loja', arquivo: '/demo-loja.mp3' },
                   { nome: 'Pet shop', arquivo: '/demo-petshop.mp3' },
                   { nome: 'Supermercado', arquivo: '/demo-supermercado.mp3' },
-                  { nome: 'VeÃ­culos', arquivo: '/demo-veiculos.mp3' },
-                  { nome: 'Vinheta de rÃ¡dio', arquivo: '/demo-vinheta-radio.mp3' },
+                  { nome: 'Veículos', arquivo: '/demo-veiculos.mp3' },
+                  { nome: 'Vinheta de rádio', arquivo: '/demo-vinheta-radio.mp3' },
                 ].map((demo) => (
                   <div key={demo.arquivo} style={{ padding: '12px', borderRadius: '12px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.25)', minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '8px' }}>{demo.nome}</div>
                     <audio controls preload="none" src={demo.arquivo} style={{ display: 'block', width: '100%', height: '38px' }}>
-                      Seu navegador nÃ£o suporta Ã¡udio.
+                      Seu navegador não suporta áudio.
                     </audio>
                   </div>
                 ))}
@@ -834,7 +784,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               <button type="button" onClick={validarCadastro} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Criar minha conta</button>
             </div>
             {erroCadastro && <p style={{ color: '#c084fc', marginTop: '14px', fontWeight: 600 }}>{erroCadastro}</p>}
-            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>â†? Voltar para entrar</button>
+            <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>↝? Voltar para entrar</button>
           </div>
         </div>
       )
@@ -843,9 +793,9 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box', background: 'linear-gradient(rgba(5,3,10,0.35), rgba(5,3,10,0.50)), url(/fundo-estudio.png) center center / cover fixed', color: '#fff' }}>
         <div style={{ width: '100%', maxWidth: '760px', padding: '34px', boxSizing: 'border-box', borderRadius: '24px', background: 'rgba(13,9,22,0.68)', backdropFilter: 'blur(12px)', border: '1px solid rgba(139,92,246,0.35)', boxShadow: '0 24px 70px rgba(0,0,0,0.55)', textAlign: 'center' }}>
-          <img src={logoFabrica} alt="FÃ¡brica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
-          <h2 style={{ margin: '0 0 8px', color: '#ffffff', fontSize: '24px', fontWeight: 800, whiteSpace: 'nowrap', textShadow: '0 2px 18px rgba(139,92,246,0.45)' }}>Entre na FÃ¡brica da Voz</h2>
-          <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Crie sua conta ou entre para usar seu saldo de crÃ©ditos.</p>
+          <img src={logoFabrica} alt="Fábrica da Voz" style={{ width: '190px', maxWidth: '80%', marginBottom: '18px' }} />
+          <h2 style={{ margin: '0 0 8px', color: '#ffffff', fontSize: '24px', fontWeight: 800, whiteSpace: 'nowrap', textShadow: '0 2px 18px rgba(139,92,246,0.45)' }}>Entre na Fábrica da Voz</h2>
+          <p style={{ opacity: 0.72, margin: '0 0 24px' }}>Crie sua conta ou entre para usar seu saldo de créditos.</p>
           <div style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
             <label style={{ fontWeight: 700 }}>E-mail</label>
             <input
@@ -872,7 +822,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
             <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
           </div>
           {erroAcesso && <p style={{ color: '#ff6b6b', marginTop: '14px', fontWeight: 600 }}>{erroAcesso}</p>}
-          {/* Criar minha conta â€” botÃ£o amarelo apÃ³s entrar */}
+          {/* Criar minha conta — botão amarelo após entrar */}
           <button
             type="button"
             onClick={() => { setMostrarCadastro(true); setErroCadastro('') }}
@@ -897,10 +847,10 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               Quer ouvir nossas vozes?
             </div>
             <div style={{ color: '#d8c4f5', fontSize: '13px', lineHeight: 1.5 }}>
-              Deslize para baixo e ouÃ§a os demonstrativos!
+              Deslize para baixo e ouça os demonstrativos!
             </div>
             <div style={{ color: '#c084fc', fontSize: '27px', lineHeight: 1.2, animation: 'indicacaoScrollVoz 1.2s ease-in-out infinite', marginTop: '5px' }} aria-hidden="true">
-              â†“
+              ↓
             </div>
             <style>{`
               @keyframes indicacaoScrollVoz {
@@ -912,7 +862,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               }
             `}</style>
           </div>
-          {/* DemonstraÃ§Ãµes na tela inicial */}
+          {/* Demonstrações na tela inicial */}
           <section style={{ margin: '24px 0 18px', textAlign: 'center' }}>
             <div style={{ height: '1px', background: 'linear-gradient(90deg, transparent, #8b5cf6, transparent)', marginBottom: '18px' }} />
 
@@ -943,11 +893,11 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
             </svg>
 
             <h3 style={{ textAlign: 'center', margin: '0 0 8px', color: '#c4b5fd', fontSize: '19px', lineHeight: 1.3, fontWeight: 800 }}>
-              OuÃ§a nossos demonstrativos
+              Ouça nossos demonstrativos
             </h3>
 
             <p style={{ color: '#d1c5e8', fontSize: '14px', lineHeight: 1.6, margin: '0 auto 18px', maxWidth: '420px' }}>
-              ConheÃ§a exemplos de locuÃ§Ãµes com nossas vozes profissionais.
+              Conheça exemplos de locuções com nossas vozes profissionais.
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px', textAlign: 'left' }}>
@@ -956,13 +906,13 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
                 { nome: 'Loja', arquivo: '/demo-loja.mp3' },
                 { nome: 'Pet shop', arquivo: '/demo-petshop.mp3' },
                 { nome: 'Supermercado', arquivo: '/demo-supermercado.mp3' },
-                { nome: 'VeÃ­culos', arquivo: '/demo-veiculos.mp3' },
-                { nome: 'Vinheta de rÃ¡dio', arquivo: '/demo-vinheta-radio.mp3' },
+                { nome: 'Veículos', arquivo: '/demo-veiculos.mp3' },
+                { nome: 'Vinheta de rádio', arquivo: '/demo-vinheta-radio.mp3' },
               ].map((demo) => (
                 <div key={demo.arquivo} style={{ padding: '12px', borderRadius: '12px', background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.25)', minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '8px', color: '#f3e8ff' }}>{demo.nome}</div>
                   <audio controls preload="none" src={demo.arquivo} style={{ width: '100%', height: '38px' }}>
-                    Seu navegador nÃ£o suporta Ã¡udio.
+                    Seu navegador não suporta áudio.
                   </audio>
                 </div>
               ))}
@@ -988,7 +938,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               fontSize: '15px',
             }}
           >
-            ðŸ’¬ Falar no WhatsApp
+            💬 Falar no WhatsApp
           </a>
 
           <div
@@ -1003,9 +953,9 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
           </div>
 
           <div style={{ margin: '26px 0', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-          <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda nÃ£o tem uma conta?</p>
+          <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda não tem uma conta?</p>
           <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid #facc15', borderRadius: '11px', cursor: 'pointer', fontWeight: 800, fontSize: '16px', color: '#241800', background: 'linear-gradient(135deg, #fde047, #facc15)', boxShadow: '0 4px 14px rgba(250,204,21,0.22)' }}>Criar minha conta</button>
-          <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>ðŸ’³ Depois do cadastro, vocÃª poderÃ¡ comprar crÃ©ditos para gerar suas locuÃ§Ãµes.</p>
+          <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>💳 Depois do cadastro, você poderá comprar créditos para gerar suas locuções.</p>
         </div>
       </div>
     )
@@ -1086,7 +1036,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     },
         {
       id: 'B7HqRIxroDpybJI9vXMj',
-      nome: 'VinÃ­cius',
+      nome: 'Vinícius',
       foto: viniciusLocutor,
       demonstrativo: '/vozes/vinicius-voz.mp3'
 ,
@@ -1103,7 +1053,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
     {
       id: 'DQRaZFBAlsnenMlFVe0R',
-      nome: 'LourenÃ§o',
+      nome: 'Lourenço',
       foto: lourencoLocutor,
       demonstrativo: '/vozes/lourenco.mp3'
 ,
@@ -1184,7 +1134,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
     {
       id: 'gyiJ08WU9Wi2LNY7nTcB',
-      nome: 'LetÃ­cia',
+      nome: 'Letícia',
       foto: '/leticia-foto.png',
       demonstrativo: '/vozes/leticia-voz.mp3'
 ,
@@ -1262,9 +1212,9 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
     },
     {
       id: 'GiNbP6xPhrH6X8DJBD08',
-      nome: 'AndrÃ©',
-      foto: '/andrÃ©-foto.png',
-      demonstrativo: '/vozes/andrÃ©-voz.mp3',
+      nome: 'André',
+      foto: '/andré-foto.png',
+      demonstrativo: '/vozes/andré-voz.mp3',
       especialidade: 'Impacto'
     },
     {
@@ -1278,12 +1228,12 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'VinÃ­cius', 'Vitor', 'LourenÃ§o', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel', 'Marcos', 'AndrÃ©', 'Rodrigo', 'Roger', 'Thiago', 'Toledo'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel', 'Marcos', 'André', 'Rodrigo', 'Roger', 'Thiago', 'Toledo'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
   (voz) =>
-    ['Nina', 'Luiza', 'Gaby', 'LetÃ­cia', 'Regiane', 'Belkis'].includes(voz.nome)
+    ['Nina', 'Luiza', 'Gaby', 'Letícia', 'Regiane', 'Belkis'].includes(voz.nome)
 )
 
 const vozesInfantis = vozes.filter(
@@ -1365,7 +1315,7 @@ const vozesInfantis = vozes.filter(
     const dados = await resposta.json()
 
     if (!resposta.ok) {
-      throw new Error(dados?.erro || 'NÃ£o foi possÃ­vel corrigir o texto.')
+      throw new Error(dados?.erro || 'Não foi possível corrigir o texto.')
     }
 
     setTexto(dados.texto || '')
@@ -1375,7 +1325,7 @@ const vozesInfantis = vozes.filter(
     alert(
       erro instanceof Error
         ? erro.message
-        : 'NÃ£o foi possÃ­vel corrigir o texto.'
+        : 'Não foi possível corrigir o texto.'
     )
   } finally {
     setCorrigindoTexto(false)
@@ -1391,7 +1341,7 @@ const iniciarPagamento = async (pacote: {
       await supabase.auth.getSession()
 
     if (sessionError || !sessionData.session) {
-      alert('FaÃ§a login para comprar crÃ©ditos.')
+      alert('Faça login para comprar créditos.')
       return
     }
 
@@ -1405,7 +1355,7 @@ const iniciarPagamento = async (pacote: {
     const pacoteId = mapaPacotes[pacote.creditos]
 
     if (!pacoteId) {
-      alert('Pacote de crÃ©ditos invÃ¡lido.')
+      alert('Pacote de créditos inválido.')
       return
     }
 
@@ -1424,12 +1374,12 @@ const iniciarPagamento = async (pacote: {
 
     if (!resposta.ok) {
       throw new Error(
-        dados.erro || 'NÃ£o foi possÃ­vel iniciar o pagamento.'
+        dados.erro || 'Não foi possível iniciar o pagamento.'
       )
     }
 
     if (!dados.init_point) {
-      throw new Error('O Mercado Pago nÃ£o retornou o link de pagamento.')
+      throw new Error('O Mercado Pago não retornou o link de pagamento.')
     }
 
     window.location.href = dados.init_point
@@ -1439,7 +1389,7 @@ const iniciarPagamento = async (pacote: {
     alert(
       erro instanceof Error
         ? erro.message
-        : 'NÃ£o foi possÃ­vel iniciar o pagamento.'
+        : 'Não foi possível iniciar o pagamento.'
     )
   }
 }
@@ -1484,7 +1434,7 @@ const regenerarVoz = async () => {
       }
 
       const audioBlob = await resposta.blob();
-        throw new Error('O servidor retornou um Ã¡udio vazio.')
+        throw new Error('O servidor retornou um áudio vazio.')
 
       const urlAudio = URL.createObjectURL(audioBlob);
       setAudioUrl(urlAudio);
@@ -1519,21 +1469,21 @@ const gerarVoz = async () => {
     )
 
     if (carregandoCreditos) {
-      alert('Aguarde o carregamento do seu saldo de crÃ©ditos.')
+      alert('Aguarde o carregamento do seu saldo de créditos.')
       return
     }
 
     if (creditos === null) {
       await carregarCreditos()
-      alert('NÃ£o foi possÃ­vel confirmar seu saldo. Tente novamente.')
+      alert('Não foi possível confirmar seu saldo. Tente novamente.')
       return
     }
 
     if (creditos < creditosNecessarios) {
       alert(
-        `VocÃª precisa de ${creditosNecessarios} crÃ©dito${
+        `Você precisa de ${creditosNecessarios} crédito${
           creditosNecessarios === 1 ? '' : 's'
-        } para gerar essa locuÃ§Ã£o. Seu saldo atual Ã© de ${creditos} crÃ©dito${
+        } para gerar essa locução. Seu saldo atual é de ${creditos} crédito${
           creditos === 1 ? '' : 's'
         }.`
       )
@@ -1547,7 +1497,7 @@ const gerarVoz = async () => {
       sessionError ||
       !sessionData.session
     ) {
-      alert('Sua sessÃ£o expirou. FaÃ§a login novamente.')
+      alert('Sua sessão expirou. Faça login novamente.')
       return
     }
 
@@ -1600,7 +1550,7 @@ const gerarVoz = async () => {
       const audioBlob = await resposta.blob()
 
       if (!audioBlob.size) {
-        throw new Error('O servidor retornou um Ã¡udio vazio.')
+        throw new Error('O servidor retornou um áudio vazio.')
       }
 
       const urlAudio =
@@ -1615,7 +1565,7 @@ const gerarVoz = async () => {
 
       await salvarNoHistorico(audioBlob, 'locucao')
 
-      // O servidor jÃ¡ descontou os crÃ©ditos com seguranÃ§a.
+      // O servidor já descontou os créditos com segurança.
       // Apenas atualizamos o saldo exibido na tela.
       await carregarCreditos()
     } catch (erro) {
@@ -1624,7 +1574,7 @@ const gerarVoz = async () => {
       alert(
         erro instanceof Error
           ? erro.message
-          : 'NÃ£o foi possÃ­vel gerar a voz.'
+          : 'Não foi possível gerar a voz.'
       )
     } finally {
       setGerando(false)
@@ -1668,13 +1618,13 @@ const gerarVoz = async () => {
       const tokenVelocidade = sessaoVelocidade.session?.access_token
 
       if (erroSessao || !tokenVelocidade) {
-        throw new Error('Sua sessÃ£o expirou. Entre novamente.')
+        throw new Error('Sua sessão expirou. Entre novamente.')
       }
 
       const respostaOriginal = await fetch(audioOriginalUrl)
 
       if (!respostaOriginal.ok) {
-        throw new Error('NÃ£o foi possÃ­vel acessar o Ã¡udio original.')
+        throw new Error('Não foi possível acessar o áudio original.')
       }
 
       const arquivoOriginal = await respostaOriginal.blob()
@@ -1690,13 +1640,13 @@ const gerarVoz = async () => {
       })
 
       if (!resposta.ok) {
-        let mensagem = 'NÃ£o foi possÃ­vel alterar a velocidade.'
+        let mensagem = 'Não foi possível alterar a velocidade.'
 
         try {
           const dadosErro = await resposta.json()
           mensagem = dadosErro.erro || mensagem
         } catch {
-          // MantÃ©m a mensagem padrÃ£o se a resposta nÃ£o for JSON.
+          // Mantém a mensagem padrão se a resposta não for JSON.
         }
 
         throw new Error(mensagem)
@@ -1705,7 +1655,7 @@ const gerarVoz = async () => {
       const audioProcessado = await resposta.blob()
 
       if (!audioProcessado.size) {
-        throw new Error('O servidor retornou um Ã¡udio vazio.')
+        throw new Error('O servidor retornou um áudio vazio.')
       }
 
       const novaUrl = URL.createObjectURL(audioProcessado)
@@ -1719,7 +1669,7 @@ const gerarVoz = async () => {
       setErroVelocidade(
         erro instanceof Error
           ? erro.message
-          : 'Erro ao alterar velocidade do Ã¡udio.'
+          : 'Erro ao alterar velocidade do áudio.'
       )
     } finally {
       setAlterandoVelocidade(false)
@@ -1731,7 +1681,7 @@ const gerarVoz = async () => {
     const textoLimpo = textoDJ.trim()
 
     if (!nomeLimpo) {
-      alert('Digite seu nome artÃ­stico de DJ.')
+      alert('Digite seu nome artístico de DJ.')
       return
     }
 
@@ -1741,7 +1691,7 @@ const gerarVoz = async () => {
     }
 
     if (nomeLimpo.length > 60 || textoLimpo.length > 800) {
-      alert('Confira os limites: nome artÃ­stico atÃ© 60 caracteres e texto atÃ© 800.')
+      alert('Confira os limites: nome artístico até 60 caracteres e texto até 800.')
       return
     }
 
@@ -1754,7 +1704,7 @@ const gerarVoz = async () => {
         await supabase.auth.getSession()
 
       if (sessionError || !sessionData.session) {
-        throw new Error('FaÃ§a login para gerar sua vinheta DJ.')
+        throw new Error('Faça login para gerar sua vinheta DJ.')
       }
 
       const resposta = await fetch('/api/gerar-jingle-dj', {
@@ -1772,13 +1722,13 @@ const gerarVoz = async () => {
       })
 
       if (!resposta.ok) {
-        let mensagem = 'NÃ£o foi possÃ­vel gerar a vinheta DJ.'
+        let mensagem = 'Não foi possível gerar a vinheta DJ.'
 
         try {
           const dadosErro = await resposta.json()
           mensagem = dadosErro.erro || mensagem
         } catch {
-          // MantÃ©m a mensagem padrÃ£o se a resposta nÃ£o for JSON.
+          // Mantém a mensagem padrão se a resposta não for JSON.
         }
 
         await carregarCreditos()
@@ -1788,7 +1738,7 @@ const gerarVoz = async () => {
       const audioBlob = await resposta.blob()
 
       if (!audioBlob.size) {
-        throw new Error('O servidor retornou um Ã¡udio vazio.')
+        throw new Error('O servidor retornou um áudio vazio.')
       }
 
       const novaUrl = URL.createObjectURL(audioBlob)
@@ -1805,7 +1755,7 @@ const gerarVoz = async () => {
       alert(
         erro instanceof Error
           ? erro.message
-          : 'NÃ£o foi possÃ­vel gerar a vinheta DJ.'
+          : 'Não foi possível gerar a vinheta DJ.'
       )
     } finally {
       setGerandoDJ(false)
@@ -1817,7 +1767,7 @@ const gerarVoz = async () => {
     const sloganLimpo = sloganRadioIA.trim();
 
     if (!nomeLimpo) {
-      alert("Digite o nome da rÃ¡dio.");
+      alert("Digite o nome da rádio.");
       return;
     }
 
@@ -1835,7 +1785,7 @@ const gerarVoz = async () => {
         await supabase.auth.getSession();
 
       if (sessionError || !sessionData.session) {
-        throw new Error("FaÃ§a login para gerar as vinhetas.");
+        throw new Error("Faça login para gerar as vinhetas.");
       }
 
       const resposta = await fetch("/api/gerar-vinhetas-radio-ia", {
@@ -1859,12 +1809,12 @@ const gerarVoz = async () => {
 
       if (!resposta.ok) {
         await carregarCreditos();
-        throw new Error(dados.erro || "NÃ£o foi possÃ­vel gerar as vinhetas.");
+        throw new Error(dados.erro || "Não foi possível gerar as vinhetas.");
       }
 
       if (!Array.isArray(dados.vinhetas) || dados.vinhetas.length === 0) {
         await carregarCreditos();
-        throw new Error("O servidor nÃ£o retornou nenhum Ã¡udio.");
+        throw new Error("O servidor não retornou nenhum áudio.");
       }
 
       const novasVinhetas = dados.vinhetas.map(
@@ -1898,16 +1848,16 @@ const gerarVoz = async () => {
       } else {
         alert(
           `Foram entregues ${novasVinhetas.length} vinheta(s). ` +
-          `CrÃ©ditos consumidos: ${dados.creditosConsumidos}.`
+          `Créditos consumidos: ${dados.creditosConsumidos}.`
         );
       }
     } catch (erro) {
-      console.error("Erro ao gerar vinhetas de rÃ¡dio IA:", erro);
+      console.error("Erro ao gerar vinhetas de rádio IA:", erro);
 
       alert(
         erro instanceof Error
           ? erro.message
-          : "NÃ£o foi possÃ­vel gerar as vinhetas."
+          : "Não foi possível gerar as vinhetas."
       );
     } finally {
       setGerandoVinhetasRadioIA(false);
@@ -1935,20 +1885,20 @@ const gerarVoz = async () => {
       { nome: '15 - Comercial', arquivo: '/trilhas/comercial/15-comercial.mp3' },
     ],
     forro: [
-      { nome: '01 - ForrÃ³', arquivo: '/trilhas/forro/01- ForrÃ³.mp3' },
-      { nome: '02 - ForrÃ³', arquivo: '/trilhas/forro/02- ForrÃ³.mp3' },
-      { nome: '03 - ForrÃ³', arquivo: '/trilhas/forro/03- ForrÃ³.mp3' },
-      { nome: '04 - ForrÃ³', arquivo: '/trilhas/forro/04- ForrÃ³.mp3' },
-      { nome: '05 - ForrÃ³', arquivo: '/trilhas/forro/05- ForrÃ³.mp3' },
-      { nome: '06 - ForrÃ³', arquivo: '/trilhas/forro/06- ForrÃ³.mp3' },
-      { nome: '07 - ForrÃ³', arquivo: '/trilhas/forro/07- ForrÃ³.mp3' },
-      { nome: '08 - ForrÃ³', arquivo: '/trilhas/forro/08- ForrÃ³.mp3' },
-      { nome: '09 - ForrÃ³', arquivo: '/trilhas/forro/09- ForrÃ³.mp3' },
-      { nome: '10 - ForrÃ³', arquivo: '/trilhas/forro/10- ForrÃ³.mp3' },
-      { nome: '11 - ForrÃ³', arquivo: '/trilhas/forro/11- ForrÃ³.mp3' },
-      { nome: '12 - ForrÃ³', arquivo: '/trilhas/forro/12- ForrÃ³.mp3' },
-      { nome: '13 - ForrÃ³', arquivo: '/trilhas/forro/13- ForrÃ³.mp3' },
-      { nome: '14 - ForrÃ³', arquivo: '/trilhas/forro/14- ForrÃ³.mp3' },
+      { nome: '01 - Forró', arquivo: '/trilhas/forro/01- Forró.mp3' },
+      { nome: '02 - Forró', arquivo: '/trilhas/forro/02- Forró.mp3' },
+      { nome: '03 - Forró', arquivo: '/trilhas/forro/03- Forró.mp3' },
+      { nome: '04 - Forró', arquivo: '/trilhas/forro/04- Forró.mp3' },
+      { nome: '05 - Forró', arquivo: '/trilhas/forro/05- Forró.mp3' },
+      { nome: '06 - Forró', arquivo: '/trilhas/forro/06- Forró.mp3' },
+      { nome: '07 - Forró', arquivo: '/trilhas/forro/07- Forró.mp3' },
+      { nome: '08 - Forró', arquivo: '/trilhas/forro/08- Forró.mp3' },
+      { nome: '09 - Forró', arquivo: '/trilhas/forro/09- Forró.mp3' },
+      { nome: '10 - Forró', arquivo: '/trilhas/forro/10- Forró.mp3' },
+      { nome: '11 - Forró', arquivo: '/trilhas/forro/11- Forró.mp3' },
+      { nome: '12 - Forró', arquivo: '/trilhas/forro/12- Forró.mp3' },
+      { nome: '13 - Forró', arquivo: '/trilhas/forro/13- Forró.mp3' },
+      { nome: '14 - Forró', arquivo: '/trilhas/forro/14- Forró.mp3' },
     ],
     institucional: [
       { nome: '01 - Institucional', arquivo: '/trilhas/institucional/01-Trilha institucional.mp3' },
@@ -1978,21 +1928,21 @@ const gerarVoz = async () => {
       { nome: '10 - Gospel', arquivo: '/trilhas/gospel/10- Gospel.mp3' },
     ],
     jornalistica: [
-      { nome: '01 - JornalÃ­stica', arquivo: '/trilhas/jornalistica/01-Trilha jornaslÃ­stica.mp3' },
-      { nome: '02 - JornalÃ­stica', arquivo: '/trilhas/jornalistica/02-Trilha jornalÃ­stica.mp3' },
-      { nome: '03 - JornalÃ­stica', arquivo: '/trilhas/jornalistica/03-Trilha jornalÃ­stica.mp3' },
-      { nome: '04 - JornalÃ­stica', arquivo: '/trilhas/jornalistica/04-Trilha jornalÃ­stica.mp3' },
-      { nome: '05 - JornalÃ­stica', arquivo: '/trilhas/jornalistica/05-Trilha jornalÃ­stica.mp3' },
-      { nome: '06 - JornalÃ­stica', arquivo: '/trilhas/jornalistica/06-Trilha jornalÃ­stica.mp3' },
+      { nome: '01 - Jornalística', arquivo: '/trilhas/jornalistica/01-Trilha jornaslística.mp3' },
+      { nome: '02 - Jornalística', arquivo: '/trilhas/jornalistica/02-Trilha jornalística.mp3' },
+      { nome: '03 - Jornalística', arquivo: '/trilhas/jornalistica/03-Trilha jornalística.mp3' },
+      { nome: '04 - Jornalística', arquivo: '/trilhas/jornalistica/04-Trilha jornalística.mp3' },
+      { nome: '05 - Jornalística', arquivo: '/trilhas/jornalistica/05-Trilha jornalística.mp3' },
+      { nome: '06 - Jornalística', arquivo: '/trilhas/jornalistica/06-Trilha jornalística.mp3' },
     ],
     gaucha: [
-      { nome: '01 - GaÃºcha', arquivo: '/trilhas/gaucha/01- GaÃºcha.mp3' },
-      { nome: '02 - GaÃºcha', arquivo: '/trilhas/gaucha/02- GaÃºcha.mp3' },
-      { nome: '03 - GaÃºcha', arquivo: '/trilhas/gaucha/03- GaÃºcha.mp3' },
-      { nome: '04 - GaÃºcha', arquivo: '/trilhas/gaucha/04- GaÃºcha.mp3' },
-      { nome: '05 - GaÃºcha', arquivo: '/trilhas/gaucha/05- GaÃºcha.mp3' },
-      { nome: '06 - GaÃºcha', arquivo: '/trilhas/gaucha/06- GaÃºcha.mp3' },
-      { nome: '07 - GaÃºcha', arquivo: '/trilhas/gaucha/07- GaÃºcha.mp3' },
+      { nome: '01 - Gaúcha', arquivo: '/trilhas/gaucha/01- Gaúcha.mp3' },
+      { nome: '02 - Gaúcha', arquivo: '/trilhas/gaucha/02- Gaúcha.mp3' },
+      { nome: '03 - Gaúcha', arquivo: '/trilhas/gaucha/03- Gaúcha.mp3' },
+      { nome: '04 - Gaúcha', arquivo: '/trilhas/gaucha/04- Gaúcha.mp3' },
+      { nome: '05 - Gaúcha', arquivo: '/trilhas/gaucha/05- Gaúcha.mp3' },
+      { nome: '06 - Gaúcha', arquivo: '/trilhas/gaucha/06- Gaúcha.mp3' },
+      { nome: '07 - Gaúcha', arquivo: '/trilhas/gaucha/07- Gaúcha.mp3' },
     ],
     natal: [
       { nome: '01 - Natal', arquivo: '/trilhas/natal/01-natal.mp3' },
@@ -2012,19 +1962,19 @@ const gerarVoz = async () => {
       { nome: '03 - Sertanejo', arquivo: '/trilhas/sertanejo/03- Sertanejo.mp3' },
     ],
     eletronica: [
-      { nome: '01 - EletrÃ´nica', arquivo: '/trilhas/eletronica/01- EletrÃ´nica.mp3' },
-      { nome: '02 - EletrÃ´nica', arquivo: '/trilhas/eletronica/02- EletrÃ´nica.mp3' },
-      { nome: '03 - EletrÃ´nica', arquivo: '/trilhas/eletronica/03- EletrÃ´nica.mp3' },
-      { nome: '04 - EletrÃ´nica', arquivo: '/trilhas/eletronica/04- EletrÃµnica.mp3' },
-      { nome: '05 - EletrÃ´nica', arquivo: '/trilhas/eletronica/05- EletrÃ´nica.mp3' },
-      { nome: '06 - EletrÃ´nica', arquivo: '/trilhas/eletronica/06- EletrÃ´nica.mp3' },
-      { nome: '07 - EletrÃ´nica', arquivo: '/trilhas/eletronica/07- EletrÃ´nica.mp3' },
-      { nome: '08 - EletrÃ´nica', arquivo: '/trilhas/eletronica/08- EletrÃ´nica.mp3' },
-      { nome: '09 - EletrÃ´nica', arquivo: '/trilhas/eletronica/09- EletrÃ´nica.mp3' },
-      { nome: '10 - EletrÃ´nica', arquivo: '/trilhas/eletronica/10- EletrÃ´nica.mp3' },
-      { nome: '11 - EletrÃ´nica', arquivo: '/trilhas/eletronica/11- EletrÃ´nica.mp3' },
-      { nome: '12 - EletrÃ´nica', arquivo: '/trilhas/eletronica/12- EletrÃ´nica.mp3' },
-      { nome: '13 - EletrÃ´nica', arquivo: '/trilhas/eletronica/13- EletrÃ´nica.mp3' },
+      { nome: '01 - Eletrônica', arquivo: '/trilhas/eletronica/01- Eletrônica.mp3' },
+      { nome: '02 - Eletrônica', arquivo: '/trilhas/eletronica/02- Eletrônica.mp3' },
+      { nome: '03 - Eletrônica', arquivo: '/trilhas/eletronica/03- Eletrônica.mp3' },
+      { nome: '04 - Eletrônica', arquivo: '/trilhas/eletronica/04- Eletrõnica.mp3' },
+      { nome: '05 - Eletrônica', arquivo: '/trilhas/eletronica/05- Eletrônica.mp3' },
+      { nome: '06 - Eletrônica', arquivo: '/trilhas/eletronica/06- Eletrônica.mp3' },
+      { nome: '07 - Eletrônica', arquivo: '/trilhas/eletronica/07- Eletrônica.mp3' },
+      { nome: '08 - Eletrônica', arquivo: '/trilhas/eletronica/08- Eletrônica.mp3' },
+      { nome: '09 - Eletrônica', arquivo: '/trilhas/eletronica/09- Eletrônica.mp3' },
+      { nome: '10 - Eletrônica', arquivo: '/trilhas/eletronica/10- Eletrônica.mp3' },
+      { nome: '11 - Eletrônica', arquivo: '/trilhas/eletronica/11- Eletrônica.mp3' },
+      { nome: '12 - Eletrônica', arquivo: '/trilhas/eletronica/12- Eletrônica.mp3' },
+      { nome: '13 - Eletrônica', arquivo: '/trilhas/eletronica/13- Eletrônica.mp3' },
     ],
     infantil: [
       { nome: '01 - Infantil', arquivo: '/trilhas/infantil/01-Infantil.mp3' },
@@ -2034,17 +1984,17 @@ const gerarVoz = async () => {
   }
 
   const estilosDeTrilha = [
-    { valor: 'comercial', nome: 'ðŸŽ™ï¸ Comercial' },
-    { valor: 'forro', nome: 'ðŸ’ƒ ForrÃ³' },
-    { valor: 'institucional', nome: 'ðŸ¢ Institucional' },
-    { valor: 'impacto', nome: 'âš¡ Impacto' },
-    { valor: 'gospel', nome: 'âœï¸ Gospel' },
-    { valor: 'jornalistica', nome: 'ðŸ“° JornalÃ­stica' },
-    { valor: 'gaucha', nome: 'ðŸ¤  GaÃºcha' },
-    { valor: 'natal', nome: 'ðŸŽ„ Natal' },
-    { valor: 'sertanejo', nome: 'ðŸ¤  Sertanejo' },
-    { valor: 'eletronica', nome: 'ðŸŽ§ EletrÃ´nica' },
-    { valor: 'infantil', nome: 'ðŸ§¸ Infantil' },
+    { valor: 'comercial', nome: '🎙️ Comercial' },
+    { valor: 'forro', nome: '💃 Forró' },
+    { valor: 'institucional', nome: '🏢 Institucional' },
+    { valor: 'impacto', nome: '⚡ Impacto' },
+    { valor: 'gospel', nome: '✝️ Gospel' },
+    { valor: 'jornalistica', nome: '📰 Jornalística' },
+    { valor: 'gaucha', nome: '🤠 Gaúcha' },
+    { valor: 'natal', nome: '🎄 Natal' },
+    { valor: 'sertanejo', nome: '🤠 Sertanejo' },
+    { valor: 'eletronica', nome: '🎧 Eletrônica' },
+    { valor: 'infantil', nome: '🧸 Infantil' },
   ]
   const trilhasAtuais =
     trilhasPorEstilo[
@@ -2083,7 +2033,7 @@ const gerarVoz = async () => {
       )
     ) {
       alert(
-        'Escolha um arquivo de Ã¡udio MP3, WAV, OGG, M4A ou AAC.'
+        'Escolha um arquivo de áudio MP3, WAV, OGG, M4A ou AAC.'
       )
 
       e.target.value = ''
@@ -2310,7 +2260,7 @@ const gerarVoz = async () => {
     }
 
     if (!trilhaSelecionada && !trilhaArquivo) {
-      alert('Escolha uma trilha ou envie sua prÃ³pria trilha.')
+      alert('Escolha uma trilha ou envie sua própria trilha.')
       return
     }
 
@@ -2322,7 +2272,7 @@ const gerarVoz = async () => {
       const vozResponse = await fetch(audioUrl)
 
       if (!vozResponse.ok) {
-        throw new Error('NÃ£o foi possÃ­vel acessar o Ã¡udio da voz.')
+        throw new Error('Não foi possível acessar o áudio da voz.')
       }
 
       const vozBuffer = await vozResponse.arrayBuffer()
@@ -2335,7 +2285,7 @@ const gerarVoz = async () => {
         const trilhaResponse = await fetch(trilhaSelecionada)
 
         if (!trilhaResponse.ok) {
-          throw new Error('NÃ£o foi possÃ­vel carregar a trilha selecionada.')
+          throw new Error('Não foi possível carregar a trilha selecionada.')
         }
 
         trilhaBuffer = await trilhaResponse.arrayBuffer()
@@ -2350,7 +2300,7 @@ const gerarVoz = async () => {
         ).webkitAudioContext
 
       if (!AudioContextClass) {
-        throw new Error('Seu navegador nÃ£o suporta mixagem de Ã¡udio.')
+        throw new Error('Seu navegador não suporta mixagem de áudio.')
       }
 
       contexto = new AudioContextClass()
@@ -2402,20 +2352,20 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       // -----------------------------------------------------
       // CARREGAR EFEITOS
       // -----------------------------------------------------
-      // encodeURI evita problemas com nomes como "TransmissÃ£o.mp3".
+      // encodeURI evita problemas com nomes como "Transmissão.mp3".
       const carregarEfeito = async (
         caminho: string
       ): Promise<AudioBuffer> => {
         const resposta = await fetch(encodeURI(caminho))
 
         if (!resposta.ok) {
-          throw new Error(`NÃ£o foi possÃ­vel carregar o efeito: ${caminho}`)
+          throw new Error(`Não foi possível carregar o efeito: ${caminho}`)
         }
 
         const dados = await resposta.arrayBuffer()
 
         if (!dados.byteLength) {
-          throw new Error(`O efeito estÃ¡ vazio: ${caminho}`)
+          throw new Error(`O efeito está vazio: ${caminho}`)
         }
 
         return contexto.decodeAudioData(dados.slice(0))
@@ -2445,8 +2395,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
       const duracaoVoz = voz.duration
 
-      // Os efeitos sÃ£o posicionados em relaÃ§Ã£o ao INÃCIO DA TRILHA,
-      // nunca em relaÃ§Ã£o ao inÃ­cio da voz.
+      // Os efeitos são posicionados em relação ao INÍCIO DA TRILHA,
+      // nunca em relação ao início da voz.
       const posicaoEfeitoNormalizada = Math.max(
         0,
         Number(posicaoEfeito) || 0
@@ -2457,8 +2407,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         Number(posicaoEfeito2) || 0
       )
 
-      // Remove eventual silÃªncio do comeÃ§o do arquivo para que o efeito
-      // aconteÃ§a no segundo escolhido pelo usuÃ¡rio.
+      // Remove eventual silêncio do começo do arquivo para que o efeito
+      // aconteça no segundo escolhido pelo usuário.
       const encontrarOffsetComSom = (buffer: AudioBuffer) => {
         const limiteSom = 0.008
 
@@ -2507,10 +2457,10 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       // -----------------------------------------------------
       // TEMPOS DO DUCKING
       // -----------------------------------------------------
-      // NÃ£o existe fade no inÃ­cio.
-      // A trilha comeÃ§a imediatamente no volume escolhido.
+      // Não existe fade no início.
+      // A trilha começa imediatamente no volume escolhido.
       // Depois da voz, reservamos tempo para a trilha subir antes
-      // de comeÃ§ar o fade final.
+      // de começar o fade final.
       const duracaoEntradaVoz = Math.min(
         0.8,
         Math.max(0.25, duracaoVoz / 10)
@@ -2524,7 +2474,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       const fimDaVoz = inicio + duracaoVoz
       const fimSubidaTrilha = fimDaVoz + duracaoSaidaVoz
 
-      // O fade final sÃ³ comeÃ§a DEPOIS da subida da trilha.
+      // O fade final só começa DEPOIS da subida da trilha.
       const duracaoTotal = Math.max(
         inicio + duracaoVoz + duracaoSaidaVoz + final,
         fimEfeito1,
@@ -2577,7 +2527,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       vozSource.start(inicio)
 
       // -----------------------------------------------------
-      // FUNÃ‡ÃƒO PARA INSERIR EFEITO
+      // FUNÇÃO PARA INSERIR EFEITO
       // -----------------------------------------------------
       const adicionarEfeito = (
         buffer: AudioBuffer,
@@ -2609,7 +2559,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         gain.connect(compressor)
         compressor.connect(offline.destination)
 
-        // IMPORTANTE: posiÃ§Ã£o absoluta desde o comeÃ§o da trilha.
+        // IMPORTANTE: posição absoluta desde o começo da trilha.
         source.start(posicao, offsetSom, duracaoSom)
       }
 
@@ -2646,8 +2596,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       // 30% do volume escolhido durante a voz.
       const volumeDuranteVoz = volumeNormal * 0.30
 
-      // SEM FADE NO INÃCIO.
-      // A trilha comeÃ§a imediatamente alta no volume escolhido.
+      // SEM FADE NO INÍCIO.
+      // A trilha começa imediatamente alta no volume escolhido.
       trilhaGain.gain.setValueAtTime(volumeNormal, 0)
 
       if (inicio > 0) {
@@ -2656,26 +2606,26 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           inicio - duracaoEntradaVoz
         )
 
-        // MantÃ©m a trilha normal atÃ© comeÃ§ar a descida.
+        // Mantém a trilha normal até começar a descida.
         trilhaGain.gain.setValueAtTime(
           volumeNormal,
           inicioDucking
         )
 
-        // Abaixa suavemente atÃ© o nÃ­vel da locuÃ§Ã£o.
+        // Abaixa suavemente até o nível da locução.
         trilhaGain.gain.linearRampToValueAtTime(
           volumeDuranteVoz,
           inicio
         )
       } else {
-        // Se a voz comeÃ§a em 0, apenas fazemos a descida da trilha.
+        // Se a voz começa em 0, apenas fazemos a descida da trilha.
         trilhaGain.gain.linearRampToValueAtTime(
           volumeDuranteVoz,
           Math.min(duracaoEntradaVoz, fimDaVoz)
         )
       }
 
-      // MantÃ©m baixa durante toda a locuÃ§Ã£o.
+      // Mantém baixa durante toda a locução.
       trilhaGain.gain.setValueAtTime(
         volumeDuranteVoz,
         fimDaVoz
@@ -2688,7 +2638,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       )
 
       // -----------------------------------------------------
-      // FADE FINAL â€” SOMENTE NO FINAL
+      // FADE FINAL — SOMENTE NO FINAL
       // -----------------------------------------------------
       if (final > 0) {
         const fadeOutInicio = Math.max(
@@ -2696,7 +2646,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           duracaoTotal - final
         )
 
-        // Garante que o fade comeÃ§a com a trilha jÃ¡ alta.
+        // Garante que o fade começa com a trilha já alta.
         trilhaGain.gain.setValueAtTime(
           volumeNormal,
           fadeOutInicio
@@ -2707,8 +2657,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           duracaoTotal
         )
       } else {
-        // Sem fade configurado, mantÃ©m a trilha no volume normal
-        // atÃ© o final reservado para a subida.
+        // Sem fade configurado, mantém a trilha no volume normal
+        // até o final reservado para a subida.
         trilhaGain.gain.setValueAtTime(
           volumeNormal,
           Math.min(fimSubidaTrilha, duracaoTotal)
@@ -2779,14 +2729,14 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
       if (!respostaMix.ok) {
         throw new Error(
-          'NÃ£o foi possÃ­vel converter a mixagem para MP3.'
+          'Não foi possível converter a mixagem para MP3.'
         )
       }
 
       const mp3Blob = await respostaMix.blob()
 
       if (!mp3Blob.size) {
-        throw new Error('A mixagem retornou um Ã¡udio vazio.')
+        throw new Error('A mixagem retornou um áudio vazio.')
       }
 
       const mixUrl = URL.createObjectURL(mp3Blob)
@@ -2800,7 +2750,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       alert(
         erro instanceof Error
           ? erro.message
-          : 'NÃ£o foi possÃ­vel mixar a voz com a trilha.'
+          : 'Não foi possível mixar a voz com a trilha.'
       )
     } finally {
       try {
@@ -2844,7 +2794,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         : null
 
       if (respostaTrilha && !respostaTrilha.ok) {
-        throw new Error('NÃ£o foi possÃ­vel carregar a trilha selecionada.')
+        throw new Error('Não foi possível carregar a trilha selecionada.')
       }
 
       const [vozDados, trilhaDados] = await Promise.all([
@@ -2858,7 +2808,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       const carregarEfeitoStudio = async (caminho: string): Promise<AudioBuffer | null> => {
         if (!caminho) return null
         const resposta = await fetch(encodeURI(caminho))
-        if (!resposta.ok) throw new Error("NÃ£o foi possÃ­vel carregar o efeito: " + caminho)
+        if (!resposta.ok) throw new Error("Não foi possível carregar o efeito: " + caminho)
         return await contexto!.decodeAudioData(await resposta.arrayBuffer())
       }
 
@@ -3040,7 +2990,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       const respostaOriginal = await fetch(mixAudioUrl);
 
       if (!respostaOriginal.ok) {
-        throw new Error("NÃ£o foi possÃ­vel carregar a mixagem original.");
+        throw new Error("Não foi possível carregar a mixagem original.");
       }
 
       const arquivoOriginal = await respostaOriginal.blob();
@@ -3059,7 +3009,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       });
 
       if (!resposta.ok) {
-        let mensagem = "NÃ£o foi possÃ­vel masterizar o Ã¡udio.";
+        let mensagem = "Não foi possível masterizar o áudio.";
 
         try {
           const dados = await resposta.json();
@@ -3072,7 +3022,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       const arquivoMasterizado = await resposta.blob();
 
       if (!arquivoMasterizado.size) {
-        throw new Error("O Ã¡udio masterizado ficou vazio.");
+        throw new Error("O áudio masterizado ficou vazio.");
       }
 
       const novaUrl = URL.createObjectURL(arquivoMasterizado);
@@ -3082,12 +3032,12 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         return novaUrl;
       });
     } catch (erro) {
-      console.error("Erro na masterizaÃ§Ã£o:", erro);
+      console.error("Erro na masterização:", erro);
 
       alert(
         erro instanceof Error
           ? erro.message
-          : "Ocorreu um erro ao masterizar o Ã¡udio."
+          : "Ocorreu um erro ao masterizar o áudio."
       );
     } finally {
       setMasterizando(false);
@@ -3100,12 +3050,12 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
   if (mostrarDJExpress) {
     const estilosDJ = [
-      { id: 'pancadao', nome: 'PancadÃ£o', descricao: 'Voz forte e impacto curto', simbolo: 'ðŸ’¥', arquivo: 'pancadÃ£o.mp3' },
-      { id: 'reiDaPista', nome: 'Rei da Pista', descricao: 'Voz poderosa e final marcante', simbolo: 'ðŸ‘‘', arquivo: 'rei das pistas.mp3' },
-      { id: 'fantasma', nome: 'Fantasma', descricao: 'Eco longo e misterioso', simbolo: 'ðŸ‘»', arquivo: 'fantasma.mp3' },
-      { id: 'explosao', nome: 'ExplosÃ£o', descricao: 'Impacto no comeÃ§o e no fim', simbolo: 'âš¡', arquivo: 'explosÃ£o.mp3' },
-      { id: 'assinaturaDJ', nome: 'Assinatura DJ', descricao: 'Destaque para o nome artÃ­stico', simbolo: 'ðŸŽ§', arquivo: 'assinatura dj.mp3' },
-      { id: 'alerta', nome: 'Alerta', descricao: 'Chamada intensa e vibrante', simbolo: 'ðŸš¨', arquivo: 'alerta.mp3' },
+      { id: 'pancadao', nome: 'Pancadão', descricao: 'Voz forte e impacto curto', simbolo: '💥', arquivo: 'pancadão.mp3' },
+      { id: 'reiDaPista', nome: 'Rei da Pista', descricao: 'Voz poderosa e final marcante', simbolo: '👑', arquivo: 'rei das pistas.mp3' },
+      { id: 'fantasma', nome: 'Fantasma', descricao: 'Eco longo e misterioso', simbolo: '👻', arquivo: 'fantasma.mp3' },
+      { id: 'explosao', nome: 'Explosão', descricao: 'Impacto no começo e no fim', simbolo: '⚡', arquivo: 'explosão.mp3' },
+      { id: 'assinaturaDJ', nome: 'Assinatura DJ', descricao: 'Destaque para o nome artístico', simbolo: '🎧', arquivo: 'assinatura dj.mp3' },
+      { id: 'alerta', nome: 'Alerta', descricao: 'Chamada intensa e vibrante', simbolo: '🚨', arquivo: 'alerta.mp3' },
     ]
 
     const creditosDJ = Math.max(1, Math.ceil(textoDJ.trim().length / 100))
@@ -3133,7 +3083,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               fontWeight: 700,
             }}
           >
-            â† Voltar Ã  FÃ¡brica da Voz
+            ← Voltar à Fábrica da Voz
           </button>
 
           <div style={{
@@ -3145,7 +3095,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             boxShadow: '0 0 35px rgba(147,51,234,0.16)',
             marginBottom: '20px',
           }}>
-            <div style={{ fontSize: '46px' }}>ðŸŽ§</div>
+            <div style={{ fontSize: '46px' }}>🎧</div>
             <h1 style={{
               margin: '8px 0',
               fontSize: 'clamp(28px, 6vw, 42px)',
@@ -3159,7 +3109,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               Crie sua vinheta com efeitos exclusivos
             </p>
             <p style={{ color: '#facc15', fontWeight: 800, marginBottom: 0 }}>
-              {creditosDJ} crÃ©dito(s) por geraÃ§Ã£o Â· 1 crÃ©dito a cada 100 caracteres
+              {creditosDJ} crédito(s) por geração · 1 crédito a cada 100 caracteres
             </p>
           </div>
 
@@ -3172,7 +3122,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             border: '1px solid rgba(216,180,254,0.2)',
           }}>
             <label style={{ display: 'grid', gap: '8px', fontWeight: 700 }}>
-              Nome artÃ­stico do DJ
+              Nome artístico do DJ
               <input
                 value={nomeDJ}
                 onChange={(e) => setNomeDJ(e.target.value)}
@@ -3287,12 +3237,12 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                           marginTop: '7px',
                           fontWeight: 800,
                         }}>
-                          {selecionado ? 'âœ“ EFEITO SELECIONADO' : 'SELECIONAR EFEITO'}
+                          {selecionado ? '✓ EFEITO SELECIONADO' : 'SELECIONAR EFEITO'}
                         </div>
                       </button>
 
                       <div style={{ color: '#d8b4fe', fontSize: '12px', fontWeight: 700 }}>
-                        OUÃ‡A COMO FICA:
+                        OUÇA COMO FICA:
                       </div>
                       <audio
                         controls
@@ -3349,7 +3299,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 opacity: gerandoDJ ? 0.75 : 1,
               }}
             >
-              {gerandoDJ ? 'GERANDO SUA VINHETA...' : `ðŸŽ™ï¸ GERAR VINHETA Â· ${creditosDJ} CRÃ‰DITO(S)`}
+              {gerandoDJ ? 'GERANDO SUA VINHETA...' : `🎙️ GERAR VINHETA · ${creditosDJ} CRÉDITO(S)`}
             </button>
 
             {audioDJUrl && (
@@ -3360,7 +3310,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 background: '#130e19',
               }}>
                 <div style={{ color: '#facc15', fontWeight: 800, marginBottom: '12px' }}>
-                  Sua vinheta estÃ¡ pronta!
+                  Sua vinheta está pronta!
                 </div>
                 <audio controls src={audioDJUrl} style={{ width: '100%' }} />
                 <a
@@ -3378,7 +3328,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                     fontWeight: 900,
                   }}
                 >
-                  â¬‡ Baixar MP3
+                  ⬇ Baixar MP3
                 </a>
               </div>
             )}
@@ -3389,9 +3339,9 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               fontSize: '13px',
               lineHeight: 1.6,
             }}>
-              Efeitos de voz exclusivos. NÃ£o inclui trilha musical.
+              Efeitos de voz exclusivos. Não inclui trilha musical.
               <br />
-              Saldo disponÃ­vel: {creditos === null ? '...' : creditos} crÃ©ditos.
+              Saldo disponível: {creditos === null ? '...' : creditos} créditos.
             </div>
           </div>
         </div>
@@ -3409,33 +3359,33 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           </button>
 
           <h1 style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 900, marginBottom: '8px' }}>
-            VINHETAS DE <span style={{ color: '#7dd3fc' }}>RÃDIO IA</span>
+            VINHETAS DE <span style={{ color: '#7dd3fc' }}>RÁDIO IA</span>
           </h1>
           <p style={{ color: '#cbd5e1', marginTop: 0, lineHeight: 1.6 }}>
-            Crie de 1 a 5 vinhetas curtas para identificar e destacar sua rÃ¡dio.
+            Crie de 1 a 5 vinhetas curtas para identificar e destacar sua rádio.
           </p>
 
           <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(16,35,56,0.95), rgba(18,14,25,0.98))' }}>
-            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="nome-radio-ia">Nome da rÃ¡dio</label>
-            <input id="nome-radio-ia" value={nomeRadioIA} onChange={e => setNomeRadioIA(e.target.value)} maxLength={60} placeholder="Ex.: RÃ¡dio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="nome-radio-ia">Nome da rádio</label>
+            <input id="nome-radio-ia" value={nomeRadioIA} onChange={e => setNomeRadioIA(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="slogan-radio-ia">Slogan (opcional)</label>
-            <input id="slogan-radio-ia" value={sloganRadioIA} onChange={e => setSloganRadioIA(e.target.value)} maxLength={100} placeholder="Ex.: A rÃ¡dio que Ã© sucesso!" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+            <input id="slogan-radio-ia" value={sloganRadioIA} onChange={e => setSloganRadioIA(e.target.value)} maxLength={100} placeholder="Ex.: A rádio que é sucesso!" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="tema-radio-ia">Tema das vinhetas (opcional)</label>
             <input id="tema-radio-ia" value={temaRadioIA} onChange={e => setTemaRadioIA(e.target.value)} maxLength={120} placeholder="Ex.: Bom dia, Boa noite, Carnaval, Natal..." style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
-            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="estilo-radio-ia">Estilo da rÃ¡dio</label>
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="estilo-radio-ia">Estilo da rádio</label>
             <select id="estilo-radio-ia" value={estiloRadioIA} onChange={e => setEstiloRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
               <option value="popular">Popular / comercial</option>
               <option value="sertanejo">Sertanejo</option>
               <option value="jovem">Jovem / pop</option>
               <option value="gospel">Gospel</option>
               <option value="adulta">Adulto / elegante</option>
-              <option value="moderna">Moderna / energÃ©tica</option>
-              <option value="forro">ForrÃ³</option>
+              <option value="moderna">Moderna / energética</option>
+              <option value="forro">Forró</option>
               <option value="esporte">Esporte</option>
-              <option value="noticias">NotÃ­cias</option>
+              <option value="noticias">Notícias</option>
               <option value="natal">Natal</option>
             </select>
 
@@ -3444,15 +3394,15 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               {[1, 2, 3, 4, 5].map(qtd => <option key={qtd} value={qtd}>{qtd} {qtd === 1 ? 'vinheta' : 'vinhetas'}</option>)}
             </select>
 
-            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Tipo de Ã¡udio</label>
+            <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Tipo de áudio</label>
             <select value={modoAudioRadioIA} onChange={e => setModoAudioRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
-              <option value="completo">Mixagem completa com mÃºsica e efeitos</option>
-              <option value="off">Somente OFF - voz sem mÃºsica e efeitos</option>
+              <option value="completo">Mixagem completa com música e efeitos</option>
+              <option value="off">Somente OFF - voz sem música e efeitos</option>
             </select>
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="voz-radio-ia">Voz do locutor</label>
             <select id="voz-radio-ia" value={vozRadioIA} onChange={e => setVozRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '22px' }}>
-              <option value="auto">Escolha automÃ¡tica</option>
+              <option value="auto">Escolha automática</option>
               {vozes.map(voz => (
                 <option key={voz.id} value={voz.id}>{voz.nome}</option>
               ))}
@@ -3463,26 +3413,26 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               return vozDemo ? (
                 <div style={{ marginTop: '-8px', marginBottom: '22px', padding: '14px', borderRadius: '12px', background: 'rgba(125,211,252,0.08)', border: '1px solid rgba(125,211,252,0.25)' }}>
                   <div style={{ fontWeight: 700, marginBottom: '8px', color: '#bae6fd' }}>
-                    OuÃ§a a demonstraÃ§Ã£o de {vozDemo.nome
+                    Ouça a demonstração de {vozDemo.nome
                     }
                   </div>
                   <audio controls preload="none" src={vozDemo.demonstrativo} style={{ width: '100%' }} />
                   <div style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '6px' }}>
-                    DemonstraÃ§Ã£o gratuita â€” nÃ£o consome crÃ©ditos.
+                    Demonstração gratuita — não consome créditos.
                   </div>
                 </div>
               ) : null;
             })()}
 
             <p style={{ color: "#bae6fd", fontWeight: 800, textAlign: "center", marginBottom: "12px" }}>
-              VocÃª selecionou {quantidadeRadioIA} {quantidadeRadioIA === 1 ? "vinheta" : "vinhetas"} â€” {quantidadeRadioIA} {quantidadeRadioIA === 1 ? "crÃ©dito" : "crÃ©ditos"}.
+              Você selecionou {quantidadeRadioIA} {quantidadeRadioIA === 1 ? "vinheta" : "vinhetas"} — {quantidadeRadioIA} {quantidadeRadioIA === 1 ? "crédito" : "créditos"}.
             </p>
             <button type="button" onClick={() => void gerarVinhetasRadioIA()} disabled={gerandoVinhetasRadioIA} style={{ width: '100%', padding: '15px', border: 0, borderRadius: '12px', background: gerandoVinhetasRadioIA ? '#334155' : '#0284c7', color: '#fff', fontWeight: 800, fontSize: '16px', cursor: gerandoVinhetasRadioIA ? 'wait' : 'pointer', opacity: gerandoVinhetasRadioIA ? 0.75 : 1 }}>
               {gerandoVinhetasRadioIA ? 'Gerando suas vinhetas...' : 'GERAR VINHETAS AGORA'}
             </button>
 
             <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.6, marginBottom: 0 }}>
-              Cada vinheta entregue custa 1 crÃ©dito. VocÃª sÃ³ paga pelos Ã¡udios gerados com sucesso.
+              Cada vinheta entregue custa 1 crédito. Você só paga pelos áudios gerados com sucesso.
             </p>
           </div>
 
@@ -3511,13 +3461,13 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           <button type="button" onClick={() => setMostrarFabricaStudio(false)} style={{ border: '1px solid rgba(216,180,254,0.35)', borderRadius: '12px', padding: '10px 15px', color: '#e9d5ff', background: '#21152c', cursor: 'pointer', marginBottom: '22px', fontWeight: 700 }}>
             Voltar ao menu
           </button>
-<h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 46px)', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '8px', textShadow: '0 0 28px rgba(168,85,247,0.28)' }}>FÃBRICA <span style={{ color: '#d8b4fe' }}>STUDIO</span></h1>
-          <p style={{ color: '#e9d5ff', marginTop: 0 }}>Seu estÃºdio de Ã¡udio online</p>
+<h1 style={{ color: '#fff', fontSize: 'clamp(32px, 5vw, 46px)', fontWeight: 900, letterSpacing: '-1.5px', marginBottom: '8px', textShadow: '0 0 28px rgba(168,85,247,0.28)' }}>FÁBRICA <span style={{ color: '#d8b4fe' }}>STUDIO</span></h1>
+          <p style={{ color: '#e9d5ff', marginTop: 0 }}>Seu estúdio de áudio online</p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '22px', marginTop: '32px' }}>
             <section style={{ border: '1px solid rgba(192,132,252,0.20)', borderRadius: '16px', padding: '24px', background: 'linear-gradient(145deg, rgba(31,22,43,0.98), rgba(18,14,25,0.98))', boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}>
-              <h2 style={{ color: '#facc15', fontSize: '20px' }}>1. Sua locuÃ§Ã£o</h2>
-              <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a gravaÃ§Ã£o de voz no seu computador.</p>
+              <h2 style={{ color: '#facc15', fontSize: '20px' }}>1. Sua locução</h2>
+              <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a gravação de voz no seu computador.</p>
               <input type="file" accept="audio/*" onChange={(e) => {
                 const arquivo = e.target.files?.[0] || null;
                 setStudioVozArquivo(arquivo);
@@ -3532,7 +3482,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 <h3 style={{ color: '#facc15', margin: '0 0 10px', fontSize: '16px' }}>Reverb da voz</h3>
                 <label style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
                   <input type="checkbox" checked={studioReverbAtivo} onChange={(e) => setStudioReverbAtivo(e.target.checked)} />
-                  Ativar reverb somente na locuÃ§Ã£o
+                  Ativar reverb somente na locução
                 </label>
                 <label htmlFor="studio-reverb-volume">Intensidade: {studioVolumeReverb}%</label>
                 <input id="studio-reverb-volume" type="range" min="0" max="100" value={studioVolumeReverb} onChange={(e) => setStudioVolumeReverb(Number(e.target.value))} style={{ display: 'block', width: '100%', marginTop: '10px' }} />
@@ -3550,7 +3500,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 <option value="">Usar arquivo do computador</option>
                 {trilhasPorEstilo[studioEstiloTrilha as keyof typeof trilhasPorEstilo].map((trilha) => <option key={trilha.arquivo} value={trilha.arquivo}>{trilha.nome}</option>)}
               </select>
-              <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a mÃºsica de fundo para acompanhar sua locuÃ§Ã£o.</p>
+              <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a música de fundo para acompanhar sua locução.</p>
               <input type="file" accept="audio/*" onChange={(e) => {
                 const arquivo = e.target.files?.[0] || null;
                 setStudioTrilhaArquivo(arquivo);
@@ -3563,10 +3513,10 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               <audio id="studio-trilha" controls onLoadedMetadata={(e) => { const duracao = e.currentTarget.duration; if (Number.isFinite(duracao) && duracao > 0) { setStudioDuracaoTrilha(Math.floor(duracao)); setStudioPontoTrilha((ponto) => Math.min(ponto, Math.max(0, Math.floor(duracao) - 1))); } }} style={{ width: '100%', marginTop: '10px' }} />
               <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', border: '1px solid rgba(250,204,21,0.3)', background: 'rgba(15,10,22,0.65)' }}>
   <label htmlFor="studio-ponto-trilha" style={{ display: 'block', color: '#facc15', fontWeight: 700 }}>
-    InÃ­cio da mÃºsica: {Math.floor(studioPontoTrilha / 60).toString().padStart(2, '0')}:{Math.floor(studioPontoTrilha % 60).toString().padStart(2, '0')}
+    Início da música: {Math.floor(studioPontoTrilha / 60).toString().padStart(2, '0')}:{Math.floor(studioPontoTrilha % 60).toString().padStart(2, '0')}
   </label>
   <p style={{ color: '#e9d5ff', fontSize: '13px', margin: '6px 0 10px' }}>
-    Arraste para escolher o trecho da mÃºsica que comeÃ§arÃ¡ na mixagem.
+    Arraste para escolher o trecho da música que começará na mixagem.
   </p>
   <input
     id="studio-ponto-trilha"
@@ -3584,7 +3534,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
           <section style={{ border: '1px solid rgba(216,180,254,0.25)', borderRadius: '18px', padding: '22px', marginTop: '18px', background: 'rgba(48,33,61,0.72)' }}>
             <h2 style={{ color: '#facc15', fontSize: '20px' }}>3. Ajustes da mixagem</h2>
-            <label htmlFor="studio-volume-voz">Volume da locuÃ§Ã£o: {studioVolumeVoz}%</label>
+            <label htmlFor="studio-volume-voz">Volume da locução: {studioVolumeVoz}%</label>
             <input id="studio-volume-voz" type="range" min="0" max="150" value={studioVolumeVoz} onChange={(e) => {
               const valor = Number(e.target.value);
               setStudioVolumeVoz(valor);
@@ -3602,7 +3552,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
             <label htmlFor="studio-atraso-voz">Segundos de musica antes da voz: {studioAtrasoVoz}s</label>
             <input id="studio-atraso-voz" type="range" min="0" max="30" value={studioAtrasoVoz} onChange={(e) => setStudioAtrasoVoz(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '10px 0 20px' }} />
-            <label htmlFor="studio-segundos-finais">Segundos de mÃºsica apÃ³s a voz: {studioSegundosFinais}s</label>
+            <label htmlFor="studio-segundos-finais">Segundos de música após a voz: {studioSegundosFinais}s</label>
             <input id="studio-segundos-finais" type="range" min="0" max="60" value={studioSegundosFinais} onChange={(e) => setStudioSegundosFinais(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '10px 0 20px' }} />
             <div style={{ borderTop: '1px solid rgba(216,180,254,0.25)', marginTop: '20px', paddingTop: '18px' }}>
 
@@ -3612,18 +3562,18 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 <option value="">Nenhum efeito</option>
                 <option value="/efeitos/Laser.mp3">Laser</option>
                 <option value="/efeitos/Impacto.mp3">Impacto</option>
-                <option value="/efeitos/Transmiss%C3%A3o.mp3">TransmissÃ£o</option>
+                <option value="/efeitos/Transmiss%C3%A3o.mp3">Transmissão</option>
                 <option value="/efeitos/Buzina.mp3">Buzina</option>
                 <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
                 <option value="/efeitos/Assobio.mp3">Assobio</option>
                 <option value="/efeitos/Buzina carro.wav">Buzina de carro</option>
-                <option value="/efeitos/Liquido no copo.mp3">LÃ­quido no copo</option>
+                <option value="/efeitos/Liquido no copo.mp3">Líquido no copo</option>
                 <option value="/efeitos/Motor.wav">Motor</option>
                 <option value="/efeitos/Telefone.mp3">Telefone</option>
               </select>
               <label htmlFor="studio-efeito1-volume">Volume do primeiro efeito: {studioVolumeEfeito1}%</label>
               <input id="studio-efeito1-volume" type="range" min="0" max="100" value={studioVolumeEfeito1} onChange={(e) => setStudioVolumeEfeito1(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 14px' }} />
-              <label htmlFor="studio-efeito1-posicao">PosiÃ§Ã£o do primeiro efeito: {studioPosicaoEfeito1.toFixed(1)}s</label>
+              <label htmlFor="studio-efeito1-posicao">Posição do primeiro efeito: {studioPosicaoEfeito1.toFixed(1)}s</label>
               <input id="studio-efeito1-posicao" type="range" min="0" max="60" step="0.1" value={studioPosicaoEfeito1} onChange={(e) => setStudioPosicaoEfeito1(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 18px' }} />
 
               <label htmlFor="studio-efeito2">Segundo efeito (opcional)</label>
@@ -3631,27 +3581,27 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 <option value="">Nenhum efeito</option>
                 <option value="/efeitos/Laser.mp3">Laser</option>
                 <option value="/efeitos/Impacto.mp3">Impacto</option>
-                <option value="/efeitos/Transmiss%C3%A3o.mp3">TransmissÃ£o</option>
+                <option value="/efeitos/Transmiss%C3%A3o.mp3">Transmissão</option>
                 <option value="/efeitos/Buzina.mp3">Buzina</option>
                 <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
                 <option value="/efeitos/Assobio.mp3">Assobio</option>
                 <option value="/efeitos/Buzina carro.wav">Buzina de carro</option>
-                <option value="/efeitos/Liquido no copo.mp3">LÃ­quido no copo</option>
+                <option value="/efeitos/Liquido no copo.mp3">Líquido no copo</option>
                 <option value="/efeitos/Motor.wav">Motor</option>
                 <option value="/efeitos/Telefone.mp3">Telefone</option>
               </select>
               <label htmlFor="studio-efeito2-volume">Volume do segundo efeito: {studioVolumeEfeito2}%</label>
               <input id="studio-efeito2-volume" type="range" min="0" max="100" value={studioVolumeEfeito2} onChange={(e) => setStudioVolumeEfeito2(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 14px' }} />
-              <label htmlFor="studio-efeito2-posicao">PosiÃ§Ã£o do segundo efeito: {studioPosicaoEfeito2.toFixed(1)}s</label>
+              <label htmlFor="studio-efeito2-posicao">Posição do segundo efeito: {studioPosicaoEfeito2.toFixed(1)}s</label>
               <input id="studio-efeito2-posicao" type="range" min="0" max="60" step="0.1" value={studioPosicaoEfeito2} onChange={(e) => setStudioPosicaoEfeito2(Number(e.target.value))} style={{ display: 'block', width: '100%', margin: '8px 0 18px' }} />
             </div>
             <label style={{ display: 'flex', gap: '10px', alignItems: 'center', margin: '12px 0 20px' }}>
               <input type="checkbox" checked={studioDucking} onChange={(e) => setStudioDucking(e.target.checked)} />
-              Reduzir a trilha automaticamente durante a locuÃ§Ã£o
+              Reduzir a trilha automaticamente durante a locução
             </label>
 
             <button type="button" disabled={studioMixando || !studioVozArquivo || (!studioTrilhaArquivo && !studioTrilhaSelecionada)} onClick={() => void mixarFabricaStudio()} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #facc15', background: studioMixando ? '#51445c' : 'linear-gradient(90deg, #8b2be2, #6420a0)', color: '#fff', fontSize: '17px', fontWeight: 900, cursor: studioMixando ? 'wait' : 'pointer', opacity: studioMixando ? 0.7 : 1 }}>
-              {studioMixando ? 'MIXANDO OS ÃUDIOS...' : 'MIXAR E GERAR MP3'}
+              {studioMixando ? 'MIXANDO OS ÁUDIOS...' : 'MIXAR E GERAR MP3'}
             </button>
           </section>
 
@@ -3665,7 +3615,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             </section>
           )}
           <p style={{ color: '#c4b5d0', marginTop: '24px', lineHeight: 1.6 }}>
-            A trilha fica em volume reduzido durante toda a locuÃ§Ã£o e volta ao volume escolhido quando a voz termina.
+            A trilha fica em volume reduzido durante toda a locução e volta ao volume escolhido quando a voz termina.
           </p>
         </div>
       </div>
@@ -3684,7 +3634,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
             <img
               src={logoFabrica}
-              alt="FÃ¡brica da Voz"
+              alt="Fábrica da Voz"
             />
 
           </div>
@@ -3728,7 +3678,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   marginBottom: '8px'
                 }}
               >
-                <h2 style={{ margin: 0 }}>ðŸ’³ Comprar crÃ©ditos</h2>
+                <h2 style={{ margin: 0 }}>💳 Comprar créditos</h2>
                 <button
                   type="button"
                   onClick={() => setMostrarCompraCreditos(false)}
@@ -3742,12 +3692,12 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   }}
                   aria-label="Fechar"
                 >
-                  Ã—
+                  ×
                 </button>
               </div>
 
               <p style={{ margin: '0 0 20px', opacity: 0.72 }}>
-                1 crÃ©dito = 1 locuÃ§Ã£o de atÃ© 800 caracteres.
+                1 crédito = 1 locução de até 800 caracteres.
               </p>
 
               <div
@@ -3796,7 +3746,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                       {pacote.creditos}
                     </div>
                     <div style={{ opacity: 0.72, marginBottom: '10px' }}>
-                      {pacote.creditos === 1 ? 'crÃ©dito' : 'crÃ©ditos'}
+                      {pacote.creditos === 1 ? 'crédito' : 'créditos'}
                     </div>
                     <div style={{ fontSize: '21px', fontWeight: 800, color: '#c084fc', marginBottom: '16px' }}>
                       {pacote.preco}
@@ -3835,7 +3785,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   fontSize: '13px'
                 }}
               >
-                ðŸ’³ O pagamento serÃ¡ integrado depois. Esta tela jÃ¡ estÃ¡ pronta com os pacotes de crÃ©ditos.
+                💳 O pagamento será integrado depois. Esta tela já está pronta com os pacotes de créditos.
               </div>
             </div>
           </div>
@@ -3882,9 +3832,9 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 }}
               >
                 <div>
-                  <h2 style={{ margin: 0 }}>ðŸ•˜ HistÃ³rico de vinhetas</h2>
+                  <h2 style={{ margin: 0 }}>🕘 Histórico de vinhetas</h2>
                   <div style={{ marginTop: '5px', color: '#aaa', fontSize: '13px' }}>
-                    Seus Ã¡udios ficam disponÃ­veis por 3 dias e nÃ£o consomem novos crÃ©ditos.
+                    Seus áudios ficam disponíveis por 3 dias e não consomem novos créditos.
                   </div>
                 </div>
 
@@ -3898,19 +3848,19 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                     fontSize: '28px',
                     cursor: 'pointer'
                   }}
-                  aria-label="Fechar histÃ³rico"
+                  aria-label="Fechar histórico"
                 >
-                  Ã—
+                  ×
                 </button>
               </div>
 
               {carregandoHistorico ? (
                 <div style={{ padding: '35px 10px', textAlign: 'center', color: '#c084fc', fontWeight: 700 }}>
-                  â³ Carregando seu histÃ³rico...
+                  ⏳ Carregando seu histórico...
                 </div>
               ) : historico.length === 0 ? (
                 <div style={{ padding: '35px 10px', textAlign: 'center', color: '#aaa' }}>
-                  VocÃª ainda nÃ£o tem vinhetas no histÃ³rico.
+                  Você ainda não tem vinhetas no histórico.
                 </div>
               ) : (
                 <div style={{ display: 'grid', gap: '14px' }}>
@@ -3930,8 +3880,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '7px' }}>
                           <strong>
-                            {item.tipo === 'mixagem' ? 'ðŸŽµ Mixagem' : 'ðŸŽ™ï¸ LocuÃ§Ã£o'}
-                            {item.nome_voz ? ` â€” ${item.nome_voz}` : ''}
+                            {item.tipo === 'mixagem' ? '🎵 Mixagem' : '🎙️ Locução'}
+                            {item.nome_voz ? ` — ${item.nome_voz}` : ''}
                           </strong>
                           <span style={{ color: '#c084fc', fontSize: '12px' }}>
                             {item.estilo || 'Natural'}
@@ -3939,7 +3889,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                         </div>
 
                         <div style={{ color: '#999', fontSize: '12px', marginBottom: '8px' }}>
-                          Gerada em {criado.toLocaleString('pt-BR')} Â· expira em {expira.toLocaleString('pt-BR')}
+                          Gerada em {criado.toLocaleString('pt-BR')} · expira em {expira.toLocaleString('pt-BR')}
                         </div>
 
                         <div style={{ color: '#ddd', fontSize: '13px', lineHeight: 1.45, marginBottom: '11px' }}>
@@ -3962,7 +3912,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                                 href={item.url}
                                 download={`fabrica-da-voz-${item.id}.mp3`}
                               >
-                                â¬‡ï¸ Baixar novamente
+                                ⬇️ Baixar novamente
                               </a>
 
                               <button
@@ -3977,13 +3927,13 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                                   cursor: 'pointer'
                                 }}
                               >
-                                ðŸ—‘ï¸ Excluir
+                                🗑️ Excluir
                               </button>
                             </div>
                           </>
                         ) : (
                           <div style={{ color: '#facc15', fontSize: '13px' }}>
-                            NÃ£o foi possÃ­vel carregar este Ã¡udio agora.
+                            Não foi possível carregar este áudio agora.
                           </div>
                         )}
                       </div>
@@ -4008,7 +3958,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   cursor: carregandoHistorico ? 'wait' : 'pointer'
                 }}
               >
-                ðŸ”„ Atualizar histÃ³rico
+                🔄 Atualizar histórico
               </button>
             </div>
           </div>
@@ -4017,8 +3967,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         <main className="main">
 
           <section className="hero">
-  <h2>Crie locuÃ§Ãµes profissionais com IA</h2>
-  <p>Transforme seu texto em Ã¡udio em segundos</p>
+  <h2>Crie locuções profissionais com IA</h2>
+  <p>Transforme seu texto em áudio em segundos</p>
 </section>
 
           <section className="editor-area">
@@ -4026,7 +3976,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             <div className="editor">
 
               <h3>
-                Crie seu Ã¡udio
+                Crie seu áudio
               </h3>
 
 
@@ -4068,15 +4018,15 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         fontSize: '36px'
       }}>&#128188;</div>
       <div style={{flex: 1, minWidth: 0}}>
-        <div style={{fontSize: '18px', color: '#d8b4fe', marginBottom: '4px'}}>Seus crÃ©ditos</div>
+        <div style={{fontSize: '18px', color: '#d8b4fe', marginBottom: '4px'}}>Seus créditos</div>
         <div style={{fontSize: 'clamp(22px, 5vw, 40px)', fontWeight: 800, lineHeight: 1.15, whiteSpace: 'nowrap', overflowWrap: 'normal'}}>
-          {creditos === null ? '...' : creditos} crÃ©ditos
+          {creditos === null ? '...' : creditos} créditos
         </div>
       </div>
-      <button type="button" onClick={() => void carregarCreditos()} disabled={carregandoCreditos} title="Atualizar saldo de crÃ©ditos" style={{
+      <button type="button" onClick={() => void carregarCreditos()} disabled={carregandoCreditos} title="Atualizar saldo de créditos" style={{
         border: 0, background: 'transparent', color: '#d8b4fe',
         fontSize: '30px', padding: '8px', cursor: carregandoCreditos ? 'wait' : 'pointer'
-      }}>{carregandoCreditos ? '...' : 'â†»'}</button>
+      }}>{carregandoCreditos ? '...' : '↻'}</button>
     </div>
 
 
@@ -4189,8 +4139,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           color: '#7dd3fc', fontSize: '24px'
         }}>&#128251;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Vinhetas de RÃ¡dio IA<span style={{background: "#7dd3fc", color: "#102338", fontSize: "11px", fontWeight: 900, padding: "4px 7px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
-          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie 5 vinhetas para sua rÃ¡dio.</span>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Vinhetas de Rádio IA<span style={{background: "#7dd3fc", color: "#102338", fontSize: "11px", fontWeight: 900, padding: "4px 7px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie 5 vinhetas para sua rádio.</span>
         </span>
       </button>
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
@@ -4285,11 +4235,11 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     borderRadius: '14px'
   }}>
     <h3 style={{ color: '#e9d5ff', marginTop: 0 }}>
-      ðŸŽ™ï¸ Minhas Vozes Clonadas
+      🎙️ Minhas Vozes Clonadas
     </h3>
 
     <p style={{ color: '#c4b5d0', fontSize: '13px' }}>
-      Crie sua prÃ³pria voz com inteligÃªncia artificial e utilize nas suas locuÃ§Ãµes.
+      Crie sua própria voz com inteligência artificial e utilize nas suas locuções.
     </p>
 
     <button
@@ -4308,7 +4258,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         cursor: 'pointer'
       }}
     >
-      {mostrarFormularioClone ? 'Fechar formulÃ¡rio' : '+ Criar minha voz'}
+      {mostrarFormularioClone ? 'Fechar formulário' : '+ Criar minha voz'}
     </button>
 
     {mostrarFormularioClone && (
@@ -4325,9 +4275,9 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           color: '#fde68a',
           fontSize: '13px'
         }}>
-          AtenÃ§Ã£o! Envie uma gravaÃ§Ã£o limpa, sem mÃºsica, ruÃ­dos ou outras vozes.
-          Quanto melhor a gravaÃ§Ã£o, melhor serÃ¡ o resultado da clonagem.
-          Utilize somente uma voz que vocÃª tenha autorizaÃ§Ã£o para clonar.
+          Atenção! Envie uma gravação limpa, sem música, ruídos ou outras vozes.
+          Quanto melhor a gravação, melhor será o resultado da clonagem.
+          Utilize somente uma voz que você tenha autorização para clonar.
         </div>
 
         <label style={{ color: '#fff', fontWeight: 700 }}>
@@ -4353,7 +4303,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         </label>
 
         <label style={{ color: '#fff', fontWeight: 700 }}>
-          Envie sua gravaÃ§Ã£o
+          Envie sua gravação
           <input
             type="file"
             accept="audio/*"
@@ -4375,7 +4325,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             onChange={(e) => {
               const foto = e.currentTarget.files?.[0] || null
               if (foto && foto.size > 2 * 1024 * 1024) {
-                setMensagemClone('A foto deve ter no mÃ¡ximo 2 MB.')
+                setMensagemClone('A foto deve ter no máximo 2 MB.')
                 e.currentTarget.value = ''
                 setFotoNovaVoz(null)
                 return
@@ -4417,7 +4367,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             onChange={(e) => setConfirmacaoAudioClone(e.currentTarget.checked)}
             style={{ marginTop: '3px' }}
           />
-          Confirmo que tenho autorizaÃ§Ã£o para clonar esta voz e que o Ã¡udio enviado Ã© uma gravaÃ§Ã£o limpa e adequada.
+          Confirmo que tenho autorização para clonar esta voz e que o áudio enviado é uma gravação limpa e adequada.
         </label>
 
         <div style={{
@@ -4425,7 +4375,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           fontWeight: 800,
           fontSize: '14px'
         }}>
-          Custo para criar sua voz: 5 crÃ©ditos.
+          Custo para criar sua voz: 5 créditos.
         </div>
 
         <button
@@ -4453,7 +4403,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             ) ? 0.5 : 1
           }}
         >
-          {criandoVozClone ? 'CRIANDO SUA VOZ...' : 'CRIAR VOZ Â· 5 CRÃ‰DITOS'}
+          {criandoVozClone ? 'CRIANDO SUA VOZ...' : 'CRIAR VOZ · 5 CRÉDITOS'}
         </button>
 
         {mensagemClone && (
@@ -4508,30 +4458,6 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               )}
               <button
                 type="button"
-                className="cartao-voz-play"
-                title="Ouvir previa desta voz"
-                aria-label={`Ouvir previa de ${voz.nome}`}
-                disabled={gerandoPreviewClone}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  void ouvirPreviewClone(voz.id)
-                }}
-                onKeyDown={(e) => e.stopPropagation()}
-              >
-                {gerandoPreviewClone && audioPreviewCloneId === voz.id ? "..." : "â–¶"}
-              </button>
-
-              {audioPreviewCloneId === voz.id && audioPreviewCloneUrl && (
-                <audio
-                  controls
-                  autoPlay
-                  src={audioPreviewCloneUrl}
-                  style={{ width: "100%", marginTop: "8px" }}
-                />
-              )}
-
-              <button
-                type="button"
                 onClick={(e) => {
                   e.stopPropagation()
                   void excluirVozClonada(voz)
@@ -4557,7 +4483,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       </>
     ) : (
       <p style={{ color: '#a99ab8', fontSize: '13px' }}>
-        VocÃª ainda nÃ£o criou nenhuma voz clonada.
+        Você ainda não criou nenhuma voz clonada.
       </p>
     )}
   </section>
@@ -4604,11 +4530,11 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 tocarDemonstrativo(voz)
               }}
             >
-              {vozDemoTocandoId === voz.id ? 'â…¡' : 'â–¶'}
+              {vozDemoTocandoId === voz.id ? 'Ⅱ' : '▶'}
             </button>
 
             {vozSelecionada === voz.id && (
-              <span className="cartao-voz-confirmacao">âœ“</span>
+              <span className="cartao-voz-confirmacao">✓</span>
             )}
           </div>
         ))}
@@ -4671,31 +4597,31 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   }}
                 >
                   <option value="normal">
-                    Natural â€” Voz natural e profissional
+                    Natural — Voz natural e profissional
                   </option>
                   <option value="animado">
-                    Animado â€” Mais energia e entusiasmo
+                    Animado — Mais energia e entusiasmo
                   </option>
                   <option value="muitoAnimado">
-                    Muito Animado â€” Mais ritmo e empolgaÃ§Ã£o
+                    Muito Animado — Mais ritmo e empolgação
                   </option>
                   <option value="superImpacto">
-                    Impacto â€” Forte, intenso e marcante
+                    Impacto — Forte, intenso e marcante
                   </option>
                   <option value="serio">
-                    SÃ©rio â€” Firme, sÃ©rio e profissional
+                    Sério — Firme, sério e profissional
                   </option>
                   <option value="urgente">
-                    Urgente â€” AtenÃ§Ã£o e intensidade
+                    Urgente — Atenção e intensidade
                   </option>
                   <option value="comercial">
-                    Comercial â€” Persuasivo e vendedor
+                    Comercial — Persuasivo e vendedor
                   </option>
                   <option value="festa">
-                    Festa â€” Alegre e descontraÃ­do
+                    Festa — Alegre e descontraído
                   </option>
                   <option value="solene">
-                    Solene â€” Grave e respeitoso
+                    Solene — Grave e respeitoso
                   </option>
 
                   <option value="aoVivoLoja">
@@ -4719,15 +4645,15 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                       fontWeight: 800,
                       marginBottom: '6px'
                     }}>
-                      LOCAÃ‡ÃƒO DE LOJA E OFERTAS
+                      LOCAÇÃO DE LOJA E OFERTAS
                     </div>
-                    Ideal para supermercados, lojas, feirÃµes, queimas de estoque e promoÃ§Ãµes. Voz animada com efeito de reverberaÃ§Ã£o para dar sensaÃ§Ã£o de anÃºncio no microfone da loja.
+                    Ideal para supermercados, lojas, feirões, queimas de estoque e promoções. Voz animada com efeito de reverberação para dar sensação de anúncio no microfone da loja.
                     <div style={{
                       marginTop: '8px',
                       color: '#d8b4fe',
                       fontWeight: 700
                     }}>
-                      DisponÃ­vel com Celso, Henrique e Gustavo.
+                      Disponível com Celso, Henrique e Gustavo.
                     </div>
                     {!['Celso', 'Henrique', 'Gustavo'].includes(vozAtual.nome) && (
                       <div style={{
@@ -4739,7 +4665,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                         color: '#facc15',
                         fontWeight: 700
                       }}>
-                        AtenÃ§Ã£o: para usar este estilo, selecione o locutor Celso, Henrique ou Gustavo.
+                        Atenção: para usar este estilo, selecione o locutor Celso, Henrique ou Gustavo.
                       </div>
                     )}
                   </div>
@@ -4751,7 +4677,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               {/* TEXTO */}
 
               <label>
-                Texto da locuÃ§Ã£o
+                Texto da locução
               </label>
 
               <textarea
@@ -4760,7 +4686,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
   value={texto}
   onChange={(e) => setTexto(e.target.value)}
 
-  placeholder="Digite aqui o texto que vocÃª quer transformar..."
+  placeholder="Digite aqui o texto que você quer transformar..."
 />
 
 <div
@@ -4774,7 +4700,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     opacity: 0.85
   }}
 >
-  {texto.length} caracteres â€¢ {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} crÃ©ditos
+  {texto.length} caracteres • {texto.length === 0 ? 0 : Math.ceil(texto.length / 800)} créditos
 </div>
 <button
   type="button"
@@ -4782,7 +4708,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
   onClick={corrigirTextoComIA}
   disabled={corrigindoTexto}
 >
-  {corrigindoTexto ? 'Corrigindo texto...' : 'âœ¨ Corrigir texto com IA'}
+  {corrigindoTexto ? 'Corrigindo texto...' : '✨ Corrigir texto com IA'}
 </button>
 
               <div style={{
@@ -4799,11 +4725,11 @@ fontSize: '12px',
 fontWeight: 400
               }}>
                 <div style={{ fontSize: '13px', marginBottom: '5px', color: '#facc15', fontWeight: 700 }}>
-                  âš ï¸ ATENÃ‡ÃƒO
+                  ⚠️ ATENÇÃO
                 </div>
                 <div>
-                  NÃ£o nos responsabilizamos por erros de escrita do usuÃ¡rio,
-                  corrigiremos apenas erros de pronÃºncia ou devaneios da IA.
+                  Não nos responsabilizamos por erros de escrita do usuário,
+                  corrigiremos apenas erros de pronúncia ou devaneios da IA.
                 </div>
               </div>
 
@@ -4819,8 +4745,8 @@ fontWeight: 400
                   disabled={gerando}
                 >
                   {gerando
-                    ? 'â³ Gerando...'
-                    : 'ðŸŽ™ï¸ Gerar voz'}
+                    ? '⏳ Gerando...'
+                    : '🎙️ Gerar voz'}
                 </button>
               </div>
 
@@ -4832,7 +4758,7 @@ fontWeight: 400
                 <div className="resultado-pos-geracao">
 
                   <div className="titulo-previa">
-                    ðŸŽ§ PrÃ©via da sua locuÃ§Ã£o
+                    🎧 Prévia da sua locução
                   </div>
 
                   <audio
@@ -4850,23 +4776,23 @@ fontWeight: 400
                     textAlign: 'center'
                   }}>
                     <div style={{ fontWeight: 600, marginBottom: '10px' }}>
-                      Velocidade da locuÃ§Ã£o
+                      Velocidade da locução
                     </div>
 
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center', margin: '0 auto', padding: '5px', borderRadius: '12px', background: 'rgba(128,128,128,0.10)', border: '1px solid rgba(128,128,128,0.18)', width: 'fit-content', maxWidth: '100%' }}>
                       <button type="button" disabled={alterandoVelocidade} onClick={() => void alterarVelocidadePosGeracao('normal')} style={{ padding: '10px 16px', borderRadius: '9px', border: velocidadePosGeracao === 'normal' ? '1px solid #8b5cf6' : '1px solid transparent', background: velocidadePosGeracao === 'normal' ? 'rgba(139,92,246,0.22)' : 'transparent', color: 'inherit', fontWeight: velocidadePosGeracao === 'normal' ? 700 : 500, cursor: 'pointer' }}>
-                        1,0x Â· Normal
+                        1,0x · Normal
                       </button>
                       <button type="button" disabled={alterandoVelocidade} onClick={() => void alterarVelocidadePosGeracao('rapido')} style={{ padding: '10px 16px', borderRadius: '9px', border: velocidadePosGeracao === 'rapido' ? '1px solid #8b5cf6' : '1px solid transparent', background: velocidadePosGeracao === 'rapido' ? 'rgba(139,92,246,0.22)' : 'transparent', color: 'inherit', fontWeight: velocidadePosGeracao === 'rapido' ? 700 : 500, cursor: 'pointer' }}>
-                        1,25x Â· RÃ¡pido
+                        1,25x · Rápido
                       </button>
                       <button type="button" disabled={alterandoVelocidade} onClick={() => void alterarVelocidadePosGeracao('super')} style={{ padding: '10px 16px', borderRadius: '9px', border: velocidadePosGeracao === 'super' ? '1px solid #8b5cf6' : '1px solid transparent', background: velocidadePosGeracao === 'super' ? 'rgba(139,92,246,0.22)' : 'transparent', color: 'inherit', fontWeight: velocidadePosGeracao === 'super' ? 700 : 500, cursor: 'pointer' }}>
-                        1,45x Â· Super rÃ¡pido
+                        1,45x · Super rápido
                       </button>
                     </div>
 
                     {alterandoVelocidade && (
-                      <p>Ajustando velocidade do Ã¡udio...</p>
+                      <p>Ajustando velocidade do áudio...</p>
                     )}
 
                     {erroVelocidade && (
@@ -4913,7 +4839,7 @@ fontWeight: 400
                         setMostrarTrilhas(!mostrarTrilhas)
                       }
                     >
-                      ðŸŽµ{' '}
+                      🎵{' '}
                       {mostrarTrilhas
                         ? 'Fechar trilhas'
                         : 'Adicionar trilha'}
@@ -4929,12 +4855,12 @@ fontWeight: 400
                     <div className="painel-trilhas">
 
                       <h3>
-                        ðŸŽµ Escolha uma trilha
+                        🎵 Escolha uma trilha
                       </h3>
 
 <div className="estilos" style={{ marginTop: '20px' }}>
                         <label>
-                          ðŸŽµ Estilo da trilha
+                          🎵 Estilo da trilha
                         </label>
 
                         <select
@@ -4981,11 +4907,11 @@ fontWeight: 400
                       <div className="trilha-item">
 
                         <strong>
-                          ðŸ“¤ Enviar minha prÃ³pria trilha
+                          📤 Enviar minha própria trilha
                         </strong>
 
                         <p>
-                          Escolha uma mÃºsica ou trilha de Ã¡udio do seu computador.
+                          Escolha uma música ou trilha de áudio do seu computador.
                         </p>
 
                         <input
@@ -5000,7 +4926,7 @@ fontWeight: 400
                               marginTop: '10px'
                             }}
                           >
-                            ðŸŽµ{' '}
+                            🎵{' '}
                             <strong>
                               {nomeTrilhaArquivo}
                             </strong>
@@ -5037,8 +4963,8 @@ fontWeight: 400
                               }}
                             >
                               {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
-                                ? `âœ“ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `ðŸ“? Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                                ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
+                                : `📝? Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
                             </button>
                           </>
                         )}
@@ -5151,11 +5077,11 @@ fontWeight: 400
                       <div className="editor-tempo">
 
                         <h3>
-                          ðŸŽšï¸ Ajuste da trilha
+                          🎚️ Ajuste da trilha
                         </h3>
 
                         <p>
-                          Escolha quanto tempo de trilha ficarÃ¡ antes e depois da sua locuÃ§Ã£o.
+                          Escolha quanto tempo de trilha ficará antes e depois da sua locução.
                         </p>
 
                         <div className="tempo-opcoes">
@@ -5163,7 +5089,7 @@ fontWeight: 400
                           <div className="tempo-campo">
 
                             <label>
-                              ðŸŽµ Trilha antes da voz
+                              🎵 Trilha antes da voz
                             </label>
 
                             <input
@@ -5193,7 +5119,7 @@ fontWeight: 400
                           <div className="tempo-campo">
 
                             <label>
-                              ðŸŽµ Trilha depois da voz
+                              🎵 Trilha depois da voz
                             </label>
 
                             <input
@@ -5223,11 +5149,11 @@ fontWeight: 400
                         </div>
 
                         <div className="resumo-tempo">
-                          ðŸŽµ {segundosInicio}s de trilha
-                          {' â†’ '}
-                          ðŸŽ™ï¸ LocuÃ§Ã£o
-                          {' â†’ '}
-                          {segundosFinal}s de trilha ðŸŽµ
+                          🎵 {segundosInicio}s de trilha
+                          {' → '}
+                          🎙️ Locução
+                          {' → '}
+                          {segundosFinal}s de trilha 🎵
                         </div>
 
                       </div>
@@ -5244,12 +5170,12 @@ fontWeight: 400
                            }}
                          >
                             {pontoTrilhaConfirmado
-                              ? <>âœ“ <strong>Ponto de inÃ­cio selecionado:</strong>{' '}
+                              ? <>✓ <strong>Ponto de início selecionado:</strong>{' '}
                                   {Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}
                                   :
                                   {Math.floor(inicioTrilha % 60).toString().padStart(2, '0')}
                                 </>
-                              : <>ðŸ“? <strong>InÃ­cio da trilha:</strong> 00:00</>}
+                              : <>📝? <strong>Início da trilha:</strong> 00:00</>}
                             <div
                               style={{
                                 marginTop: '6px',
@@ -5258,8 +5184,8 @@ fontWeight: 400
                               }}
                             >
                               {pontoTrilhaConfirmado
-                                ? 'âœ“ Ponto confirmado. Agora Ã© sÃ³ mixar a voz com a trilha.'
-                                : 'OuÃ§a a trilha, posicione no trecho desejado e clique em â€œUsar este pontoâ€?.'}
+                                ? '✓ Ponto confirmado. Agora é só mixar a voz com a trilha.'
+                                : 'Ouça a trilha, posicione no trecho desejado e clique em “Usar este ponto”?.'}
                            </div>
                          </div>
                        ) : null}
@@ -5288,7 +5214,7 @@ fontWeight: 400
                               fontWeight: 700
                             }}
                           >
-                            ðŸŽ™ï¸ Volume da voz: {volumeVoz}%
+                            🎙️ Volume da voz: {volumeVoz}%
                           </label>
 
                           <input
@@ -5316,7 +5242,7 @@ fontWeight: 400
                               fontWeight: 700
                             }}
                           >
-                            ðŸŽµ Volume da trilha: {volumeTrilha}%
+                            🎵 Volume da trilha: {volumeTrilha}%
                           </label>
 
                           <input
@@ -5343,14 +5269,14 @@ fontWeight: 400
                               opacity: 0.75
                             }}
                           >
-                            Durante a voz, a trilha Ã© reduzida automaticamente para deixar o locutor em destaque.
+                            Durante a voz, a trilha é reduzida automaticamente para deixar o locutor em destaque.
                           </small>
 
                         </div>
                       )}
 
                       {/* =================================================
-                          FINALIZAÃ‡ÃƒO DO ÃUDIO
+                          FINALIZAÇÃO DO ÁUDIO
                       ================================================= */}
 
                       {(trilhaSelecionada || trilhaArquivo) && (
@@ -5371,7 +5297,7 @@ fontWeight: 400
                               marginBottom: '14px'
                             }}
                           >
-                            ðŸŽ›ï¸ FinalizaÃ§Ã£o do Ã¡udio
+                            🎛️ Finalização do áudio
                           </div>
 
                           <button
@@ -5394,7 +5320,7 @@ fontWeight: 400
                               transition: '0.2s'
                             }}
                           >
-                            {reverbAtivo ? 'âœ¨ Reverb: ATIVADO' : 'âœ¨ Reverb: DESLIGADO'}
+                            {reverbAtivo ? '✨ Reverb: ATIVADO' : '✨ Reverb: DESLIGADO'}
                           </button>
 
                           <div style={{ marginTop: '12px' }}>
@@ -5424,7 +5350,7 @@ fontWeight: 400
                                   marginBottom: '7px'
                                 }}
                               >
-                                ðŸŽšï¸ Volume do Reverb: {volumeReverb}%
+                                🎚️ Volume do Reverb: {volumeReverb}%
                               </div>
 
                               <input
@@ -5444,7 +5370,7 @@ fontWeight: 400
                             </div>
                           )}
 
-                              ðŸŽ§ Efeitos sonoros
+                              🎧 Efeitos sonoros
                             </div>
 
                             <select
@@ -5464,7 +5390,7 @@ fontWeight: 400
                               <option value="">Nenhum efeito</option>
                               <option value="/efeitos/Laser.mp3">Laser</option>
                               <option value="/efeitos/Impacto.mp3">Impacto</option>
-                              <option value="/efeitos/TransmissÃ£o.mp3">TransmissÃ£o</option>
+                              <option value="/efeitos/Transmissão.mp3">Transmissão</option>
                               <option value="/efeitos/Buzina.mp3">Buzina</option>
                               <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
                               <option value="/efeitos/Assobio.mp3">Assobio</option>
@@ -5503,7 +5429,7 @@ fontWeight: 400
                                 />
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
-                                  <span>PosiÃ§Ã£o na locuÃ§Ã£o</span>
+                                  <span>Posição na locução</span>
                                   <strong style={{ color: '#facc15' }}>{posicaoEfeito.toFixed(1)}s</strong>
                                 </div>
                                 <input
@@ -5534,7 +5460,7 @@ fontWeight: 400
                                   cursor: 'pointer'
                                 }}
                               >
-                                âž• Adicionar segundo efeito
+                                ➕ Adicionar segundo efeito
                               </button>
                             )}
 
@@ -5570,7 +5496,7 @@ fontWeight: 400
                                   <option value="">Nenhum efeito</option>
                                   <option value="/efeitos/Laser.mp3">Laser</option>
                                   <option value="/efeitos/Impacto.mp3">Impacto</option>
-                                  <option value="/efeitos/TransmissÃ£o.mp3">TransmissÃ£o</option>
+                                  <option value="/efeitos/Transmissão.mp3">Transmissão</option>
                                   <option value="/efeitos/Buzina.mp3">Buzina</option>
                                   <option value="/efeitos/WhatsApp.mp3">WhatsApp</option>
                                 <option value="/efeitos/Assobio.mp3">Assobio</option>
@@ -5589,7 +5515,7 @@ fontWeight: 400
                                     <input type="range" min="0" max="100" value={volumeEfeito2} onChange={(e) => setVolumeEfeito2(Number(e.target.value))} style={{ width: '100%', accentColor: '#a855f7' }} />
 
                                     <div style={{ display: 'flex', justifyContent: 'space-between', color: '#d1d5db', fontSize: '14px', margin: '10px 0 6px' }}>
-                                      <span>PosiÃ§Ã£o na locuÃ§Ã£o</span>
+                                      <span>Posição na locução</span>
                                       <strong style={{ color: '#facc15' }}>{posicaoEfeito2.toFixed(1)}s</strong>
                                     </div>
                                     <input type="range" min="0" max="60" step="0.1" value={posicaoEfeito2} onChange={(e) => setPosicaoEfeito2(Number(e.target.value))} style={{ width: '100%', accentColor: '#a855f7' }} />
@@ -5626,11 +5552,11 @@ fontWeight: 400
                               fontSize: '14px'
                             }}
                           >
-                            <strong>ðŸ’¡ DICA IMPORTANTE</strong>
+                            <strong>💡 DICA IMPORTANTE</strong>
                             <div style={{ marginTop: '5px', color: '#f3f3f3' }}>
-                              VocÃª pode trocar a trilha, os efeitos, o volume e a posiÃ§Ã£o dos efeitos
-                              e <strong>mixar novamente quantas vezes quiser sem gastar novos crÃ©ditos.</strong>
-                              O crÃ©dito Ã© descontado somente ao gerar a locuÃ§Ã£o.
+                              Você pode trocar a trilha, os efeitos, o volume e a posição dos efeitos
+                              e <strong>mixar novamente quantas vezes quiser sem gastar novos créditos.</strong>
+                              O crédito é descontado somente ao gerar a locução.
                             </div>
                           </div>
 
@@ -5649,8 +5575,8 @@ fontWeight: 400
                             disabled={mixando}
                           >
                             {mixando
-                              ? 'â³ Mixando...'
-                              : 'ðŸŽšï¸ Mixar voz + trilha'}
+                              ? '⏳ Mixando...'
+                              : '🎚️ Mixar voz + trilha'}
                           </button>
 
                         </div>
@@ -5664,7 +5590,7 @@ fontWeight: 400
                         <div className="resultado-mixagem">
 
                           <div className="titulo-previa">
-                            ðŸŽµ Mixagem pronta
+                            🎵 Mixagem pronta
                           </div>
 
                           <audio
@@ -5699,14 +5625,14 @@ fontWeight: 400
                             style={{ width: "100%", marginTop: "12px" }}
                           >
                             {masterizando
-                              ? "Masterizando Ã¡udio..."
-                              : "Masterizar Ã¡udio"}
+                              ? "Masterizando áudio..."
+                              : "Masterizar áudio"}
                           </button>
 
                           {audioMasterizadoUrl && (
                             <div style={{ marginTop: "18px" }}>
                               <div className="titulo-previa">
-                                Ãudio masterizado
+                                Áudio masterizado
                               </div>
                               <audio
                                 className="player-audio"
@@ -5761,7 +5687,6 @@ fontWeight: 400
 }
 
 export default App
-
 
 
 
