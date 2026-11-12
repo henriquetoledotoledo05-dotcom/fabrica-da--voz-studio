@@ -4964,14 +4964,14 @@ fontWeight: 400
                             >
                               {pontoTrilhaConfirmado && trilhaEmPrevia === '__arquivo__'
                                 ? `✓ Ponto selecionado (${Math.floor(inicioTrilha / 60).toString().padStart(2, '0')}:${Math.floor(inicioTrilha % 60).toString().padStart(2, '0')})`
-                                : `📝? Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
+                                : `Usar este ponto (${Math.floor(tempoPreviaTrilha / 60).toString().padStart(2, '0')}:${Math.floor(tempoPreviaTrilha % 60).toString().padStart(2, '0')})`}
                             </button>
                           </>
                         )}
 
                       </div>
 
-                      {estiloTrilhaSelecionado && (
+                      {(estiloTrilhaSelecionado || trilhaArquivo) && (
                         <>
                       {/* =================================================
                           TRILHAS POR ESTILO
@@ -4979,6 +4979,7 @@ fontWeight: 400
 
                       
 
+                      {estiloTrilhaSelecionado && (
                       <div>
                         {trilhaSelecionada && (
                           <button
@@ -5069,6 +5070,7 @@ fontWeight: 400
                         ))}
                       </div>
                       </div>
+                      )}
 
 {/* =================================================
                           EDITOR DE TEMPO
@@ -5175,7 +5177,7 @@ fontWeight: 400
                                   :
                                   {Math.floor(inicioTrilha % 60).toString().padStart(2, '0')}
                                 </>
-                              : <>📝? <strong>Início da trilha:</strong> 00:00</>}
+                              : <><strong>Início da trilha:</strong> 00:00</>}
                             <div
                               style={{
                                 marginTop: '6px',
@@ -5185,7 +5187,7 @@ fontWeight: 400
                             >
                               {pontoTrilhaConfirmado
                                 ? '✓ Ponto confirmado. Agora é só mixar a voz com a trilha.'
-                                : 'Ouça a trilha, posicione no trecho desejado e clique em “Usar este ponto”?.'}
+                                : 'Ouça a trilha, posicione no trecho desejado e clique em “Usar este ponto”.'}
                            </div>
                          </div>
                        ) : null}
