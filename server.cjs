@@ -1689,6 +1689,77 @@ app.get("/api/minhas-vozes-clonadas", async (req, res) => {
     });
   }
 });
+
+app.post("/api/preview-clone", async (req, res) => {
+  try {
+    const usuario = await autenticarUsuario(req);
+    const voiceId = String(req.body.voiceId || "").trim();
+
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(voiceId)) {
+      return res.status(400).json({ erro: "Identificador de voz invalido." });
+    }
+
+    const { data: voz, error } = await supabaseAdmin
+      .from("vozes_clonadas")
+      .select("cartesia_voice_id")
+      .eq("id", voiceId)
+      .eq("user_id", usuario.id)
+      .single();
+
+    if (error || !voz || !voz.cartesia_voice_id) {
+      return res.status(404).json({ erro: "Voz clonada nao encontrada." });
+    }
+
+    if (!process.env.CARTESIA_API_KEY) {
+      return res.status(500).json({ erro: "CARTESIA_API_KEY nao configurada." });
+    }
+
+    const resposta = await fetch("https://api.cartesia.ai/tts/bytes", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.CARTESIA_API_KEY}`,
+        "Cartesia-Version": process.env.CARTESIA_API_VERSION || "2026-08-14",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model_id: "sonic-3.6",
+        transcript: "Tudo bem? Seja bem-vindo!",
+        voice: {
+          mode: "id",
+          id: voz.cartesia_voice_id
+        },
+        locale: "pt-BR",
+        output_format: {
+          container: "mp3",
+          sample_rate: 44100,
+          bit_rate: 128000
+        }
+      })
+    });
+
+    if (!resposta.ok) {
+      const erroApi = await resposta.text();
+      console.error("ERRO NA PREVIA CARTESIA:", erroApi);
+      return res.status(502).json({ erro: "Nao foi possivel gerar a previa da voz." });
+    }
+
+    const audio = Buffer.from(await resposta.arrayBuffer());
+
+    if (!audio.length) {
+      return res.status(502).json({ erro: "A Cartesia retornou um audio vazio." });
+    }
+
+    res.setHeader("Content-Type", "audio/mpeg");
+    res.setHeader("Content-Length", audio.length);
+    res.setHeader("Cache-Control", "no-store");
+    return res.send(audio);
+
+  } catch (erro) {
+    console.error("ERRO NA PREVIA DO CLONE:", erro.message);
+    return res.status(500).json({ erro: erro.message || "Erro ao gerar previa." });
+  }
+});
+
 function textosSaoSemelhantes(textoOriginal, textoNovo) {
   const normalizar = (texto) =>
     String(texto || "")
