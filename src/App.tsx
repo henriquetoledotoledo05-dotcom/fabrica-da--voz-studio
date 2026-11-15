@@ -311,6 +311,9 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
   const [confirmacaoAudioClone, setConfirmacaoAudioClone] = useState(false)
   const [criandoVozClone, setCriandoVozClone] = useState(false)
   const [mensagemClone, setMensagemClone] = useState('')
+  const [previewCloneUrl, setPreviewCloneUrl] = useState('')
+  const [previewCloneVoiceId, setPreviewCloneVoiceId] = useState('')
+  const [gerandoPreviewClone, setGerandoPreviewClone] = useState(false)
 
   const [estiloSelecionado, setEstiloSelecionado] = useState('normal')
 
@@ -551,6 +554,42 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
         resultado.avisoFoto ||
         'Voz clonada criada com sucesso!'
       )
+
+      setGerandoPreviewClone(true)
+      setPreviewCloneUrl((urlAnterior) => {
+        if (urlAnterior) URL.revokeObjectURL(urlAnterior)
+        return ''
+      })
+
+      try {
+        const respostaPreview = await fetch('/api/preview-clone', {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + sessionData.session.access_token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ voiceId: resultado.voz.id }),
+        })
+
+        if (!respostaPreview.ok) {
+          const erroPreview = await respostaPreview.json().catch(() => ({}))
+          throw new Error(erroPreview.erro || 'Nao foi possivel gerar a previa.')
+        }
+
+        const audioPreview = await respostaPreview.blob()
+
+        if (!audioPreview.size) {
+          throw new Error('A previa retornou um audio vazio.')
+        }
+
+        setPreviewCloneUrl(URL.createObjectURL(audioPreview))
+        setPreviewCloneVoiceId(resultado.voz.id)
+      } catch (erroPreview) {
+        console.error('Erro na previa da voz clonada:', erroPreview)
+        setMensagemClone('Voz criada! Nao foi possivel gerar a previa. Voce pode tentar novamente mais tarde.')
+      } finally {
+        setGerandoPreviewClone(false)
+      }
     } catch (erro) {
       setMensagemClone(
         erro instanceof Error
@@ -4418,6 +4457,12 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       </div>
     )}
 
+    {gerandoPreviewClone && (
+      <p style={{ color: '#facc15', fontSize: '13px', fontWeight: 700 }}>
+        Gerando demonstracao da sua nova voz...
+      </p>
+    )}
+
     {vozesClonadas.length > 0 ? (
       <>
         <h4 style={{ color: '#fff', marginBottom: '10px' }}>
@@ -4453,6 +4498,50 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 <strong>{voz.nome}</strong>
                 <small>Minha voz clonada</small>
               </div>
+              {(
+                <button
+                  type="button"
+                  className="cartao-voz-play"
+                  aria-label={`Ouvir previa de ${voz.nome}`}
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    try {
+                      const { data: sessionData, error } = await supabase.auth.getSession()
+                      if (error || !sessionData.session) {
+                        throw new Error('Faca login novamente.')
+                      }
+
+                      const resposta = await fetch('/api/preview-clone', {
+                        method: 'POST',
+                        headers: {
+                          Authorization: 'Bearer ' + sessionData.session.access_token,
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ voiceId: voz.id }),
+                      })
+
+                      if (!resposta.ok) {
+                        const erro = await resposta.json().catch(() => ({}))
+                        throw new Error(erro.erro || 'Nao foi possivel gerar a previa.')
+                      }
+
+                      const blob = await resposta.blob()
+                      if (!blob.size) throw new Error('Audio vazio.')
+
+                      const url = URL.createObjectURL(blob)
+                      const audio = new Audio(url)
+                      audio.onended = () => URL.revokeObjectURL(url)
+                      audio.onerror = () => URL.revokeObjectURL(url)
+                      await audio.play()
+                    } catch (erro) {
+                      setMensagemClone(erro instanceof Error ? erro.message : 'Erro ao reproduzir a previa.')
+                    }
+                  }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  {'\u25B6'}
+                </button>
+              )}
               {vozSelecionada === voz.id && (
                 <span className="cartao-voz-confirmacao">&#10003;</span>
               )}
