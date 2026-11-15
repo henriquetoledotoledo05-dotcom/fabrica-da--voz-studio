@@ -4096,27 +4096,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
       </button>
 
-      <button type="button" onClick={() => { window.open('https://www.fabricadavozstudio.com.br/central-demonstrativos', '_blank', 'noopener,noreferrer'); }} style={{
-        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
-        boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #7c3aed',
-        background: 'linear-gradient(145deg, #160d20, #09070d)',
-        color: '#fff', cursor: 'pointer',
-        display: 'flex', flexDirection: 'row', alignItems: 'center',
-        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
-      }}>
-        <span style={{
-          width: '46px', height: '46px', flex: '0 0 46px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: '13px', background: '#291536',
-          color: '#f5c542', fontSize: '24px'
-        }}>&#127908;</span>
-        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Central de Vozes</span>
-          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Conhe&#231;a e teste nossos locutores.</span>
-        </span>
 
-      </button>
 
       <button type="button" onClick={() => { setMostrarHistorico(true); void carregarHistorico(); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
