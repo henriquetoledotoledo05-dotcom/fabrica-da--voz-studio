@@ -1,4 +1,4 @@
-import logoFabrica from './assets/logo-fabrica.png'
+﻿import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -4459,6 +4459,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       </div>
     )}
 
+    {mostrarFormularioClone && (
+      <>
     {gerandoPreviewClone && (
       <p style={{ color: '#facc15', fontSize: '13px', fontWeight: 700 }}>
         Gerando demonstracao da sua nova voz...
@@ -4576,6 +4578,9 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <p style={{ color: '#a99ab8', fontSize: '13px' }}>
         Você ainda não criou nenhuma voz clonada.
       </p>
+    )}
+
+      </>
     )}
   </section>
 
@@ -5780,6 +5785,7 @@ fontWeight: 400
 }
 
 export default App
+
 
 
 
