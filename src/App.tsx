@@ -4473,7 +4473,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           Suas vozes
         </h4>
 
-        <div className="galeria-vozes-grid">
+        <div className="galeria-vozes-grid galeria-vozes-clonadas-grid">
           {vozesClonadas.map((voz) => (
             <div
               key={voz.id}
@@ -5785,6 +5785,7 @@ fontWeight: 400
 }
 
 export default App
+
 
 
 

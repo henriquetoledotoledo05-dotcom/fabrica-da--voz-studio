@@ -3966,3 +3966,53 @@ main button[style*="height: 88px"]:hover {
     flex: 0 0 36px !important;
   }
 }
+
+/* CARTOES COMPACTOS - VOZES CLONADAS */
+.galeria-vozes-clonadas-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz {
+  min-height: 66px !important;
+  padding: 7px !important;
+  gap: 7px !important;
+  border-radius: 10px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-foto {
+  width: 38px !important;
+  height: 38px !important;
+  flex: 0 0 38px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-info {
+  gap: 3px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-info strong {
+  font-size: 11px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-info small {
+  font-size: 9px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-play {
+  width: 27px !important;
+  height: 27px !important;
+  flex: 0 0 27px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz > button:not(.cartao-voz-play) {
+  margin-top: 3px !important;
+  padding: 4px 6px !important;
+  font-size: 9px !important;
+}
+
+@media (max-width: 650px) {
+  .galeria-vozes-clonadas-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+  }
+}
