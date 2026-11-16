@@ -1,4 +1,4 @@
-﻿import logoFabrica from './assets/logo-fabrica.png'
+import logoFabrica from './assets/logo-fabrica.png'
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
 import { supabase } from './supabase'
@@ -4272,10 +4272,12 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     background: '#171020',
     border: '1px solid #8b5cf6',
     borderRadius: '12px',
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr) auto',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '10px'
+    gap: '12px',
+    width: '100%',
+    boxSizing: 'border-box'
   }}>
     <span style={{ color: '#e9d5ff', fontSize: '14px', fontWeight: 700 }}>
       🎙️ Minhas Vozes Clonadas
@@ -4304,7 +4306,11 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
     {mostrarFormularioClone && (
       <div style={{
-        marginTop: '16px',
+        gridColumn: '1 / -1',
+        width: '100%',
+        minWidth: 0,
+        boxSizing: 'border-box',
+        marginTop: '4px',
         display: 'grid',
         gap: '12px'
       }}>
@@ -4462,18 +4468,18 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     {mostrarFormularioClone && (
       <>
     {gerandoPreviewClone && (
-      <p style={{ color: '#facc15', fontSize: '13px', fontWeight: 700 }}>
+      <p style={{ gridColumn: '1 / -1', width: '100%',  color: '#facc15', fontSize: '13px', fontWeight: 700 }}>
         Gerando demonstracao da sua nova voz...
       </p>
     )}
 
     {vozesClonadas.length > 0 ? (
       <>
-        <h4 style={{ color: '#fff', marginBottom: '10px' }}>
+        <h4 style={{ gridColumn: '1 / -1', width: '100%',  color: '#fff', marginBottom: '10px' }}>
           Suas vozes
         </h4>
 
-        <div className="galeria-vozes-grid galeria-vozes-clonadas-grid">
+        <div className="galeria-vozes-grid galeria-vozes-clonadas-grid" style={{ gridColumn: "1 / -1", width: "100%", minWidth: 0 }}>
           {vozesClonadas.map((voz) => (
             <div
               key={voz.id}
@@ -4575,7 +4581,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         </div>
       </>
     ) : (
-      <p style={{ color: '#a99ab8', fontSize: '13px' }}>
+      <p style={{ gridColumn: '1 / -1', width: '100%',  color: '#a99ab8', fontSize: '13px' }}>
         Você ainda não criou nenhuma voz clonada.
       </p>
     )}
