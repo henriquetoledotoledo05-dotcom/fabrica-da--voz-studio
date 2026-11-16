@@ -4267,19 +4267,19 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 <div className="galeria-vozes">
   <label>Escolha seu locutor</label>
   <section style={{
-    margin: '18px 0',
-    padding: '16px',
+    margin: '10px 0',
+    padding: '10px 12px',
     background: '#171020',
     border: '1px solid #8b5cf6',
-    borderRadius: '14px'
+    borderRadius: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '10px'
   }}>
-    <h3 style={{ color: '#e9d5ff', marginTop: 0 }}>
+    <span style={{ color: '#e9d5ff', fontSize: '14px', fontWeight: 700 }}>
       🎙️ Minhas Vozes Clonadas
-    </h3>
-
-    <p style={{ color: '#c4b5d0', fontSize: '13px' }}>
-      Crie sua própria voz com inteligência artificial e utilize nas suas locuções.
-    </p>
+    </span>
 
     <button
       type="button"
@@ -4288,16 +4288,18 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         setMensagemClone('')
       }}
       style={{
-        padding: '12px 18px',
+        padding: '8px 12px',
         border: 0,
-        borderRadius: '9px',
+        borderRadius: '8px',
         background: '#7c3aed',
         color: '#fff',
+        fontSize: '12px',
         fontWeight: 800,
-        cursor: 'pointer'
+        cursor: 'pointer',
+        whiteSpace: 'nowrap'
       }}
     >
-      {mostrarFormularioClone ? 'Fechar formulário' : '+ Criar minha voz'}
+      {mostrarFormularioClone ? 'Fechar' : '+ Criar minha voz'}
     </button>
 
     {mostrarFormularioClone && (
