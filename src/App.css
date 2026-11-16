@@ -1,4 +1,4 @@
-
+﻿
 /* =========================================================
    FÃBRICA DA VOZ - APP.CSS
    CSS LIMPO E ORGANIZADO
@@ -4016,3 +4016,86 @@ main button[style*="height: 88px"]:hover {
     gap: 7px !important;
   }
 }
+
+/* LAYOUT RESPONSIVO DEFINITIVO - CLONES */
+.galeria-vozes-clonadas-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 70px !important;
+  padding: 10px 14px !important;
+  gap: 12px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-foto {
+  width: 44px !important;
+  height: 44px !important;
+  flex: 0 0 44px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-info {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-info strong {
+  font-size: 13px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-info small {
+  font-size: 10px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz-play {
+  width: 32px !important;
+  height: 32px !important;
+  flex: 0 0 32px !important;
+}
+
+.galeria-vozes-clonadas-grid .cartao-voz > button:not(.cartao-voz-play) {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 5px 7px !important;
+  font-size: 9px !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 480px) {
+  .galeria-vozes-clonadas-grid {
+    gap: 8px !important;
+  }
+
+  .galeria-vozes-clonadas-grid .cartao-voz {
+    min-height: 62px !important;
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+
+  .galeria-vozes-clonadas-grid .cartao-voz-foto {
+    width: 38px !important;
+    height: 38px !important;
+    flex-basis: 38px !important;
+  }
+
+  .galeria-vozes-clonadas-grid .cartao-voz-play {
+    width: 29px !important;
+    height: 29px !important;
+    flex-basis: 29px !important;
+  }
+
+  .galeria-vozes-clonadas-grid .cartao-voz > button:not(.cartao-voz-play) {
+    padding: 4px 5px !important;
+    font-size: 8px !important;
+  }
+}
+
