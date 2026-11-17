@@ -4909,18 +4909,64 @@ fontWeight: 400
                       type="button"
                       className="botao-download"
                       disabled={baixandoAudio}
-                      onClick={() => {
+                      onClick={async () => {
                         setBaixandoAudio(true)
-                        const link = document.createElement('a')
-                        link.href = audioUrl
-                        link.download = 'fabrica-da-voz.mp3'
-                        document.body.appendChild(link)
-                        link.click()
-                        link.remove()
-                        window.setTimeout(() => setBaixandoAudio(false), 1500)
+
+                        try {
+                          const ehIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+
+                          if (ehIOS) {
+                            const resposta = await fetch(audioUrl)
+                            const blob = await resposta.blob()
+                            const arquivo = new File(
+                              [blob],
+                              'fabrica-da-voz.mp3',
+                              { type: 'audio/mpeg' }
+                            )
+
+                            if (
+                              navigator.share &&
+                              navigator.canShare?.({ files: [arquivo] })
+                            ) {
+                              await navigator.share({
+                                files: [arquivo],
+                                title: 'Locução pronta'
+                              })
+                            } else {
+                              const link = document.createElement('a')
+                              link.href = audioUrl
+                              link.target = '_blank'
+                              link.rel = 'noopener'
+                              document.body.appendChild(link)
+                              link.click()
+                              link.remove()
+                            }
+                          } else {
+                            const link = document.createElement('a')
+                            link.href = audioUrl
+                            link.download = 'fabrica-da-voz.mp3'
+                            document.body.appendChild(link)
+                            link.click()
+                            link.remove()
+                          }
+                        } catch (erro) {
+                          if (erro instanceof Error && erro.name !== 'AbortError') {
+                            console.error('Erro ao baixar áudio:', erro)
+
+                            const link = document.createElement('a')
+                            link.href = audioUrl
+                            link.target = '_blank'
+                            link.rel = 'noopener'
+                            document.body.appendChild(link)
+                            link.click()
+                            link.remove()
+                          }
+                        } finally {
+                          setBaixandoAudio(false)
+                        }
                       }}
                     >
-                      {baixandoAudio ? 'Preparando download...' : 'Baixar audio'}
+                      {baixandoAudio ? 'Preparando download...' : 'Baixar áudio'}
                     </button>
 
                     <button
