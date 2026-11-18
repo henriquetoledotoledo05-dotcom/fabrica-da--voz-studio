@@ -3622,7 +3622,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               </button>
 
               <button type="button" onClick={() => setPacoteVinhetasRadio('gospel')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'gospel' ? '2px solid #fbbf24' : '1px solid #594d32', background: pacoteVinhetasRadio === 'gospel' ? 'rgba(217,153,27,0.13)' : '#17150f', color: '#fff', cursor: 'pointer' }}>
-                <div style={{ fontSize: '27px', marginBottom: '8px' }}>ðŸŽ™ï¸</div>
+                <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127897;</div>
                 <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE GOSPEL</div>
                 <div style={{ color: '#fcd34d', marginTop: '7px', fontSize: '14px' }}>Locutor Rodrigo</div>
                 <div style={{ color: '#cbd5e1', marginTop: '8px', fontSize: '13px' }}>5 vinhetas com identidade gospel.</div>
@@ -4373,7 +4373,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         </span>
       </button>
       <button type="button" onClick={() => { setMostrarVinhetasRadioPacote(true); }} style={{
-        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        width: '100%', minWidth: 0, height: 'auto', minHeight: '112px', maxHeight: 'none', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
         border: '1px solid #a855f7',
         background: 'linear-gradient(145deg, #28113b, #09070d)',
