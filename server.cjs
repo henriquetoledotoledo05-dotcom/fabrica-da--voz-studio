@@ -3088,6 +3088,294 @@ app.post("/api/gerar-vinhetas-radio-ia", async (req, res) => {
     });
   }
 });
+app.post("/api/gerar-vinhetas-radio-pacote", async (req, res) => {
+  let usuarioId = null;
+  let creditosReservados = 0;
+  let diretorioTemporario = null;
+
+  try {
+    const { nomeRadio, pacote } = req.body || {};
+    const nome = typeof nomeRadio === "string" ? nomeRadio.trim() : "";
+
+    const pacotesPermitidos = {
+      jovem: {
+        pasta: "vinhetas jovem",
+        voz: "xyyAflT5WWJ3HeqszUn0"
+      },
+      gospel: {
+        pasta: "vinhetas gospel",
+        voz: "5ZHkTB2DBtlPdKeuCgxu"
+      }
+    };
+
+    if (!nome || nome.length > 60) {
+      return res.status(400).json({
+        erro: "Informe o nome da rádio, com no máximo 60 caracteres."
+      });
+    }
+
+    if (typeof pacote !== "string" || !pacotesPermitidos[pacote]) {
+      return res.status(400).json({
+        erro: "Selecione um pacote válido."
+      });
+    }
+
+    if (!openai || !process.env.ELEVENLABS_API_KEY) {
+      return res.status(503).json({
+        erro: "Serviço de personalização indisponível. Nenhum crédito foi consumido."
+      });
+    }
+
+    const usuario = await autenticarUsuario(req);
+    usuarioId = usuario.id;
+
+    const verificacao = await openai.moderations.create({
+      model: "omni-moderation-latest",
+      input: nome
+    });
+
+    if (verificacao.results?.[0]?.flagged) {
+      return res.status(400).json({
+        erro: "O nome informado precisa ser revisado. Nenhum crédito foi consumido."
+      });
+    }
+
+    const caminhoConfig = path.join(
+      __dirname,
+      "config",
+      "vinhetas-radio.json"
+    );
+
+    const configVinhetas = JSON.parse(
+      fs.readFileSync(caminhoConfig, "utf8")
+    );
+
+    const pontos = configVinhetas[pacote];
+    const arquivos = Object.keys(pontos || {});
+
+    if (
+      arquivos.length !== 5 ||
+      !Number.isFinite(configVinhetas.pausaAntesIdentificacao) ||
+      !Number.isFinite(configVinhetas.musicaAposIdentificacao)
+    ) {
+      throw new Error("A configuração do pacote está incompleta.");
+    }
+
+    const pacoteEscolhido = pacotesPermitidos[pacote];
+    const pastaOriginais = path.join(
+      __dirname,
+      "public",
+      pacoteEscolhido.pasta
+    );
+
+    for (const arquivo of arquivos) {
+      const caminhoOriginal = path.join(pastaOriginais, arquivo);
+      const ponto = pontos[arquivo];
+
+      if (
+        !fs.existsSync(caminhoOriginal) ||
+        !Number.isFinite(ponto) ||
+        ponto < 0
+      ) {
+        throw new Error("Um dos arquivos originais ou seus tempos não foi encontrado.");
+      }
+    }
+
+    await consumirCreditos(usuarioId, 5);
+    creditosReservados = 5;
+
+    diretorioTemporario = fs.mkdtempSync(
+      path.join(os.tmpdir(), "fabrica-radio-pacote-")
+    );
+
+    const respostaAudio = await fetch(
+      "https://api.elevenlabs.io/v1/text-to-speech/" +
+        encodeURIComponent(pacoteEscolhido.voz),
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": process.env.ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+          "Accept": "audio/mpeg"
+        },
+        body: JSON.stringify({
+          text: nome,
+          model_id: "eleven_v3",
+          language_code: "pt",
+          voice_settings: {
+            stability: 0.42,
+            style: 0
+          },
+          output_format: "mp3_44100_128"
+        })
+      }
+    );
+
+    if (!respostaAudio.ok) {
+      const detalhe = (await respostaAudio.text()).slice(0, 300);
+      console.error("VINHETAS RADIO PACOTE - erro ElevenLabs:", detalhe);
+      throw new Error("Não foi possível gerar a identificação da rádio.");
+    }
+
+    const audioIdentificacao = Buffer.from(
+      await respostaAudio.arrayBuffer()
+    );
+
+    if (!audioIdentificacao.length) {
+      throw new Error("A identificação gerada veio vazia.");
+    }
+
+    const caminhoIdentificacao = path.join(
+      diretorioTemporario,
+      "identificacao.mp3"
+    );
+
+    fs.writeFileSync(caminhoIdentificacao, audioIdentificacao);
+
+    const duracaoIdentificacao = await obterDuracao(
+      caminhoIdentificacao
+    );
+
+    const pausa = configVinhetas.pausaAntesIdentificacao;
+    const cauda = configVinhetas.musicaAposIdentificacao;
+    const vinhetas = [];
+
+    for (let i = 0; i < arquivos.length; i++) {
+      const arquivo = arquivos[i];
+      const caminhoOriginal = path.join(pastaOriginais, arquivo);
+      const caminhoSaida = path.join(
+        diretorioTemporario,
+        "vinheta-" + (i + 1) + ".mp3"
+      );
+
+      const duracaoOriginal = await obterDuracao(caminhoOriginal);
+      const inicioIdentificacao = pontos[arquivo] + pausa;
+      const fimIdentificacao = inicioIdentificacao + duracaoIdentificacao;
+      const duracaoFinal = fimIdentificacao + cauda;
+
+      if (duracaoFinal > duracaoOriginal) {
+        throw new Error(
+          "A vinheta " + (i + 1) +
+          " não possui música suficiente para receber a identificação e o encerramento."
+        );
+      }
+
+      const atrasoMs = Math.round(inicioIdentificacao * 1000);
+
+      const filtro = [
+        "[0:a]volume='if(between(t," + inicioIdentificacao + "," + fimIdentificacao + "),0.35,1)',atrim=duration=" + duracaoFinal +
+          ",afade=t=out:st=" + fimIdentificacao +
+          ":d=" + cauda + "[base]",
+        "[1:a]volume=2.5,adelay=" + atrasoMs + "|" + atrasoMs + "[id]",
+        "[base][id]amix=inputs=2:duration=longest:" +
+          "dropout_transition=0:normalize=0," +
+          "atrim=duration=" + duracaoFinal + "[out]"
+      ].join(";");
+
+      await executarFfmpeg(
+        [
+          "-y",
+          "-i", caminhoOriginal,
+          "-i", caminhoIdentificacao,
+          "-filter_complex", filtro,
+          "-map", "[out]",
+          "-codec:a", "libmp3lame",
+          "-b:a", "192k",
+          "-t", String(duracaoFinal),
+          caminhoSaida
+        ],
+        caminhoSaida
+      );
+
+      const audioFinal = fs.readFileSync(caminhoSaida);
+
+      if (!audioFinal.length) {
+        throw new Error("A vinheta " + (i + 1) + " ficou vazia.");
+      }
+
+      vinhetas.push({
+        titulo: "Vinheta " + (i + 1),
+        audioBase64: audioFinal.toString("base64")
+      });
+    }
+
+    if (vinhetas.length !== 5) {
+      throw new Error("Não foi possível concluir as cinco vinhetas.");
+    }
+
+    creditosReservados = 0;
+
+    return res.json({
+      vinhetas,
+      creditosConsumidos: 5
+    });
+
+  } catch (erro) {
+    console.error(
+      "VINHETAS RADIO PACOTE - falha na operação:",
+      erro
+    );
+
+    let devolucaoConfirmada = false;
+
+    if (usuarioId && creditosReservados > 0) {
+      try {
+        const saldoDevolucao = await devolverCreditos(
+          usuarioId,
+          creditosReservados
+        );
+
+        devolucaoConfirmada =
+          typeof saldoDevolucao === "number" &&
+          Number.isFinite(saldoDevolucao);
+
+        if (devolucaoConfirmada) {
+          creditosReservados = 0;
+        } else {
+          console.error(
+            "VINHETAS RADIO PACOTE - ATENÇÃO: devolução não confirmada.",
+            { usuarioId, creditos: creditosReservados, saldoDevolucao }
+          );
+        }
+      } catch (erroDevolucao) {
+        console.error(
+          "VINHETAS RADIO PACOTE - falha na devolução:",
+          erroDevolucao
+        );
+      }
+    }
+
+    if (res.headersSent) return;
+
+    const mensagem = erro?.message ||
+      "Não foi possível personalizar o pacote.";
+
+    const semCreditos = /cr[eé]ditos insuficientes/i.test(mensagem);
+
+    return res.status(semCreditos ? 402 : 500).json({
+      erro: semCreditos
+        ? "Você não possui cinco créditos disponíveis para este pacote."
+        : mensagem,
+      creditosDevolvidos: devolucaoConfirmada ? 5 : 0,
+      devolucaoConfirmada
+    });
+
+  } finally {
+    if (diretorioTemporario) {
+      try {
+        fs.rmSync(diretorioTemporario, {
+          recursive: true,
+          force: true
+        });
+      } catch (erroLimpeza) {
+        console.error(
+          "VINHETAS RADIO PACOTE - falha ao limpar temporários:",
+          erroLimpeza
+        );
+      }
+    }
+  }
+});
 app.post(
   "/api/mixar-voz",
   async (req, res) => {

@@ -1,0 +1,18 @@
+{
+  "jovem": {
+    "Tp Vinhetas - 01- A Sua Frequência.mp3": 4.76,
+    "Tp Vinhetas - 02- Na melhor sintonia.mp3": 6.08,
+    "Tp Vinhetas - 03- Sua Melhor Companhia.mp3": 4.00,
+    "Tp Vinhetas - 04- Tá conectado.mp3": 4.86,
+    "Tp Vinhetas - 05- O som que faz.mp3": 3.80
+  },
+  "gospel": {
+    "O1_pct_gospel.mp3": 6.50,
+    "O2_pct_gospel.mp3": 6.16,
+    "O3_pct_gospel.mp3": 8.84,
+    "O4_pct_gospel.mp3": 6.66,
+    "O5_pct_gospel.mp3": 9.20
+  },
+  "pausaAntesIdentificacao": 1.5,
+  "musicaAposIdentificacao": 3
+}

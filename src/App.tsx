@@ -270,6 +270,11 @@ function App() {
   const [modoAudioRadioIA, setModoAudioRadioIA] = useState('completo')
   const [gerandoVinhetasRadioIA, setGerandoVinhetasRadioIA] = useState(false)
   const [vinhetasRadioIA, setVinhetasRadioIA] = useState<Array<{ titulo: string; texto: string; audioUrl: string }>>([])
+  const [mostrarVinhetasRadioPacote, setMostrarVinhetasRadioPacote] = useState(false)
+  const [pacoteVinhetasRadio, setPacoteVinhetasRadio] = useState('jovem')
+  const [nomeVinhetasRadioPacote, setNomeVinhetasRadioPacote] = useState('')
+  const [gerandoVinhetasRadioPacote, setGerandoVinhetasRadioPacote] = useState(false)
+  const [audiosVinhetasRadioPacote, setAudiosVinhetasRadioPacote] = useState<Array<{ titulo: string; audioUrl: string }>>([])
   const [mostrarDJExpress, setMostrarDJExpress] = useState(false)
   const [mostrarFabricaStudio, setMostrarFabricaStudio] = useState(false)
 const [studioVozArquivo, setStudioVozArquivo] = useState<File | null>(null)
@@ -1902,6 +1907,101 @@ const gerarVoz = async () => {
       setGerandoVinhetasRadioIA(false);
     }
   };
+  const gerarVinhetasRadioPacote = async () => {
+    const nomeLimpo = nomeVinhetasRadioPacote.trim();
+
+    if (!nomeLimpo) {
+      alert("Digite o nome da rádio.");
+      return;
+    }
+
+    if (nomeLimpo.length > 60) {
+      alert("O nome da rádio deve ter no máximo 60 caracteres.");
+      return;
+    }
+
+    if (!["jovem", "gospel"].includes(pacoteVinhetasRadio)) {
+      alert("Selecione um pacote válido.");
+      return;
+    }
+
+    if (gerandoVinhetasRadioPacote) return;
+
+    setGerandoVinhetasRadioPacote(true);
+
+    try {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        throw new Error("Faça login para personalizar as vinhetas.");
+      }
+
+      const resposta = await fetch("/api/gerar-vinhetas-radio-pacote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionData.session.access_token}`,
+        },
+        body: JSON.stringify({
+          nomeRadio: nomeLimpo,
+          pacote: pacoteVinhetasRadio,
+        }),
+      });
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        await carregarCreditos();
+        throw new Error(dados.erro || "Não foi possível personalizar as vinhetas.");
+      }
+
+      if (!Array.isArray(dados.vinhetas) || dados.vinhetas.length !== 5) {
+        await carregarCreditos();
+        throw new Error("O servidor não entregou os cinco áudios. Confira seu saldo.");
+      }
+
+      const novosAudios = dados.vinhetas.map(
+        (item: { titulo: string; audioBase64: string }) => {
+          if (!item.audioBase64) {
+            throw new Error("Um dos cinco áudios veio vazio. Tente novamente.");
+          }
+
+          const binario = atob(item.audioBase64);
+          const bytes = new Uint8Array(binario.length);
+
+          for (let i = 0; i < binario.length; i++) {
+            bytes[i] = binario.charCodeAt(i);
+          }
+
+          const blob = new Blob([bytes], { type: "audio/mpeg" });
+
+          return {
+            titulo: item.titulo,
+            audioUrl: URL.createObjectURL(blob),
+          };
+        }
+      );
+
+      setAudiosVinhetasRadioPacote((anteriores) => {
+        anteriores.forEach((item) => URL.revokeObjectURL(item.audioUrl));
+        return novosAudios;
+      });
+
+      await carregarCreditos();
+      alert("As cinco vinhetas foram personalizadas com sucesso!");
+    } catch (erro) {
+      console.error("Erro ao personalizar pacote de vinhetas:", erro);
+      alert(
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível personalizar as vinhetas."
+      );
+    } finally {
+      setGerandoVinhetasRadioPacote(false);
+    }
+  };
+
   // TRILHAS POR ESTILO
   // =====================================================
 
@@ -3492,6 +3592,96 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       </div>
     )
   }
+  // VINHETAS_RADIO_PACOTE_TELA
+  if (mostrarVinhetasRadioPacote) {
+    return (
+      <div style={{ minHeight: '100vh', padding: '32px 20px 48px', boxSizing: 'border-box', background: 'radial-gradient(ellipse at top, #31204b 0%, #100b16 48%, #08080c 100%)', color: '#fff' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <button type="button" onClick={() => setMostrarVinhetasRadioPacote(false)} style={{ border: '1px solid rgba(216,180,254,0.35)', borderRadius: '12px', padding: '10px 15px', color: '#e9d5ff', background: '#21152c', cursor: 'pointer', marginBottom: '22px', fontWeight: 700 }}>
+            Voltar ao menu
+          </button>
+
+          <h1 style={{ fontSize: 'clamp(30px, 5vw, 44px)', fontWeight: 900, marginBottom: '8px' }}>
+            VINHETAS PARA <span style={{ color: '#d8b4fe' }}>RÁDIOS</span>
+          </h1>
+
+          <p style={{ color: '#d6c8e8', marginTop: 0, lineHeight: 1.7 }}>
+            Escolha um pacote com 5 vinhetas prontas e personalize todas com o nome da sua emissora, mantendo a música, os efeitos e a voz original.
+          </p>
+
+          <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(216,180,254,0.25)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(40,25,58,0.96), rgba(18,14,25,0.98))' }}>
+            <h2 style={{ marginTop: 0, fontSize: '21px' }}>Escolha seu pacote</h2>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+              <button type="button" onClick={() => setPacoteVinhetasRadio('jovem')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'jovem' ? '2px solid #c084fc' : '1px solid #59436e', background: pacoteVinhetasRadio === 'jovem' ? 'rgba(147,51,234,0.20)' : '#171321', color: '#fff', cursor: 'pointer' }}>
+                <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127897;</div>
+                <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE JOVEM</div>
+                <div style={{ color: '#d8b4fe', marginTop: '7px', fontSize: '14px' }}>Locutor Henrique</div>
+                <div style={{ color: '#cbd5e1', marginTop: '8px', fontSize: '13px' }}>5 vinhetas com identidade jovem e moderna.</div>
+                <div style={{ color: '#c084fc', fontWeight: 800, marginTop: '12px' }}>{pacoteVinhetasRadio === 'jovem' ? '✓ PACOTE SELECIONADO' : 'Selecionar pacote'}</div>
+              </button>
+
+              <button type="button" onClick={() => setPacoteVinhetasRadio('gospel')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'gospel' ? '2px solid #fbbf24' : '1px solid #594d32', background: pacoteVinhetasRadio === 'gospel' ? 'rgba(217,153,27,0.13)' : '#17150f', color: '#fff', cursor: 'pointer' }}>
+                <div style={{ fontSize: '27px', marginBottom: '8px' }}>ðŸŽ™ï¸</div>
+                <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE GOSPEL</div>
+                <div style={{ color: '#fcd34d', marginTop: '7px', fontSize: '14px' }}>Locutor Rodrigo</div>
+                <div style={{ color: '#cbd5e1', marginTop: '8px', fontSize: '13px' }}>5 vinhetas com identidade gospel.</div>
+                <div style={{ color: '#fcd34d', fontWeight: 800, marginTop: '12px' }}>{pacoteVinhetasRadio === 'gospel' ? '✓ PACOTE SELECIONADO' : 'Selecionar pacote'}</div>
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+              <div style={{ padding: '16px', borderRadius: '14px', background: '#171321', border: '1px solid #59436e' }}>
+                <div style={{ color: '#d8b4fe', fontWeight: 900, marginBottom: '8px' }}>OUÇA O DEMONSTRATIVO JOVEM</div>
+                <div style={{ color: '#cbd5e1', fontSize: '13px', marginBottom: '10px' }}>Locutor Henrique</div>
+                <audio controls preload="none" src="/demo-vinheta-pacote-jovem.mp3" style={{ width: '100%' }} />
+              </div>
+              <div style={{ padding: '16px', borderRadius: '14px', background: '#17150f', border: '1px solid #594d32' }}>
+                <div style={{ color: '#fcd34d', fontWeight: 900, marginBottom: '8px' }}>OUÇA O DEMONSTRATIVO GOSPEL</div>
+                <div style={{ color: '#cbd5e1', fontSize: '13px', marginBottom: '10px' }}>Locutor Rodrigo</div>
+                <audio controls preload="none" src="/demo-vinheta-pacote-gospel.mp3" style={{ width: '100%' }} />
+              </div>
+            </div>
+
+            <label htmlFor="nome-radio-pacote" style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>
+              Nome da sua rádio
+            </label>
+
+            <input id="nome-radio-pacote" value={nomeVinhetasRadioPacote} onChange={e => setNomeVinhetasRadioPacote(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '10px', border: '1px solid #59436e', background: '#0b0b14', color: '#fff', marginBottom: '18px' }} />
+
+            <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(216,180,254,0.09)', border: '1px solid rgba(216,180,254,0.22)', textAlign: 'center', marginBottom: '18px' }}>
+              <div style={{ color: '#e9d5ff', fontWeight: 800 }}>PACOTE COMPLETO — 5 VINHETAS</div>
+              <div style={{ fontSize: '27px', fontWeight: 900, color: '#d8b4fe', marginTop: '5px' }}>5 CRÉDITOS</div>
+              <div style={{ color: '#cbd5e1', fontSize: '13px', marginTop: '5px' }}>Uma única cobrança pelas cinco personalizações.</div>
+            </div>
+
+            <button type="button" onClick={() => void gerarVinhetasRadioPacote()} disabled={gerandoVinhetasRadioPacote} style={{ width: '100%', padding: '16px', border: 0, borderRadius: '12px', background: gerandoVinhetasRadioPacote ? '#51445f' : 'linear-gradient(90deg, #9333ea, #7e22ce)', color: '#fff', fontWeight: 900, fontSize: '16px', cursor: gerandoVinhetasRadioPacote ? 'wait' : 'pointer', opacity: gerandoVinhetasRadioPacote ? 0.75 : 1 }}>
+              {gerandoVinhetasRadioPacote ? 'PERSONALIZANDO AS 5 VINHETAS...' : 'PERSONALIZAR MEU PACOTE'}
+            </button>
+
+            <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: 1.6, marginBottom: 0, textAlign: 'center' }}>
+              A cobrança é realizada uma única vez. Se alguma das cinco vinhetas falhar, o pacote será cancelado e os créditos serão estornados.
+            </p>
+          </div>
+
+          {audiosVinhetasRadioPacote.length > 0 && (
+            <div style={{ marginTop: '28px' }}>
+              <h2 style={{ color: '#e9d5ff' }}>Suas cinco vinhetas personalizadas</h2>
+              {audiosVinhetasRadioPacote.map((vinheta, indice) => (
+                <div key={`${vinheta.titulo}-${indice}`} style={{ marginTop: '14px', padding: '18px', borderRadius: '12px', background: '#171321', border: '1px solid #59436e' }}>
+                  <h3 style={{ marginTop: 0 }}>{vinheta.titulo}</h3>
+                  <audio controls preload="none" src={vinheta.audioUrl} style={{ width: '100%' }} />
+                  <a href={vinheta.audioUrl} download={`Vinheta-${indice + 1}-${nomeVinhetasRadioPacote.trim().replace(/[^a-zA-Z0-9_-]+/g, '-')}.mp3`} style={{ display: 'inline-block', marginTop: '12px', color: '#d8b4fe', fontWeight: 700 }}>
+                    Baixar MP3
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
   // FABRICA_STUDIO_TELA
   if (mostrarFabricaStudio) {
     return (
@@ -4180,6 +4370,26 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
           <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Vinhetas de Rádio IA<span style={{background: "#7dd3fc", color: "#102338", fontSize: "11px", fontWeight: 900, padding: "4px 7px", borderRadius: "8px", marginLeft: "8px"}}>NOVO</span></span>
           <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#d4c5df', lineHeight: 1.4}}>Crie 5 vinhetas para sua rádio.</span>
+        </span>
+      </button>
+      <button type="button" onClick={() => { setMostrarVinhetasRadioPacote(true); }} style={{
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
+        boxSizing: 'border-box', borderRadius: '17px',
+        border: '1px solid #a855f7',
+        background: 'linear-gradient(145deg, #28113b, #09070d)',
+        color: '#fff', cursor: 'pointer',
+        display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
+      }}>
+        <span style={{
+          width: '46px', height: '46px', flex: '0 0 46px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: '13px', background: '#39204f',
+          color: '#d8b4fe', fontSize: '24px'
+        }}>&#127925;</span>
+        <span style={{flex: 1, minWidth: 0, display: 'block'}}>
+          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Vinhetas para Rádios</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#e9d5ff', lineHeight: 1.4}}>RADIALISTA, VALORIZE SUA RÁDIO! Ouça grátis 5 vinhetas personalizadas nos estilos Jovem e Gospel.</span>
         </span>
       </button>
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
