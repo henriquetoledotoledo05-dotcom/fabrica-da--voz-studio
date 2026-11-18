@@ -4373,7 +4373,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         </span>
       </button>
       <button type="button" onClick={() => { setMostrarVinhetasRadioPacote(true); }} style={{
-        width: '100%', minWidth: 0, height: 'auto', minHeight: '112px', maxHeight: 'none', padding: '12px 14px',
+        width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
         border: '1px solid #a855f7',
         background: 'linear-gradient(145deg, #28113b, #09070d)',
@@ -4388,8 +4388,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           color: '#d8b4fe', fontSize: '24px'
         }}>&#127925;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '16px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>Vinhetas para Rádios</span>
-          <span style={{display: 'block', marginTop: '3px', fontSize: '12px', fontWeight: 400, color: '#e9d5ff', lineHeight: 1.4}}>RADIALISTA, VALORIZE SUA RÁDIO! Ouça grátis 5 vinhetas personalizadas nos estilos Jovem e Gospel.</span>
+          <span style={{display: 'block', fontSize: '14px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>PACOTES DE VINHETAS PARA RÁDIO</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '11px', fontWeight: 400, color: '#e9d5ff', lineHeight: 1.3}}>Cinco vinhetas personalizadas com o nome da sua rádio.</span>
         </span>
       </button>
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
