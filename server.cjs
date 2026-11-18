@@ -3266,7 +3266,7 @@ app.post("/api/gerar-vinhetas-radio-pacote", async (req, res) => {
         "[0:a]volume='if(between(t," + inicioIdentificacao + "," + fimIdentificacao + "),0.35,1)',atrim=duration=" + duracaoFinal +
           ",afade=t=out:st=" + fimIdentificacao +
           ":d=" + cauda + "[base]",
-        "[1:a]volume=2.5,adelay=" + atrasoMs + "|" + atrasoMs + "[id]",
+        "[1:a]volume=3.0,adelay=" + atrasoMs + "|" + atrasoMs + "[id]",
         "[base][id]amix=inputs=2:duration=longest:" +
           "dropout_transition=0:normalize=0," +
           "atrim=duration=" + duracaoFinal + "[out]"
