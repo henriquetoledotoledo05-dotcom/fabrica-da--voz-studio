@@ -4388,8 +4388,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           color: '#d8b4fe', fontSize: '24px'
         }}>&#127925;</span>
         <span style={{flex: 1, minWidth: 0, display: 'block'}}>
-          <span style={{display: 'block', fontSize: '14px', fontWeight: 800, color: '#fff', lineHeight: 1.2}}>PACOTES DE VINHETAS PARA RÁDIO</span>
-          <span style={{display: 'block', marginTop: '3px', fontSize: '11px', fontWeight: 400, color: '#e9d5ff', lineHeight: 1.3}}>Cinco vinhetas personalizadas com o nome da sua rádio.</span>
+          <span style={{display: 'block', fontSize: '13px', fontWeight: 800, color: '#fff', lineHeight: 1.15}}>Pacotes de Vinhetas para Rádio</span>
+          <span style={{display: 'block', marginTop: '3px', fontSize: '11px', fontWeight: 400, color: '#e9d5ff', lineHeight: 1.3}}>5 vinhetas com o nome da sua rádio.</span>
         </span>
       </button>
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
