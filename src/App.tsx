@@ -1920,7 +1920,7 @@ const gerarVoz = async () => {
       return;
     }
 
-    if (!["jovem", "gospel"].includes(pacoteVinhetasRadio)) {
+    if (!["jovem", "gospel", "natal"].includes(pacoteVinhetasRadio)) {
       alert("Selecione um pacote válido.");
       return;
     }
@@ -3606,40 +3606,40 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           </h1>
 
           <p style={{ color: '#d6c8e8', marginTop: 0, lineHeight: 1.7 }}>
-            Escolha um pacote com 5 vinhetas prontas e personalize todas com o nome da sua emissora, mantendo a música, os efeitos e a voz original.
+            {pacoteVinhetasRadio === 'natal'
+              ? 'Escolha o pacote Natal: são 5 locuções completas na voz Leonardo, com trilhas natalinas diferentes e o nome da sua rádio no encerramento.'
+              : 'Escolha um pacote com 5 vinhetas prontas e personalize todas com o nome da sua emissora, mantendo a m?sica, os efeitos e a voz original.'}
           </p>
 
           <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(216,180,254,0.25)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(40,25,58,0.96), rgba(18,14,25,0.98))' }}>
             <h2 style={{ marginTop: 0, fontSize: '21px' }}>Escolha seu pacote</h2>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-              <button type="button" onClick={() => setPacoteVinhetasRadio('jovem')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'jovem' ? '2px solid #c084fc' : '1px solid #59436e', background: pacoteVinhetasRadio === 'jovem' ? 'rgba(147,51,234,0.20)' : '#171321', color: '#fff', cursor: 'pointer' }}>
+              <div role="button" tabIndex={0} onClick={() => setPacoteVinhetasRadio('jovem')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'jovem' ? '2px solid #c084fc' : '1px solid #59436e', background: pacoteVinhetasRadio === 'jovem' ? 'rgba(147,51,234,0.20)' : '#171321', color: '#fff', cursor: 'pointer' }}>
+                <div onClick={(e) => e.stopPropagation()} style={{ marginTop: "14px" }}><div style={{ color: "#cbd5e1", fontSize: "12px", marginBottom: "6px", fontWeight: 700 }}>OUVIR DEMONSTRATIVO FIXO</div><audio controls preload="none" src="/demo-pacote-jovem-v2.mp3" style={{ width: "100%" }} /></div>
                 <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127897;</div>
                 <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE JOVEM</div>
-                <div style={{ color: '#d8b4fe', marginTop: '7px', fontSize: '14px' }}>Locutor Henrique</div>
+                <div style={{ color: '#d8b4fe', marginTop: '7px', fontSize: '14px' }}>Locutor Gustavo</div>
                 <div style={{ color: '#cbd5e1', marginTop: '8px', fontSize: '13px' }}>5 vinhetas com identidade jovem e moderna.</div>
                 <div style={{ color: '#c084fc', fontWeight: 800, marginTop: '12px' }}>{pacoteVinhetasRadio === 'jovem' ? '✓ PACOTE SELECIONADO' : 'Selecionar pacote'}</div>
-              </button>
+              </div>
 
-              <button type="button" onClick={() => setPacoteVinhetasRadio('gospel')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'gospel' ? '2px solid #fbbf24' : '1px solid #594d32', background: pacoteVinhetasRadio === 'gospel' ? 'rgba(217,153,27,0.13)' : '#17150f', color: '#fff', cursor: 'pointer' }}>
+              <div role="button" tabIndex={0} onClick={() => setPacoteVinhetasRadio('gospel')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'gospel' ? '2px solid #fbbf24' : '1px solid #594d32', background: pacoteVinhetasRadio === 'gospel' ? 'rgba(217,153,27,0.13)' : '#17150f', color: '#fff', cursor: 'pointer' }}>
+                <div onClick={(e) => e.stopPropagation()} style={{ marginTop: "14px" }}><div style={{ color: "#cbd5e1", fontSize: "12px", marginBottom: "6px", fontWeight: 700 }}>OUVIR DEMONSTRATIVO FIXO</div><audio controls preload="none" src="/demo-pacote-gospel-v2.mp3" style={{ width: "100%" }} /></div>
                 <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127897;</div>
                 <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE GOSPEL</div>
-                <div style={{ color: '#fcd34d', marginTop: '7px', fontSize: '14px' }}>Locutor Rodrigo</div>
+                <div style={{ color: '#fcd34d', marginTop: '7px', fontSize: '14px' }}>Locutor Henrique</div>
                 <div style={{ color: '#cbd5e1', marginTop: '8px', fontSize: '13px' }}>5 vinhetas com identidade gospel.</div>
                 <div style={{ color: '#fcd34d', fontWeight: 800, marginTop: '12px' }}>{pacoteVinhetasRadio === 'gospel' ? '✓ PACOTE SELECIONADO' : 'Selecionar pacote'}</div>
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-              <div style={{ padding: '16px', borderRadius: '14px', background: '#171321', border: '1px solid #59436e' }}>
-                <div style={{ color: '#d8b4fe', fontWeight: 900, marginBottom: '8px' }}>OUÇA O DEMONSTRATIVO JOVEM</div>
-                <div style={{ color: '#cbd5e1', fontSize: '13px', marginBottom: '10px' }}>Locutor Henrique</div>
-                <audio controls preload="none" src="/demo-vinheta-pacote-jovem.mp3" style={{ width: '100%' }} />
               </div>
-              <div style={{ padding: '16px', borderRadius: '14px', background: '#17150f', border: '1px solid #594d32' }}>
-                <div style={{ color: '#fcd34d', fontWeight: 900, marginBottom: '8px' }}>OUÇA O DEMONSTRATIVO GOSPEL</div>
-                <div style={{ color: '#cbd5e1', fontSize: '13px', marginBottom: '10px' }}>Locutor Rodrigo</div>
-                <audio controls preload="none" src="/demo-vinheta-pacote-gospel.mp3" style={{ width: '100%' }} />
+
+              <div role="button" tabIndex={0} onClick={() => setPacoteVinhetasRadio('natal')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'natal' ? '2px solid #22c55e' : '1px solid #42634b', background: pacoteVinhetasRadio === 'natal' ? 'rgba(22,163,74,0.20)' : '#101b16', color: '#fff', cursor: 'pointer' }}>
+                <div onClick={(e) => e.stopPropagation()} style={{ marginTop: "14px" }}><div style={{ color: "#cbd5e1", fontSize: "12px", marginBottom: "6px", fontWeight: 700 }}>OUVIR DEMONSTRATIVO FIXO</div><audio controls preload="none" src="/demo-pacote-natal-v2.mp3" style={{ width: "100%" }} /></div>
+                <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127876;</div>
+                <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE NATAL</div>
+                <div style={{ color: '#86efac', marginTop: '7px', fontSize: '14px' }}>Locutor Leonardo</div>
+                <div style={{ color: '#cbd5e1', marginTop: '8px', fontSize: '13px' }}>5 locuções completas com trilhas natalinas diferentes e o nome da sua rádio no final.</div>
+                <div style={{ color: '#86efac', fontWeight: 800, marginTop: '12px' }}>{pacoteVinhetasRadio === 'natal' ? '✓ PACOTE SELECIONADO' : 'Selecionar pacote'}</div>
               </div>
             </div>
 
