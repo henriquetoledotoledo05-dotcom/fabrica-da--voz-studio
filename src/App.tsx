@@ -278,6 +278,7 @@ function App() {
   const [mostrarDJExpress, setMostrarDJExpress] = useState(false)
   const [mostrarFabricaStudio, setMostrarFabricaStudio] = useState(false)
 const [studioVozArquivo, setStudioVozArquivo] = useState<File | null>(null)
+const [studioVozPreviewUrl, setStudioVozPreviewUrl] = useState('')
 const [studioTrilhaArquivo, setStudioTrilhaArquivo] = useState<File | null>(null)
 const [studioEstiloTrilha, setStudioEstiloTrilha] = useState('comercial')
 const [studioTrilhaSelecionada, setStudioTrilhaSelecionada] = useState('')
@@ -3697,16 +3698,32 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             <section style={{ border: '1px solid rgba(192,132,252,0.20)', borderRadius: '16px', padding: '24px', background: 'linear-gradient(145deg, rgba(31,22,43,0.98), rgba(18,14,25,0.98))', boxShadow: '0 12px 30px rgba(0,0,0,0.18)' }}>
               <h2 style={{ color: '#facc15', fontSize: '20px' }}>1. Sua locução</h2>
               <p style={{ color: '#e9d5ff', lineHeight: 1.5 }}>Escolha a gravação de voz no seu computador.</p>
-              <input type="file" accept="audio/*" onChange={(e) => {
-                const arquivo = e.target.files?.[0] || null;
-                setStudioVozArquivo(arquivo);
-                const audio = document.getElementById('studio-locucao') as HTMLAudioElement | null;
-                if (audio) {
-                  audio.src = arquivo ? URL.createObjectURL(arquivo) : '';
-                  audio.load();
-                }
-              }} style={{ width: '100%', color: '#fff', margin: '10px 0' }} />
-              <audio id="studio-locucao" controls style={{ width: '100%', marginTop: '10px' }} />
+              <input
+                type="file"
+                accept="audio/*,.mp3,.wav,.m4a,.ogg,.aac"
+                onChange={(e) => {
+                  const arquivo = e.target.files?.[0] || null;
+                  setStudioVozArquivo(arquivo);
+
+                  if (studioVozPreviewUrl) {
+                    URL.revokeObjectURL(studioVozPreviewUrl);
+                  }
+
+                  setStudioVozPreviewUrl(
+                    arquivo ? URL.createObjectURL(arquivo) : ''
+                  );
+                }}
+                style={{ width: '100%', color: '#fff', margin: '10px 0' }}
+              />
+              {studioVozPreviewUrl && (
+                <audio
+                  src={studioVozPreviewUrl}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  style={{ width: '100%', marginTop: '10px' }}
+                />
+              )}
               <div style={{ marginTop: '16px', padding: '14px', borderRadius: '12px', border: '1px solid rgba(250,204,21,0.35)', background: 'rgba(15,10,22,0.65)' }}>
                 <h3 style={{ color: '#facc15', margin: '0 0 10px', fontSize: '16px' }}>Reverb da voz</h3>
                 <label style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
