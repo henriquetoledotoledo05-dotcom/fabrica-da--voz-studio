@@ -2757,7 +2757,7 @@ async function mixarVinhetaPacoteNatal(audioBuffer, caminhoTrilha) {
       "-stream_loop", "-1", "-i", caminhoTrilha,
       "-filter_complex",
       "[0:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=1.15,adelay=1500|1500,apad=pad_dur=3[voz];" +
-      "[1:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=0.20[trilha];" +
+      "[1:a]aresample=44100,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=0.32[trilha];" +
       "[voz][trilha]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,alimiter=limit=0.95[out]",
       "-map", "[out]",
       "-c:a", "libmp3lame",
@@ -4482,6 +4482,7 @@ process.on(
   "SIGTERM",
   () => encerrarServidor("SIGTERM")
 );
+
 
 
 

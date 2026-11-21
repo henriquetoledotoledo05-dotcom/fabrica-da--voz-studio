@@ -3609,7 +3609,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
           <p style={{ color: '#d6c8e8', marginTop: 0, lineHeight: 1.7 }}>
             {pacoteVinhetasRadio === 'natal'
               ? 'Escolha o pacote Natal: são 5 locuções completas na voz Leonardo, com trilhas natalinas diferentes e o nome da sua rádio no encerramento.'
-              : 'Escolha um pacote com 5 vinhetas prontas e personalize todas com o nome da sua emissora, mantendo a m?sica, os efeitos e a voz original.'}
+              : 'Escolha um pacote com 5 vinhetas prontas e personalize todas com o nome da sua emissora, mantendo as músicas, os efeitos e as vozes originais.'}
           </p>
 
           <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(216,180,254,0.25)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(40,25,58,0.96), rgba(18,14,25,0.98))' }}>
