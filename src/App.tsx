@@ -3617,6 +3617,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
               <div role="button" tabIndex={0} onClick={() => setPacoteVinhetasRadio('jovem')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'jovem' ? '2px solid #c084fc' : '1px solid #59436e', background: pacoteVinhetasRadio === 'jovem' ? 'rgba(147,51,234,0.20)' : '#171321', color: '#fff', cursor: 'pointer' }}>
+                <img src="/capa-jovem-premium.png" alt="Capa do Pacote Jovem" style={{ width: "100%", height: "210px", objectFit: "contain", display: "block", marginBottom: "10px", borderRadius: "10px" }} />
                 <div onClick={(e) => e.stopPropagation()} style={{ marginTop: "14px" }}><div style={{ color: "#cbd5e1", fontSize: "12px", marginBottom: "6px", fontWeight: 700 }}>OUVIR DEMONSTRATIVO FIXO</div><audio controls preload="none" src="/demo-pacote-jovem-v2.mp3" style={{ width: "100%" }} /></div>
                 <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127897;</div>
                 <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE JOVEM</div>
@@ -3626,6 +3627,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               </div>
 
               <div role="button" tabIndex={0} onClick={() => setPacoteVinhetasRadio('gospel')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'gospel' ? '2px solid #fbbf24' : '1px solid #594d32', background: pacoteVinhetasRadio === 'gospel' ? 'rgba(217,153,27,0.13)' : '#17150f', color: '#fff', cursor: 'pointer' }}>
+                <img src="/capa-gospel-premium.png" alt="Capa do Pacote Gospel" style={{ width: "100%", height: "210px", objectFit: "contain", display: "block", marginBottom: "10px", borderRadius: "10px" }} />
                 <div onClick={(e) => e.stopPropagation()} style={{ marginTop: "14px" }}><div style={{ color: "#cbd5e1", fontSize: "12px", marginBottom: "6px", fontWeight: 700 }}>OUVIR DEMONSTRATIVO FIXO</div><audio controls preload="none" src="/demo-pacote-gospel-v2.mp3" style={{ width: "100%" }} /></div>
                 <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127897;</div>
                 <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE GOSPEL</div>
@@ -3635,6 +3637,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               </div>
 
               <div role="button" tabIndex={0} onClick={() => setPacoteVinhetasRadio('natal')} style={{ padding: '20px', textAlign: 'left', borderRadius: '14px', border: pacoteVinhetasRadio === 'natal' ? '2px solid #22c55e' : '1px solid #42634b', background: pacoteVinhetasRadio === 'natal' ? 'rgba(22,163,74,0.20)' : '#101b16', color: '#fff', cursor: 'pointer' }}>
+                <img src="/capa-natal-premium.png" alt="Capa do Pacote Natal" style={{ width: "100%", height: "210px", objectFit: "contain", display: "block", marginBottom: "10px", borderRadius: "10px" }} />
                 <div onClick={(e) => e.stopPropagation()} style={{ marginTop: "14px" }}><div style={{ color: "#cbd5e1", fontSize: "12px", marginBottom: "6px", fontWeight: 700 }}>OUVIR DEMONSTRATIVO FIXO</div><audio controls preload="none" src="/demo-pacote-natal-v2.mp3" style={{ width: "100%" }} /></div>
                 <div style={{ fontSize: '27px', marginBottom: '8px' }}>&#127876;</div>
                 <div style={{ fontWeight: 900, fontSize: '19px' }}>PACOTE NATAL</div>
