@@ -757,3 +757,16 @@ main div[style*="margin: 8px 0 24px"] button:hover {
     max-height: 96px !important;
   }
 }
+@media (max-width: 600px) {
+  .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100px !important;
+    max-height: none !important;
+  }
+}
