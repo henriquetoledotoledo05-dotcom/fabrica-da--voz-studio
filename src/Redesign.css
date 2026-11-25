@@ -1,0 +1,759 @@
+﻿/* REDESIGN FABRICA DA VOZ - CAMADA VISUAL */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: #0b0b12 !important;
+  color: #f4f2fa !important;
+}
+
+.app {
+  background: #0b0b12 !important;
+  color: #f4f2fa !important;
+}
+
+.topo {
+  background: linear-gradient(135deg, #151521, #24153d) !important;
+  border: 1px solid rgba(155, 89, 255, 0.18) !important;
+  border-radius: 18px !important;
+}
+
+.card,
+.editor,
+.hero {
+  background: #15151f !important;
+  border: 1px solid rgba(155, 89, 255, 0.16) !important;
+  border-radius: 18px !important;
+}
+
+button {
+  border-radius: 12px !important;
+}
+/* ===== REDESIGN: CARDS E CONTROLES ===== */
+
+.card,
+.editor,
+.hero {
+  padding: 24px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22) !important;
+}
+
+input,
+textarea,
+select {
+  background: #101019 !important;
+  color: #f4f2fa !important;
+  border: 1px solid #343044 !important;
+  border-radius: 12px !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #9b59ff !important;
+  box-shadow: 0 0 0 3px rgba(155, 89, 255, 0.14) !important;
+  outline: none !important;
+}
+
+button {
+  transition: all 0.2s ease !important;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+}
+
+.botao-gerar {
+  background: linear-gradient(135deg, #8b3dff, #b05cff) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 5px 20px rgba(139, 61, 255, 0.25) !important;
+}
+/* ===== CARDS DO MENU PRINCIPAL ===== */
+button[style*="height: 88px"] {
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  background: linear-gradient(135deg, #191522, #0e0d15) !important;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.22) !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+button[style*="height: 88px"]:hover {
+  transform: translateY(-2px) !important;
+  border-color: #a855f7 !important;
+  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.16) !important;
+}
+/* ===== REDESIGN: ESTRUTURA PRINCIPAL ===== */
+
+.app {
+  background: #0b0b10 !important;
+}
+
+.main {
+  background: transparent !important;
+}
+
+.hero {
+  background: linear-gradient(135deg, #191522, #100e16) !important;
+  border: 1px solid rgba(168, 85, 247, 0.22) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28) !important;
+}
+
+.topo {
+  background: linear-gradient(135deg, #17131f, #241533) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* ===== ACABAMENTO PREMIUM DOS CARDS ===== */
+button[style*="height: 88px"] {
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 16px !important;
+  padding: 14px 16px !important;
+  background: linear-gradient(135deg, #1c1827, #111018) !important;
+  border: 1px solid rgba(168, 85, 247, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+}
+
+button[style*="height: 88px"]:hover {
+  background: linear-gradient(135deg, #251b35, #15111e) !important;
+  border-color: rgba(192, 132, 252, 0.65) !important;
+  box-shadow: 0 6px 22px rgba(139, 92, 246, 0.18) !important;
+}
+
+button[style*="height: 88px"] > span:first-child {
+  border: 1px solid rgba(192, 132, 252, 0.12) !important;
+  box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.08) !important;
+}
+
+button[style*="height: 88px"] > span:nth-child(2) {
+  text-align: left !important;
+}
+
+button[style*="height: 88px"] > span:nth-child(2) > span:first-child {
+  letter-spacing: 0.2px !important;
+}
+
+button[style*="height: 88px"] > span:nth-child(2) > span:last-child {
+  opacity: 0.85 !important;
+}
+
+
+/* ===== HARMONIZAÇÃO DO TEMA GRAFITE E ROXO ===== */
+body,
+.app {
+  background: #09090f !important;
+}
+
+.main {
+  background: transparent !important;
+}
+
+.hero {
+  background: linear-gradient(145deg, #1b1526, #100e17) !important;
+  border: 1px solid rgba(168, 85, 247, 0.28) !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35) !important;
+}
+
+.topo {
+  background: linear-gradient(145deg, #15121e, #21142f) !important;
+  border: 1px solid rgba(168, 85, 247, 0.28) !important;
+}
+
+
+/* ===== NOVA CAMADA VISUAL: MENU PREMIUM ===== */
+.app button[style*="88px"] {
+  background: linear-gradient(135deg, #21182e 0%, #15121d 55%, #100e16 100%) !important;
+  border: 1px solid rgba(167, 100, 255, 0.28) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28) !important;
+}
+
+.app button[style*="88px"]:hover {
+  background: linear-gradient(135deg, #302044 0%, #1c1528 100%) !important;
+  border-color: rgba(192, 132, 252, 0.7) !important;
+  box-shadow: 0 8px 26px rgba(147, 51, 234, 0.18) !important;
+}
+
+.app button[style*="88px"] span {
+  color: #f3eaff !important;
+}
+
+.app button[style*="88px"] span:last-child {
+  color: #c7b8dc !important;
+}
+
+
+/* ===== CARDS PRINCIPAIS - ACABAMENTO FINAL ===== */
+.app button[style*="88px"] {
+  transition: all 0.22s ease !important;
+  transform: translateY(0) !important;
+}
+
+.app button[style*="88px"]:hover {
+  transform: translateY(-2px) !important;
+}
+
+.app button[style*="88px"] > span:first-child {
+  border-radius: 14px !important;
+  width: 48px !important;
+  height: 48px !important;
+  flex-basis: 48px !important;
+}
+
+.app button[style*="88px"] > span:nth-child(2) {
+  gap: 5px !important;
+}
+
+.app button[style*="88px"] > span:nth-child(2) > span:first-child {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+
+.app button[style*="88px"] > span[style*="flex: 1"] > span:last-child {
+  font-size: 12px !important;
+  line-height: 1.5 !important;
+}
+
+
+/* ===== PAINEL DE CRÉDITOS PREMIUM ===== */
+.app main > div[style*="borderRadius: 28px"] {
+  background: linear-gradient(145deg, #15101f, #0c0a12) !important;
+  border: 1px solid rgba(168, 85, 247, 0.28) !important;
+  border-radius: 24px !important;
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.35),
+    0 0 25px rgba(139, 92, 246, 0.08) !important;
+}
+
+.app main > div[style*="borderRadius: 28px"] > div {
+  background: linear-gradient(145deg, #21152f, #17101f) !important;
+  border: 1px solid rgba(192, 132, 252, 0.24) !important;
+  border-radius: 20px !important;
+}
+
+.app main > div[style*="borderRadius: 28px"] button {
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.app main > div[style*="borderRadius: 28px"] button:hover {
+  color: #ffffff !important;
+  background: rgba(168, 85, 247, 0.12) !important;
+}
+
+
+/* ===== AJUSTE DEFINITIVO DO PAINEL DE CRÉDITOS ===== */
+main div[style*="margin: 8px 0 24px"] {
+  background: linear-gradient(145deg, #171020, #0c0a12) !important;
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+              0 0 25px rgba(139, 92, 246, 0.10) !important;
+}
+
+main div[style*="margin: 8px 0 24px"] > div {
+  background: linear-gradient(145deg, #241633, #17101f) !important;
+  border: 1px solid rgba(192, 132, 252, 0.30) !important;
+  border-radius: 20px !important;
+}
+
+
+/* ===== MENU PRINCIPAL - NOVO ACABAMENTO PREMIUM ===== */
+.app button[style*="88px"] {
+  background: linear-gradient(135deg, #1c1728 0%, #12101a 55%, #0d0b13 100%) !important;
+  border: 1px solid rgba(168, 85, 247, 0.32) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.app button[style*="88px"]:hover {
+  background: linear-gradient(135deg, #291b3b 0%, #171020 100%) !important;
+  border-color: rgba(192, 132, 252, 0.65) !important;
+  box-shadow:
+    0 10px 25px rgba(139, 92, 246, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  transform: translateY(-2px) !important;
+}
+
+.app button[style*="88px"]:active {
+  transform: scale(0.99) !important;
+}
+
+
+/* ===== CENTRALIZAÇÃO E ESPAÇAMENTO GERAL ===== */
+.app {
+  width: 100% !important;
+  max-width: 1160px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  box-sizing: border-box !important;
+}
+
+.app img {
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+
+/* ===== REDESIGN ESTRUTURAL DO MENU ===== */
+
+/* Grade principal dos atalhos */
+.app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  margin-top: 28px !important;
+  margin-bottom: 24px !important;
+}
+
+/* Cards do menu */
+.app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button {
+  height: 112px !important;
+  min-height: 112px !important;
+  max-height: 112px !important;
+  padding: 18px !important;
+  border-radius: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+/* Ícones */
+.app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button > span:first-child {
+  width: 54px !important;
+  height: 54px !important;
+  flex-basis: 54px !important;
+  border-radius: 16px !important;
+  font-size: 27px !important;
+}
+
+/* Texto dos cards */
+.app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button > span:nth-child(2) > span:first-child {
+  font-size: 16px !important;
+  line-height: 1.35 !important;
+}
+
+/* Descrição */
+.app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button > span:nth-child(2) > span:last-child {
+  font-size: 12px !important;
+  opacity: 0.8 !important;
+}
+
+/* Celular */
+@media (max-width: 600px) {
+  .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+    padding: 14px !important;
+  }
+}
+
+
+/* ===== CAMADA VISUAL PROFISSIONAL - FABRICA DA VOZ ===== */
+
+:root {
+  --fv-bg: #0b0b12;
+  --fv-surface: #15151f;
+  --fv-surface-hover: #1d1d2b;
+  --fv-border: rgba(255,255,255,0.09);
+  --fv-purple: #8b5cf6;
+  --fv-purple-light: #a78bfa;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top, rgba(111,65,190,0.12), transparent 45%),
+    #0b0b12 !important;
+}
+
+.app {
+  max-width: 1180px !important;
+}
+
+.topo {
+  box-shadow: 0 10px 35px rgba(0,0,0,0.22);
+  backdrop-filter: blur(12px);
+}
+
+.card,
+.editor,
+.hero {
+  transition: border-color 0.25s ease, background 0.25s ease,
+              box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.card:hover {
+  border-color: rgba(167,139,250,0.22) !important;
+}
+
+button {
+  transition: all 0.2s ease !important;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--fv-purple-light) !important;
+  outline-offset: 3px !important;
+}
+
+.botao-gerar {
+  box-shadow: 0 5px 20px rgba(139,92,246,0.20);
+}
+
+.botao-gerar:hover {
+  box-shadow: 0 8px 28px rgba(139,92,246,0.32);
+  transform: translateY(-1px);
+}
+
+.app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] {
+  gap: 16px !important;
+}
+
+.app main button[style*="height: 88px"] {
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg, #191925, #12121b) !important;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.12);
+}
+
+.app main button[style*="height: 88px"]:hover {
+  background: linear-gradient(145deg, #242236, #181722) !important;
+  border-color: rgba(167,139,250,0.35) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.24);
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .topo {
+    border-radius: 18px !important;
+  }
+
+  .card,
+  .editor,
+  .hero {
+    border-radius: 18px !important;
+  }
+
+  button {
+    min-height: 44px;
+  }
+}
+
+/* ===== FIM DA CAMADA PROFISSIONAL ===== */
+
+
+/* ===== REFINAMENTO PREMIUM: CABECALHO E CREDITOS ===== */
+
+.topo {
+  background: linear-gradient(120deg, #15141e 0%, #20162e 55%, #171420 100%) !important;
+  border: 1px solid rgba(167, 139, 250, 0.22) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22) !important;
+}
+
+/* Painel externo de creditos */
+main div[style*="margin: 8px 0 24px"] {
+  background: linear-gradient(145deg, #15121d, #100e16) !important;
+  border: 1px solid rgba(167, 139, 250, 0.24) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Painel interno */
+main div[style*="margin: 8px 0 24px"] > div {
+  background: linear-gradient(145deg, #21172d, #191321) !important;
+  border: 1px solid rgba(167, 139, 250, 0.18) !important;
+  border-radius: 20px !important;
+}
+
+/* Botao de atualizar */
+main div[style*="margin: 8px 0 24px"] button {
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+main div[style*="margin: 8px 0 24px"] button:hover {
+  background: rgba(167, 139, 250, 0.12) !important;
+  transform: rotate(8deg);
+}
+
+/* Separadores mais discretos */
+main div[style*="margin: 8px 0 24px"] hr {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Acabamento responsivo */
+@media (max-width: 600px) {
+  .topo {
+    border-radius: 18px !important;
+  }
+
+  main div[style*="margin: 8px 0 24px"] {
+    border-radius: 20px !important;
+  }
+
+  main div[style*="margin: 8px 0 24px"] > div {
+    border-radius: 16px !important;
+  }
+}
+
+/* ===== FIM DO REFINAMENTO ===== */
+
+
+/* ===== CARDS PREMIUM - ACABAMENTO FINAL ===== */
+
+.app main button[style*="height: 88px"] {
+  background: linear-gradient(145deg, #171722, #12121a) !important;
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease !important;
+}
+
+.app main button[style*="height: 88px"]:hover {
+  background: linear-gradient(145deg, #201a2d, #17141f) !important;
+  border-color: rgba(167, 139, 250, 0.30) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22) !important;
+  transform: translateY(-2px) !important;
+}
+
+.app main button[style*="height: 88px"]:active {
+  transform: translateY(0) scale(0.99) !important;
+}
+
+/* ===== FIM DOS CARDS PREMIUM ===== */
+
+
+/* ESCONDER SOMENTE ETIQUETAS NOVO */
+.app main button[style*="height: 88px"] span[style*="font-size: 10px"],
+.app main button[style*="height: 88px"] span[style*="font-size: 11px"] {
+  display: none !important;
+}
+
+/* ===== PAINEL DE CREDITOS - VISUAL SaaS MODERNO ===== */
+
+main div[style*="margin: 8px 0 24px"] {
+  background: linear-gradient(145deg, #12141a, #0e1015) !important;
+  border: 1px solid #292c35 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22) !important;
+}
+
+main div[style*="margin: 8px 0 24px"] > div {
+  background: #171920 !important;
+  border: 1px solid #2b2e38 !important;
+  border-radius: 14px !important;
+}
+
+main div[style*="margin: 8px 0 24px"] hr {
+  border-color: #30333c !important;
+  opacity: 0.7 !important;
+}
+
+/* Menos roxo, mais profissional */
+main div[style*="margin: 8px 0 24px"] button {
+  color: #c4b5fd !important;
+  background: transparent !important;
+  border-radius: 10px !important;
+}
+
+main div[style*="margin: 8px 0 24px"] button:hover {
+  background: #252832 !important;
+}
+
+/* ===== FIM PAINEL MODERNO ===== */
+
+
+/* ===== CREDITOS: DESIGN DASHBOARD PROFISSIONAL ===== */
+
+/* Container externo */
+main div[style*="margin: 8px 0 24px"] {
+  background: #101116 !important;
+  border: 1px solid #292832 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.20) !important;
+}
+
+/* Painel interno */
+main div[style*="margin: 8px 0 24px"] > div {
+  background: #17171d !important;
+  border: 1px solid #2c2c35 !important;
+  border-radius: 14px !important;
+  padding: 20px !important;
+}
+
+/* Remover visualmente a maleta grande */
+main div[style*="margin: 8px 0 24px"] > div > div > div[style*="width: 76px"] {
+  display: none !important;
+}
+
+/* Linha do saldo */
+main div[style*="margin: 8px 0 24px"] > div > div {
+  gap: 12px !important;
+  padding-bottom: 18px !important;
+  border-bottom-color: #303039 !important;
+}
+
+/* Titulo */
+main div[style*="margin: 8px 0 24px"] > div > div > div[style*="flex: 1"] > div:first-child {
+  font-size: 12px !important;
+  color: #9ca3af !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+}
+
+/* Saldo principal */
+main div[style*="margin: 8px 0 24px"] > div > div > div[style*="flex: 1"] > div:last-child {
+  color: #f3f4f6 !important;
+  font-weight: 750 !important;
+}
+
+/* Botao atualizar */
+main div[style*="margin: 8px 0 24px"] button {
+  font-size: 22px !important;
+  color: #a1a1aa !important;
+  background: #22232b !important;
+  border: 1px solid #34343e !important;
+  border-radius: 10px !important;
+  padding: 7px 10px !important;
+}
+
+/* Hover discreto */
+main div[style*="margin: 8px 0 24px"] button:hover {
+  color: #ffffff !important;
+  background: #2b2b36 !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  main div[style*="margin: 8px 0 24px"] > div {
+    padding: 14px !important;
+  }
+}
+
+/* ===== FIM DESIGN CREDITOS ===== */
+
+
+/* ===== CORRECAO PRECISA DO PAINEL DE CREDITOS ===== */
+
+.editor-area .editor > div[style*="padding: 22px"] {
+  background: #111217 !important;
+  border: 1px solid #2b2c34 !important;
+  border-radius: 16px !important;
+  padding: 12px !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18) !important;
+}
+
+.editor-area .editor > div[style*="padding: 22px"] > div {
+  background: #17181e !important;
+  border: 1px solid #2c2d35 !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+}
+
+/* Ocultar maleta */
+.editor-area .editor > div[style*="padding: 22px"] > div > div > div[style*="width: 76px"] {
+  display: none !important;
+}
+
+/* Linha do saldo */
+.editor-area .editor > div[style*="padding: 22px"] > div > div {
+  gap: 12px !important;
+  padding-bottom: 14px !important;
+  border-bottom-color: #30313a !important;
+}
+
+/* Texto superior */
+.editor-area .editor > div[style*="padding: 22px"] > div > div > div[style*="flex: 1"] > div:first-child {
+  font-size: 11px !important;
+  color: #9ca3af !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+}
+
+/* Saldo */
+.editor-area .editor > div[style*="padding: 22px"] > div > div > div[style*="flex: 1"] > div:last-child {
+  color: #f4f4f5 !important;
+}
+
+/* Atualizar saldo */
+.editor-area .editor > div[style*="padding: 22px"] button {
+  font-size: 20px !important;
+  color: #a1a1aa !important;
+  background: #22232a !important;
+  border: 1px solid #34343d !important;
+  border-radius: 9px !important;
+  padding: 6px 9px !important;
+}
+
+/* ===== FIM ===== */
+
+
+/* ===== PADRONIZACAO DOS ICONES DOS CARDS ===== */
+
+.app main button[style*="height: 88px"] > span:first-child {
+  background: #211a2c !important;
+  color: #c4b5fd !important;
+  border: 1px solid #3b2b50 !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+/* ===== FIM PADRONIZACAO ===== */
+
+
+/* ===== CARDS: GRAFITE COM IDENTIDADE ROXA ===== */
+
+.app main button[style*="height: 88px"] {
+  background: linear-gradient(145deg, #1d1926, #15141b) !important;
+  border-color: #34283f !important;
+}
+
+.app main button[style*="height: 88px"]:hover {
+  background: linear-gradient(145deg, #272033, #1a1721) !important;
+  border-color: #59416f !important;
+}
+
+/* ===== FIM AJUSTE CARDS ===== */
+
+
+/* RESPONSIVO: 2 COLUNAS EM CELULARES MAIORES */
+@media (min-width: 421px) and (max-width: 600px) {
+  .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button {
+    height: 96px !important;
+    min-height: 96px !important;
+    max-height: 96px !important;
+  }
+}

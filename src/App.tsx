@@ -4280,8 +4280,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
 
     <div style={{
-      display: 'flex', flexDirection: 'column', gap: '12px',
-      marginTop: '24px', marginBottom: '22px'
+      display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', marginTop: '24px', marginBottom: '22px'
     }}>
 
       <button type="button" onClick={() => { setMostrarEditor(true); window.setTimeout(() => document.querySelector('.galeria-vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} style={{
@@ -6077,4 +6076,6 @@ export default App
 
 
 
+
+import './Redesign.css'
 
