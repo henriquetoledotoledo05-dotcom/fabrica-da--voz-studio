@@ -770,3 +770,17 @@ main div[style*="margin: 8px 0 24px"] button:hover {
     max-height: none !important;
   }
 }
+@media (max-width: 600px) {
+  div:has(> button[style*="height: 88px"]) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+
+  div:has(> button[style*="height: 88px"]) > button {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: none !important;
+  }
+}
