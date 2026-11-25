@@ -784,3 +784,106 @@ main div[style*="margin: 8px 0 24px"] button:hover {
     max-height: none !important;
   }
 }
+
+/* ===== CORRECAO GLOBAL RESPONSIVA MOBILE ===== */
+@media (max-width: 600px) {
+  html, body, #root {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  .app {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    overflow-x: hidden !important;
+  }
+
+  .app main,
+  .app main > div,
+  .app .card,
+  .app .editor,
+  .app .hero {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .app main > div,
+  .app main div {
+    min-width: 0 !important;
+  }
+
+  .app main div[style*="display: grid"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .app main div[style*="grid-template-columns"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .app button,
+  .app input,
+  .app textarea,
+  .app select {
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .app input,
+  .app textarea,
+  .app select {
+    width: 100% !important;
+  }
+
+  .app img,
+  .app audio {
+    max-width: 100% !important;
+  }
+
+  .app main button[style*="height: 88px"] {
+    width: 100% !important;
+  }
+
+  .app main {
+    overflow-x: hidden !important;
+  }
+}
+/* ===== FIM CORRECAO GLOBAL MOBILE ===== */
+
+/* CORREÇÃO DEFINITIVA DE ESPAÇAMENTO MOBILE */
+@media (max-width: 600px) {
+  .app {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .main {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .editor-area {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .editor {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
