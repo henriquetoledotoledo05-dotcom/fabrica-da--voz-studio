@@ -826,7 +826,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               <input type="password" value={senhaCadastro} onChange={(e) => { setSenhaCadastro(e.target.value); setErroCadastro('') }} placeholder="Crie uma senha" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
               <label style={{ fontWeight: 700, marginTop: '4px' }}>Confirmar senha</label>
               <input type="password" value={confirmarSenhaCadastro} onChange={(e) => { setConfirmarSenhaCadastro(e.target.value); setErroCadastro('') }} placeholder="Digite a senha novamente" onKeyDown={(e) => { if (e.key === 'Enter') validarCadastro() }} style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
-              <button type="button" onClick={validarCadastro} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Criar minha conta</button>
+              <button type="button" onClick={validarCadastro} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #49316d', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Criar minha conta</button>
             </div>
             {erroCadastro && <p style={{ color: '#c084fc', marginTop: '14px', fontWeight: 600 }}>{erroCadastro}</p>}
             <button type="button" onClick={() => { setMostrarCadastro(false); setErroCadastro('') }} style={{ marginTop: '20px', padding: '10px 16px', border: 'none', background: 'transparent', color: '#c084fc', cursor: 'pointer', fontWeight: 700, fontSize: '15px' }}>↝? Voltar para entrar</button>
@@ -864,7 +864,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
             />
             <label style={{ fontWeight: 700, marginTop: '4px' }}>Senha</label>
             <input type="password" placeholder="Digite sua senha" value={senhaAcesso} onChange={(e) => { setSenhaAcesso(e.target.value); setErroAcesso('') }} onKeyDown={(e) => { if (e.key === 'Enter') entrarNaFabrica() }} style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '11px', border: '1px solid rgba(139,92,246,0.45)', background: '#171020', color: '#fff', fontSize: '16px' }} />
-            <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #8b5cf6', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
+            <button type="button" onClick={entrarNaFabrica} style={{ width: '100%', padding: '15px', marginTop: '6px', border: '1px solid #49316d', borderRadius: '11px', cursor: 'pointer', fontWeight: 700, fontSize: '16px', color: '#fff', background: 'linear-gradient(135deg, #7c3aed, #4c1d95)' }}>Entrar</button>
           </div>
           {erroAcesso && <p style={{ color: '#ff6b6b', marginTop: '14px', fontWeight: 600 }}>{erroAcesso}</p>}
           {/* Criar minha conta — botão amarelo após entrar */}
@@ -875,7 +875,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
               width: '100%',
               padding: '14px',
               marginTop: '16px',
-              border: '1px solid #facc15',
+              border: '1px solid #49316d',
               borderRadius: '11px',
               cursor: 'pointer',
               fontWeight: 800,
@@ -999,7 +999,7 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
 
           <div style={{ margin: '26px 0', height: '1px', background: 'rgba(255,255,255,0.1)' }} />
           <p style={{ margin: '0 0 10px', fontWeight: 700 }}>Ainda não tem uma conta?</p>
-          <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid #facc15', borderRadius: '11px', cursor: 'pointer', fontWeight: 800, fontSize: '16px', color: '#241800', background: 'linear-gradient(135deg, #fde047, #facc15)', boxShadow: '0 4px 14px rgba(250,204,21,0.22)' }}>Criar minha conta</button>
+          <button type="button" onClick={() => { setMostrarCadastro(true); setErroCadastro('') }} style={{ width: '100%', padding: '14px', border: '1px solid #49316d', borderRadius: '11px', cursor: 'pointer', fontWeight: 800, fontSize: '16px', color: '#241800', background: 'linear-gradient(135deg, #fde047, #facc15)', boxShadow: '0 4px 14px rgba(250,204,21,0.22)' }}>Criar minha conta</button>
           <p style={{ margin: '18px 0 0', fontSize: '13px', opacity: 0.55 }}>💳 Depois do cadastro, você poderá comprar créditos para gerar suas locuções.</p>
         </div>
       </div>
@@ -3270,7 +3270,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 placeholder="Ex.: DJ Henrique"
                 style={{
                   width: '100%', boxSizing: 'border-box', padding: '14px',
-                  borderRadius: '12px', border: '1px solid #70429a',
+                  borderRadius: '12px', border: '1px solid #49316d',
                   background: '#110c18', color: '#fff', fontSize: '16px',
                 }}
               />
@@ -3289,7 +3289,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                   boxSizing: 'border-box',
                   padding: '12px',
                   borderRadius: '10px',
-                  border: '1px solid #a855f7',
+                  border: '1px solid #49316d',
                   background: '#110c18',
                   color: '#fff',
                   fontSize: '15px',
@@ -3308,7 +3308,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 padding: '12px',
                 borderRadius: '12px',
                 background: '#191120',
-                border: '1px solid #5b3a70',
+                border: '1px solid #49316d',
               }}>
                 <img
                   src={vozes.find((voz) => voz.id === vozDJSelecionada)?.foto}
@@ -3406,7 +3406,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 placeholder="Digite aqui o texto que o locutor vai falar..."
                 style={{
                   width: '100%', boxSizing: 'border-box', padding: '14px',
-                  borderRadius: '12px', border: '1px solid #70429a',
+                  borderRadius: '12px', border: '1px solid #49316d',
                   background: '#110c18', color: '#fff', fontSize: '16px',
                   resize: 'vertical', lineHeight: 1.5,
                 }}
@@ -3430,7 +3430,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 minHeight: '58px',
                 padding: '15px',
                 borderRadius: '14px',
-                border: '1px solid #facc15',
+                border: '1px solid #49316d',
                 background: gerandoDJ ? '#51445c' : 'linear-gradient(90deg, #8b2be2, #6420a0)',
                 color: '#fff',
                 fontSize: '18px',
@@ -3507,16 +3507,16 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
 
           <div style={{ marginTop: '28px', padding: '24px', border: '1px solid rgba(125,211,252,0.22)', borderRadius: '18px', background: 'linear-gradient(145deg, rgba(16,35,56,0.95), rgba(18,14,25,0.98))' }}>
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="nome-radio-ia">Nome da rádio</label>
-            <input id="nome-radio-ia" value={nomeRadioIA} onChange={e => setNomeRadioIA(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+            <input id="nome-radio-ia" value={nomeRadioIA} onChange={e => setNomeRadioIA(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="slogan-radio-ia">Slogan (opcional)</label>
-            <input id="slogan-radio-ia" value={sloganRadioIA} onChange={e => setSloganRadioIA(e.target.value)} maxLength={100} placeholder="Ex.: A rádio que é sucesso!" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+            <input id="slogan-radio-ia" value={sloganRadioIA} onChange={e => setSloganRadioIA(e.target.value)} maxLength={100} placeholder="Ex.: A rádio que é sucesso!" style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="tema-radio-ia">Tema das vinhetas (opcional)</label>
-            <input id="tema-radio-ia" value={temaRadioIA} onChange={e => setTemaRadioIA(e.target.value)} maxLength={120} placeholder="Ex.: Bom dia, Boa noite, Carnaval, Natal..." style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
+            <input id="tema-radio-ia" value={temaRadioIA} onChange={e => setTemaRadioIA(e.target.value)} maxLength={120} placeholder="Ex.: Bom dia, Boa noite, Carnaval, Natal..." style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '18px' }} />
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="estilo-radio-ia">Estilo da rádio</label>
-            <select id="estilo-radio-ia" value={estiloRadioIA} onChange={e => setEstiloRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
+            <select id="estilo-radio-ia" value={estiloRadioIA} onChange={e => setEstiloRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
               <option value="popular">Popular / comercial</option>
               <option value="sertanejo">Sertanejo</option>
               <option value="jovem">Jovem / pop</option>
@@ -3530,18 +3530,18 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
             </select>
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Quantidade de vinhetas</label>
-            <select value={quantidadeRadioIA} onChange={e => setQuantidadeRadioIA(Number(e.target.value))} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
+            <select value={quantidadeRadioIA} onChange={e => setQuantidadeRadioIA(Number(e.target.value))} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
               {[1, 2, 3, 4, 5].map(qtd => <option key={qtd} value={qtd}>{qtd} {qtd === 1 ? 'vinheta' : 'vinhetas'}</option>)}
             </select>
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }}>Tipo de áudio</label>
-            <select value={modoAudioRadioIA} onChange={e => setModoAudioRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
+            <select value={modoAudioRadioIA} onChange={e => setModoAudioRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '18px' }}>
               <option value="completo">Mixagem completa com música e efeitos</option>
               <option value="off">Somente OFF - voz sem música e efeitos</option>
             </select>
 
             <label style={{ display: 'block', fontWeight: 700, marginBottom: '8px' }} htmlFor="voz-radio-ia">Voz do locutor</label>
-            <select id="voz-radio-ia" value={vozRadioIA} onChange={e => setVozRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #475569', background: '#0b1220', color: '#fff', marginBottom: '22px' }}>
+            <select id="voz-radio-ia" value={vozRadioIA} onChange={e => setVozRadioIA(e.target.value)} style={{ width: '100%', boxSizing: 'border-box', padding: '13px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b1220', color: '#fff', marginBottom: '22px' }}>
               <option value="auto">Escolha automática</option>
               {vozes.map(voz => (
                 <option key={voz.id} value={voz.id}>{voz.nome}</option>
@@ -3651,7 +3651,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               Nome da sua rádio
             </label>
 
-            <input id="nome-radio-pacote" value={nomeVinhetasRadioPacote} onChange={e => setNomeVinhetasRadioPacote(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '10px', border: '1px solid #59436e', background: '#0b0b14', color: '#fff', marginBottom: '18px' }} />
+            <input id="nome-radio-pacote" value={nomeVinhetasRadioPacote} onChange={e => setNomeVinhetasRadioPacote(e.target.value)} maxLength={60} placeholder="Ex.: Rádio Top Sertaneja" style={{ width: '100%', boxSizing: 'border-box', padding: '14px', borderRadius: '10px', border: '1px solid #49316d', background: '#0b0b14', color: '#fff', marginBottom: '18px' }} />
 
             <div style={{ padding: '16px', borderRadius: '12px', background: 'rgba(216,180,254,0.09)', border: '1px solid rgba(216,180,254,0.22)', textAlign: 'center', marginBottom: '18px' }}>
               <div style={{ color: '#e9d5ff', fontWeight: 800 }}>PACOTE COMPLETO — 5 VINHETAS</div>
@@ -3849,7 +3849,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               Reduzir a trilha automaticamente durante a locução
             </label>
 
-            <button type="button" disabled={studioMixando || !studioVozArquivo || (!studioTrilhaArquivo && !studioTrilhaSelecionada)} onClick={() => void mixarFabricaStudio()} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #facc15', background: studioMixando ? '#51445c' : 'linear-gradient(90deg, #8b2be2, #6420a0)', color: '#fff', fontSize: '17px', fontWeight: 900, cursor: studioMixando ? 'wait' : 'pointer', opacity: studioMixando ? 0.7 : 1 }}>
+            <button type="button" disabled={studioMixando || !studioVozArquivo || (!studioTrilhaArquivo && !studioTrilhaSelecionada)} onClick={() => void mixarFabricaStudio()} style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #49316d', background: studioMixando ? '#51445c' : 'linear-gradient(90deg, #8b2be2, #6420a0)', color: '#fff', fontSize: '17px', fontWeight: 900, cursor: studioMixando ? 'wait' : 'pointer', opacity: studioMixando ? 0.7 : 1 }}>
               {studioMixando ? 'MIXANDO OS ÁUDIOS...' : 'MIXAR E GERAR MP3'}
             </button>
           </section>
@@ -4007,7 +4007,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                         width: '100%',
                         padding: '12px',
                         borderRadius: '10px',
-                        border: '1px solid #8b5cf6',
+                        border: '1px solid #49316d',
                         background: pacote.destaque
                           ? 'linear-gradient(135deg, #7c3aed, #4c1d95)'
                           : '#171020',
@@ -4286,8 +4286,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarEditor(true); window.setTimeout(() => document.querySelector('.galeria-vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #a855f7',
-        background: 'linear-gradient(145deg, #21102e, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4310,8 +4310,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarEditor(true); setMostrarGaleriaVozes(true); setMostrarFormularioClone(true); setMensagemClone(''); window.setTimeout(() => document.querySelector('.galeria-vozes')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #f5c542',
-        background: 'linear-gradient(145deg, #302044, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4330,8 +4330,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarHistorico(true); void carregarHistorico(); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #7c3aed',
-        background: 'linear-gradient(145deg, #160d20, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4352,8 +4352,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarFabricaStudio(true); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #7c3aed',
-        background: 'linear-gradient(145deg, #160d20, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4374,8 +4374,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarVinhetasRadioIA(true); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #0ea5e9',
-        background: 'linear-gradient(145deg, #102338, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4394,8 +4394,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarVinhetasRadioPacote(true); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #a855f7',
-        background: 'linear-gradient(145deg, #28113b, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4414,8 +4414,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarDJExpress(true); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #a855f7',
-        background: 'linear-gradient(145deg, #21102e, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4436,8 +4436,8 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
       <button type="button" onClick={() => { setMostrarCompraCreditos(true); }} style={{
         width: '100%', minWidth: 0, height: '88px', minHeight: '88px', maxHeight: '88px', padding: '12px 14px',
         boxSizing: 'border-box', borderRadius: '17px',
-        border: '1px solid #7c3aed',
-        background: 'linear-gradient(145deg, #160d20, #09070d)',
+        border: '1px solid #49316d',
+        background: 'linear-gradient(145deg, #241B35, #15121D)',
         color: '#fff', cursor: 'pointer',
         display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'flex-start', gap: '14px', textAlign: 'left'
@@ -4499,7 +4499,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     margin: '10px 0',
     padding: '10px 12px',
     background: '#171020',
-    border: '1px solid #8b5cf6',
+    border: '1px solid #49316d',
     borderRadius: '12px',
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr) auto',
@@ -4546,7 +4546,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
         <div style={{
           padding: '12px',
           background: '#3b2020',
-          border: '1px solid #b45309',
+          border: '1px solid #49316d',
           borderRadius: '9px',
           color: '#fde68a',
           fontSize: '13px'
@@ -4571,7 +4571,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
               marginTop: '7px',
               padding: '12px',
               borderRadius: '8px',
-              border: '1px solid #6b5680',
+              border: '1px solid #49316d',
               background: '#0d0912',
               color: '#fff'
             }}
@@ -4794,7 +4794,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
                 style={{
                   marginTop: '8px',
                   padding: '7px 12px',
-                  border: '1px solid #ef4444',
+                  border: '1px solid #49316d',
                   borderRadius: '7px',
                   background: '#7f1d1d',
                   color: '#fff',
@@ -4881,7 +4881,7 @@ for (let canal = 0; canal < vozOriginal.numberOfChannels; canal++) {
     padding: '12px',
     margin: '12px 0',
     background: '#171020',
-    border: '1px solid #a855f7',
+    border: '1px solid #49316d',
     borderRadius: '12px'
   }}>
     <img src={vozAtual.foto} alt={vozAtual.nome} style={{
@@ -6078,4 +6078,5 @@ export default App
 
 
 import './Redesign.css'
+
 

@@ -1,4 +1,4 @@
-ï»¿/* REDESIGN FABRICA DA VOZ - CAMADA VISUAL */
+/* REDESIGN FABRICA DA VOZ - CAMADA VISUAL */
 :root {
   color-scheme: dark;
 }
@@ -141,7 +141,7 @@ button[style*="height: 88px"] > span:nth-child(2) > span:last-child {
 }
 
 
-/* ===== HARMONIZAÃ‡ÃƒO DO TEMA GRAFITE E ROXO ===== */
+/* ===== HARMONIZAÇÃO DO TEMA GRAFITE E ROXO ===== */
 body,
 .app {
   background: #09090f !important;
@@ -218,7 +218,7 @@ body,
 }
 
 
-/* ===== PAINEL DE CRÃ‰DITOS PREMIUM ===== */
+/* ===== PAINEL DE CRÉDITOS PREMIUM ===== */
 .app main > div[style*="borderRadius: 28px"] {
   background: linear-gradient(145deg, #15101f, #0c0a12) !important;
   border: 1px solid rgba(168, 85, 247, 0.28) !important;
@@ -245,7 +245,7 @@ body,
 }
 
 
-/* ===== AJUSTE DEFINITIVO DO PAINEL DE CRÃ‰DITOS ===== */
+/* ===== AJUSTE DEFINITIVO DO PAINEL DE CRÉDITOS ===== */
 main div[style*="margin: 8px 0 24px"] {
   background: linear-gradient(145deg, #171020, #0c0a12) !important;
   border: 1px solid rgba(168, 85, 247, 0.35) !important;
@@ -285,7 +285,7 @@ main div[style*="margin: 8px 0 24px"] > div {
 }
 
 
-/* ===== CENTRALIZAÃ‡ÃƒO E ESPAÃ‡AMENTO GERAL ===== */
+/* ===== CENTRALIZAÇÃO E ESPAÇAMENTO GERAL ===== */
 .app {
   width: 100% !important;
   max-width: 1160px !important;
@@ -331,7 +331,7 @@ main div[style*="margin: 8px 0 24px"] > div {
   gap: 16px !important;
 }
 
-/* Ãcones */
+/* Ícones */
 .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button > span:first-child {
   width: 54px !important;
   height: 54px !important;
@@ -346,7 +346,7 @@ main div[style*="margin: 8px 0 24px"] > div {
   line-height: 1.35 !important;
 }
 
-/* DescriÃ§Ã£o */
+/* Descrição */
 .app main div[style*="marginTop: 24px"][style*="marginBottom: 22px"] > button > span:nth-child(2) > span:last-child {
   font-size: 12px !important;
   opacity: 0.8 !important;
@@ -858,7 +858,7 @@ main div[style*="margin: 8px 0 24px"] button:hover {
 }
 /* ===== FIM CORRECAO GLOBAL MOBILE ===== */
 
-/* CORREÃ‡ÃƒO DEFINITIVA DE ESPAÃ‡AMENTO MOBILE */
+/* CORREÇÃO DEFINITIVA DE ESPAÇAMENTO MOBILE */
 @media (max-width: 600px) {
   .app {
     padding-left: 0 !important;
@@ -887,3 +887,86 @@ main div[style*="margin: 8px 0 24px"] button:hover {
     margin-right: 0 !important;
   }
 }
+
+/* ===== PADRONIZACAO VISUAL PRETO + ROXO ===== */
+:root {
+  --bg: #15121d;
+  --bg-soft: #1d1728;
+  --text: #f5f0ff;
+  --text-dark: #f5f0ff;
+  --purple: #8b5cf6;
+  --purple-dark: #6d28d9;
+  --purple-light: #a855f7;
+  --border: #49316d;
+}
+
+/* Fundo geral */
+body,
+#root,
+.app {
+  background-color: #15121d !important;
+  color: #f5f0ff !important;
+}
+
+/* Cards e áreas principais */
+.card,
+.editor,
+.hero,
+.menu-card,
+.feature-card {
+  background-color: #1d1728 !important;
+  color: #f5f0ff !important;
+  border-color: #49316d !important;
+}
+
+/* Cards secundários */
+.card-secondary,
+.menu-item,
+section {
+  color: #f5f0ff;
+}
+
+/* Botões */
+button {
+  color: #f5f0ff;
+}
+
+/* Campos */
+input,
+textarea,
+select {
+  background-color: #1d1728 !important;
+  color: #f5f0ff !important;
+  border-color: #49316d !important;
+}
+
+/* Textos secundários */
+.subtitle,
+.description,
+.text-muted {
+  color: #b8afc9 !important;
+}
+
+/* ===== FIM PADRONIZACAO ===== */
+
+
+
+/* ===== AJUSTE FINAL DOS CARDS PARA GRAFITE ROXO ===== */
+.card,
+.menu-card,
+.feature-card,
+.menu-item,
+[class*="card"] {
+  background-color: #241B35 !important;
+  border-color: #49316D !important;
+  color: #F5F0FF !important;
+}
+
+/* Cards internos e áreas secundárias */
+.card > div,
+.menu-card > div,
+.feature-card > div {
+  background-color: transparent;
+}
+
+/* ===== FIM AJUSTE CARDS ===== */
