@@ -1262,18 +1262,38 @@ const [studioDuracaoTrilha, setStudioDuracaoTrilha] = useState(3600)
       demonstrativo: '/vozes/andré-voz.mp3',
       especialidade: 'Impacto'
     },
-    {
+       {
       id: 'Gxi5hLxJ4skjTWK8XHBJ',
       nome: 'Toledo',
       foto: '/toledo-foto.png',
       demonstrativo: '/vozes/toledo-voz.mp3',
       especialidade: 'Comercial'
-    }
-  ]
+    },
+    {
+      id: 'x724yrPZYJi77baQl5Ns',
+      nome: 'Alfredo',
+      foto: '/Alfredo no Estúdio Fábrica da Voz.png',
+      demonstrativo: '/vozes/VOZ-Alfredo.mp3',
+      especialidade: 'Institucional'
+    },
+    {
+      id: 'XgxpQYHRwZzaajuH5Nis',
+      nome: 'Thomas',
+      foto: '/Thomas no estúdio Fábrica da Voz.png',
+      demonstrativo: '/vozes/VOZ-Thomas.mp3',
+      especialidade: 'Promocional'
+    },
+    {
+      id: 'CQUa1KO9t8WZRPTc1a5k',
+      nome: 'Antonio',
+      foto: '/Antonio no Estúdio Fábrica da Voz.png',
+      demonstrativo: '/vozes/VOZ-Antonio.mp3',
+      especialidade: 'Comercial'
+    }  ]
 
   const vozesMasculinas = vozes.filter(
   (voz) =>
-    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel', 'Marcos', 'André', 'Rodrigo', 'Roger', 'Thiago', 'Toledo'].includes(voz.nome)
+    ['Noah', 'Celso', 'Pedro', 'Henrique', 'Rafael', 'Vinícius', 'Vitor', 'Lourenço', 'Gustavo', 'Angelo', 'Bruno', 'Ricardo', 'Leonardo', 'Noel', 'Marcos', 'André', 'Rodrigo', 'Roger', 'Thiago', 'Toledo', 'Alfredo', 'Thomas', 'Antonio'].includes(voz.nome)
 )
 
 const vozesFemininas = vozes.filter(
